@@ -1,0 +1,25 @@
+server:
+  port: 19091
+
+spring:
+  main:
+    web-application-type: reactive  # Spring ??????? ???? ? ???????? ??
+  application:
+    name: gateway-service
+  cloud:
+    gateway:
+      routes:  # Spring Cloud Gateway? ??? ??
+        - id: auth-service    # 19092
+          uri: lb://auth-service
+          predicates:
+            - Path=/api/v1/auth/**
+      discovery:
+        locator:
+          enabled: true  # ??? ?????? ?? ???? ???? ????? ??
+
+eureka:
+  client:
+    register-with-eureka: true
+    fetch-registry: true
+    service-url:
+      defaultZone: http://localhost:19090/eureka/
