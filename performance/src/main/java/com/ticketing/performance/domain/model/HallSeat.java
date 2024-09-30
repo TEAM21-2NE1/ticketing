@@ -1,7 +1,7 @@
 package com.ticketing.performance.domain.model;
 
 import com.ticketing.performance.common.auditor.BaseEntity;
-import com.ticketing.performance.presentation.dto.CreateHallSeatRequestDto;
+import com.ticketing.performance.presentation.dto.hall.CreateHallSeatRequestDto;
 import jakarta.persistence.*;
 import lombok.*;
 import org.hibernate.annotations.SQLRestriction;

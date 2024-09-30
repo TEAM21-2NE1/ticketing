@@ -1,13 +1,13 @@
 package com.ticketing.performance.presentation.controller;
 
-import com.ticketing.performance.application.dto.CreateHallResponseDto;
-import com.ticketing.performance.application.dto.HallInfoResponseDto;
-import com.ticketing.performance.application.dto.HallListResponseDto;
-import com.ticketing.performance.application.dto.UpdateHallResponseDto;
+import com.ticketing.performance.application.dto.hall.CreateHallResponseDto;
+import com.ticketing.performance.application.dto.hall.HallInfoResponseDto;
+import com.ticketing.performance.application.dto.hall.HallListResponseDto;
+import com.ticketing.performance.application.dto.hall.UpdateHallResponseDto;
 import com.ticketing.performance.application.service.HallService;
 import com.ticketing.performance.common.response.CommonResponse;
-import com.ticketing.performance.presentation.dto.CreateHallRequestDto;
-import com.ticketing.performance.presentation.dto.UpdateHallRequestDto;
+import com.ticketing.performance.presentation.dto.hall.CreateHallRequestDto;
+import com.ticketing.performance.presentation.dto.hall.UpdateHallRequestDto;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;

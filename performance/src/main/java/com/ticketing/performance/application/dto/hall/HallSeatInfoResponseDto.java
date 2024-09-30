@@ -1,4 +1,4 @@
-package com.ticketing.performance.application.dto;
+package com.ticketing.performance.application.dto.hall;
 
 import com.ticketing.performance.domain.model.HallSeat;
 import lombok.AllArgsConstructor;

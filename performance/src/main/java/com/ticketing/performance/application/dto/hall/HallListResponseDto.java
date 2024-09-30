@@ -1,4 +1,4 @@
-package com.ticketing.performance.application.dto;
+package com.ticketing.performance.application.dto.hall;
 
 import com.ticketing.performance.domain.model.Hall;
 import lombok.AllArgsConstructor;
@@ -10,22 +10,21 @@ import java.util.UUID;
 
 @AllArgsConstructor
 @NoArgsConstructor
-@Getter
 @Builder
-public class UpdateHallResponseDto {
+@Getter
+public class HallListResponseDto {
 
     private UUID hallId;
     private String hallName;
     private String hallAddress;
     private Integer totalSeat;
 
-    public static UpdateHallResponseDto of(Hall hall) {
-        return UpdateHallResponseDto.builder()
+    public static HallListResponseDto of(Hall hall) {
+        return HallListResponseDto.builder()
                 .hallId(hall.getId())
                 .hallName(hall.getHallName())
                 .hallAddress(hall.getHallAddress())
                 .totalSeat(hall.getTotalSeat())
                 .build();
     }
-
 }

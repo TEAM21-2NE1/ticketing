@@ -1,4 +1,4 @@
-package com.ticketing.performance.presentation.dto;
+package com.ticketing.performance.presentation.dto.hall;
 
 
 import lombok.AllArgsConstructor;

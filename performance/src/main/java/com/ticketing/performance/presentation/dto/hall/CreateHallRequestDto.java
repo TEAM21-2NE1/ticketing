@@ -1,14 +1,18 @@
-package com.ticketing.performance.presentation.dto;
+package com.ticketing.performance.presentation.dto.hall;
+
 
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
+import java.util.List;
+
 @AllArgsConstructor
 @NoArgsConstructor
 @Getter
-public class UpdateHallRequestDto {
+public class CreateHallRequestDto {
 
     private String hallName;
     private String hallAddress;
+    private List<CreateHallSeatRequestDto> sections;
 }

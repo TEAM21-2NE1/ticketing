@@ -1,8 +1,8 @@
 package com.ticketing.performance.domain.model;
 
 import com.ticketing.performance.common.auditor.BaseEntity;
-import com.ticketing.performance.presentation.dto.CreateHallRequestDto;
-import com.ticketing.performance.presentation.dto.UpdateHallRequestDto;
+import com.ticketing.performance.presentation.dto.hall.CreateHallRequestDto;
+import com.ticketing.performance.presentation.dto.hall.UpdateHallRequestDto;
 import jakarta.persistence.*;
 import lombok.*;
 import org.hibernate.annotations.SQLRestriction;
