@@ -10,7 +10,7 @@ spring:
     gateway:
       routes:  # Spring Cloud Gateway? ??? ??
         - id: auth-service    # 19092
-          uri: lb://auth-service
+          uri: lb://user-service
           predicates:
             - Path=/api/v1/auth/**
       discovery:
