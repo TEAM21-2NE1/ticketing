@@ -1,5 +1,6 @@
 package com.ticketing.performance.presentation.controller;
 
+import com.ticketing.performance.application.dto.performance.PrfInfoResponseDto;
 import com.ticketing.performance.application.dto.performance.PrfListResponseDto;
 import com.ticketing.performance.application.service.PerformanceService;
 import com.ticketing.performance.common.response.CommonResponse;
@@ -11,8 +12,11 @@ import org.springframework.data.domain.Sort;
 import org.springframework.data.web.PageableDefault;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
+
+import java.util.UUID;
 
 @RestController
 @RequestMapping("/api/v1/performances")
@@ -29,4 +33,12 @@ public class PerformanceController {
         Page<PrfListResponseDto> prfList = performanceService.getPerformances(pageable);
         return ResponseEntity.ok(CommonResponse.success("get success!", prfList));
     }
+
+    @GetMapping("/{performanceId}")
+    public ResponseEntity<CommonResponse<PrfInfoResponseDto>> getPerformance(@PathVariable UUID performanceId) {
+        PrfInfoResponseDto responseDto = performanceService.getPerformance(performanceId);
+        return ResponseEntity.ok(CommonResponse.success("get success!", responseDto));
+    }
+
+
 }
