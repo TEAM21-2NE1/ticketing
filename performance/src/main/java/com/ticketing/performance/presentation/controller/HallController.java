@@ -53,7 +53,7 @@ public class HallController {
     }
 
     @DeleteMapping("{hallId}")
-    public ResponseEntity<CommonResponse> deleteHall(@PathVariable UUID hallId) {
+    public ResponseEntity<CommonResponse<Void>> deleteHall(@PathVariable UUID hallId) {
         hallService.deleteHall(hallId);
         return ResponseEntity.ok(CommonResponse.success("delete success!"));
     }
