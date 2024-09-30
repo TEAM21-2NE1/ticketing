@@ -1,0 +1,8 @@
+spring:
+  datasource:
+    url: jdbc:postgresql://${REVIEW.PROD.DB.HOST}:${REVIEW.PROD.DB.PORT}/${REVIEW.PROD.DB.NAME}
+    username: ${REVIEW.PROD.DB.USERNAME}
+    password: ${REVIEW.PROD.DB.PASSWORD}
+  jpa:
+    hibernate:
+      ddl-auto: none

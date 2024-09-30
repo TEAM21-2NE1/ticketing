@@ -1,0 +1,8 @@
+spring:
+  datasource:
+    url: jdbc:postgresql://${REVIEW.DEV.DB.HOST}:${REVIEW.DEV.DB.PORT}/${REVIEW.DEV.DB.NAME}
+    username: ${REVIEW.DEV.DB.USERNAME}
+    password: ${REVIEW.DEV.DB.PASSWORD}
+  jpa:
+    hibernate:
+      ddl-auto: create # 안정화 이후 update 변경
