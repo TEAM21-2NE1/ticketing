@@ -28,8 +28,19 @@ ext {
 }
 
 dependencies {
+
+	//kafka
+	implementation 'org.springframework.kafka:spring-kafka'
+
+	// prometheus
+	implementation 'org.springframework.boot:spring-boot-starter-actuator'
+	runtimeOnly 'io.micrometer:micrometer-registry-prometheus'
+
+	//swagger
+	implementation 'org.springdoc:springdoc-openapi-starter-webmvc-ui:2.4.0'
+
 	// jpa
-//	implementation 'org.springframework.boot:spring-boot-starter-data-jpa'
+	implementation 'org.springframework.boot:spring-boot-starter-data-jpa'
 
 	// valid
 	implementation 'org.springframework.boot:spring-boot-starter-validation'
@@ -40,12 +51,27 @@ dependencies {
 	// eureka-client
 	implementation 'org.springframework.cloud:spring-cloud-starter-netflix-eureka-client'
 
+	// open feign
+	implementation 'org.springframework.cloud:spring-cloud-starter-openfeign'
+
+	// postgres
+	runtimeOnly 'org.postgresql:postgresql'
+
+	// redis
+	implementation 'org.springframework.boot:spring-boot-starter-data-redis'
+
 	// lombok
 	compileOnly 'org.projectlombok:lombok'
 	annotationProcessor 'org.projectlombok:lombok'
 
 	testImplementation 'org.springframework.boot:spring-boot-starter-test'
 	testRuntimeOnly 'org.junit.platform:junit-platform-launcher'
+
+	//Querydsl 추가
+	implementation 'com.querydsl:querydsl-jpa:5.0.0:jakarta'
+	annotationProcessor "com.querydsl:querydsl-apt:5.0.0:jakarta"
+	annotationProcessor "jakarta.annotation:jakarta.annotation-api"
+	annotationProcessor "jakarta.persistence:jakarta.persistence-api"
 }
 
 dependencyManagement {
@@ -56,4 +82,8 @@ dependencyManagement {
 
 tasks.named('test') {
 	useJUnitPlatform()
+}
+
+clean {
+	delete file('src/main/generated')
 }
