@@ -1,5 +1,6 @@
 package com.ticketing.performance.domain.model;
 
+import com.ticketing.performance.common.auditor.BaseEntity;
 import jakarta.persistence.*;
 import lombok.*;
 
@@ -11,7 +12,7 @@ import java.util.UUID;
 @Getter
 @Table(name = "p_seat")
 @Entity
-public class Seat {
+public class Seat extends BaseEntity {
 
     @Id
     @GeneratedValue(strategy = GenerationType.UUID)

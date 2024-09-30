@@ -1,5 +1,6 @@
 package com.ticketing.performance.domain.model;
 
+import com.ticketing.performance.common.auditor.BaseEntity;
 import jakarta.persistence.*;
 import lombok.*;
 import org.hibernate.annotations.Comment;
@@ -14,7 +15,7 @@ import java.util.UUID;
 @Table(name = "p_performance")
 @Getter
 @Builder
-public class Performance {
+public class Performance extends BaseEntity {
 
     @Id
     @GeneratedValue(strategy = GenerationType.UUID)

@@ -1,5 +1,6 @@
 package com.ticketing.performance.domain.model;
 
+import com.ticketing.performance.common.auditor.BaseEntity;
 import jakarta.persistence.*;
 import lombok.*;
 
@@ -13,7 +14,7 @@ import java.util.UUID;
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @Builder
 @Table(name = "p_hall")
-public class Hall {
+public class Hall extends BaseEntity {
 
     @Id
     @GeneratedValue(strategy = GenerationType.UUID)
