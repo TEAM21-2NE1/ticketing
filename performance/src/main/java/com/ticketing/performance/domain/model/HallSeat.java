@@ -18,7 +18,7 @@ public class HallSeat extends BaseEntity {
     @GeneratedValue(strategy = GenerationType.UUID)
     private UUID id;
 
-    private String section;
+    private String seatType;
     private Integer rows;
     private Integer seatsPerRow;
 
