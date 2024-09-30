@@ -20,11 +20,11 @@ public record CommonResponse<T> (
                 .build();
     }
 
-    public static CommonResponse<?> success(String message) {
-        return CommonResponse.builder().message(message).build();
+    public static CommonResponse<Void> success(String message) {
+        return CommonResponse.<Void>builder().message(message).build();
     }
 
-    public static CommonResponse<?> error(String message) {
-        return CommonResponse.builder().message(message).build();
+    public static CommonResponse<Void> error(String message) {
+        return CommonResponse.<Void>builder().message(message).build();
     }
 }
