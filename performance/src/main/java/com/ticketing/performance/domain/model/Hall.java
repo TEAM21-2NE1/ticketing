@@ -2,6 +2,7 @@ package com.ticketing.performance.domain.model;
 
 import com.ticketing.performance.common.auditor.BaseEntity;
 import com.ticketing.performance.presentation.dto.CreateHallRequestDto;
+import com.ticketing.performance.presentation.dto.UpdateHallRequestDto;
 import jakarta.persistence.*;
 import lombok.*;
 import org.hibernate.annotations.SQLRestriction;
@@ -44,5 +45,10 @@ public class Hall extends BaseEntity {
 
     public Integer getTotalSeat() {
         return this.getHallSeats().stream().mapToInt(i -> i.getSeatsPerRow() * i.getRows()).sum();
+    }
+
+    public void update(UpdateHallRequestDto updateHallRequestDto) {
+        this.hallName = updateHallRequestDto.getHallName();
+        this.hallAddress = updateHallRequestDto.getHallAddress();
     }
 }
