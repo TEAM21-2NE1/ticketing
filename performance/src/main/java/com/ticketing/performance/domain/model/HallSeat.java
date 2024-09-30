@@ -1,6 +1,7 @@
 package com.ticketing.performance.domain.model;
 
 import com.ticketing.performance.common.auditor.BaseEntity;
+import com.ticketing.performance.presentation.dto.CreateHallSeatRequestDto;
 import jakarta.persistence.*;
 import lombok.*;
 
@@ -12,6 +13,7 @@ import java.util.UUID;
 @Builder
 @Getter
 @Table(name = "p_hall_seat")
+@ToString
 public class HallSeat extends BaseEntity {
 
     @Id
@@ -25,4 +27,17 @@ public class HallSeat extends BaseEntity {
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "hall_id")
     private Hall hall;
+
+    public static HallSeat create(CreateHallSeatRequestDto requestDto) {
+        return HallSeat.builder()
+                .seatType(requestDto.getSeatType())
+                .rows(requestDto.getRows())
+                .seatsPerRow(requestDto.getSeatsPerRow())
+                .build();
+    }
+
+
+    public void addHall(Hall hall) {
+        this.hall = hall;
+    }
 }

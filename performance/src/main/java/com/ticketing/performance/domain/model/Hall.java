@@ -1,6 +1,7 @@
 package com.ticketing.performance.domain.model;
 
 import com.ticketing.performance.common.auditor.BaseEntity;
+import com.ticketing.performance.presentation.dto.CreateHallRequestDto;
 import jakarta.persistence.*;
 import lombok.*;
 
@@ -26,4 +27,16 @@ public class Hall extends BaseEntity {
     @OneToMany(mappedBy = "hall", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<HallSeat> hallSeats = new ArrayList<>();
 
+
+    public static Hall create(CreateHallRequestDto createHallRequestDto) {
+        return com.ticketing.performance.domain.model.Hall.builder()
+                .hallName(createHallRequestDto.getHallName())
+                .hallAddress(createHallRequestDto.getHallAddress())
+                .build();
+    }
+
+    public void addSeats(List<HallSeat> seats) {
+        this.hallSeats= seats;
+        seats.forEach(seat -> seat.addHall(this));
+    }
 }
