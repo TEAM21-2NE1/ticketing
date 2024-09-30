@@ -9,6 +9,7 @@ import com.ticketing.performance.presentation.dto.CreateHallRequestDto;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -37,7 +38,10 @@ public class HallService {
         return CreateHallResponseDto.of(hall);
     }
 
-    public Page<HallListResponseDto> getHalls() {
-        return null;
+
+    public Page<HallListResponseDto> getHalls(Pageable pageable) {
+        return hallRepository.findAll(pageable).map(HallListResponseDto::of);
     }
+
+
 }

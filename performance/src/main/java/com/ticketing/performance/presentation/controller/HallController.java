@@ -1,15 +1,19 @@
 package com.ticketing.performance.presentation.controller;
 
 import com.ticketing.performance.application.dto.CreateHallResponseDto;
+import com.ticketing.performance.application.dto.HallListResponseDto;
 import com.ticketing.performance.application.service.HallService;
 import com.ticketing.performance.common.response.CommonResponse;
 import com.ticketing.performance.presentation.dto.CreateHallRequestDto;
+import feign.Param;
+import feign.Response;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
+import org.springframework.data.web.PageableDefault;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 @RestController
 @RequestMapping("/api/v1/halls")
@@ -23,4 +27,16 @@ public class HallController {
         CreateHallResponseDto createHallResponseDto = hallService.createHall(createHallRequestDto);
         return ResponseEntity.ok(CommonResponse.success("create success!", createHallResponseDto));
     }
+
+    @GetMapping
+    public ResponseEntity<CommonResponse<Page<HallListResponseDto>>> getHalls(
+            @PageableDefault(page = 0, size = 10, sort = "createdAt", direction = Sort.Direction.DESC) Pageable pageable) {
+
+
+
+        Page<HallListResponseDto> hallList = hallService.getHalls(pageable);
+        return ResponseEntity.ok(CommonResponse.success("get success!", hallList));
+    }
+
+
 }
