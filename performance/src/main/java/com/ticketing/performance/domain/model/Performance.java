@@ -4,6 +4,7 @@ import com.ticketing.performance.common.auditor.BaseEntity;
 import jakarta.persistence.*;
 import lombok.*;
 import org.hibernate.annotations.Comment;
+import org.hibernate.annotations.SQLRestriction;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
@@ -15,6 +16,7 @@ import java.util.UUID;
 @Table(name = "p_performance")
 @Getter
 @Builder
+@SQLRestriction("is_deleted = false")
 public class Performance extends BaseEntity {
 
     @Id

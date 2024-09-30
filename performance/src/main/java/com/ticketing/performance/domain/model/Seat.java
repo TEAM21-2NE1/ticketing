@@ -3,6 +3,7 @@ package com.ticketing.performance.domain.model;
 import com.ticketing.performance.common.auditor.BaseEntity;
 import jakarta.persistence.*;
 import lombok.*;
+import org.hibernate.annotations.SQLRestriction;
 
 import java.util.UUID;
 
@@ -12,6 +13,7 @@ import java.util.UUID;
 @Getter
 @Table(name = "p_seat")
 @Entity
+@SQLRestriction("is_deleted = false")
 public class Seat extends BaseEntity {
 
     @Id

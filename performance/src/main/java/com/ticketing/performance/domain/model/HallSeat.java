@@ -4,6 +4,7 @@ import com.ticketing.performance.common.auditor.BaseEntity;
 import com.ticketing.performance.presentation.dto.CreateHallSeatRequestDto;
 import jakarta.persistence.*;
 import lombok.*;
+import org.hibernate.annotations.SQLRestriction;
 
 import java.util.UUID;
 
@@ -13,7 +14,7 @@ import java.util.UUID;
 @Builder
 @Getter
 @Table(name = "p_hall_seat")
-@ToString
+@SQLRestriction("is_deleted = false")
 public class HallSeat extends BaseEntity {
 
     @Id

@@ -4,6 +4,7 @@ import com.ticketing.performance.common.auditor.BaseEntity;
 import com.ticketing.performance.presentation.dto.CreateHallRequestDto;
 import jakarta.persistence.*;
 import lombok.*;
+import org.hibernate.annotations.SQLRestriction;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -15,6 +16,7 @@ import java.util.UUID;
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @Builder
 @Table(name = "p_hall")
+@SQLRestriction("is_deleted = false")
 public class Hall extends BaseEntity {
 
     @Id
@@ -24,7 +26,7 @@ public class Hall extends BaseEntity {
     private String hallName;
     private String hallAddress;
 
-    @OneToMany(mappedBy = "hall", cascade = CascadeType.ALL, orphanRemoval = true)
+    @OneToMany(mappedBy = "hall",fetch = FetchType.LAZY, cascade = CascadeType.ALL, orphanRemoval = true)
     private List<HallSeat> hallSeats = new ArrayList<>();
 
 
