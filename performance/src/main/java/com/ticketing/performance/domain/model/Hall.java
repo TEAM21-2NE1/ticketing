@@ -51,4 +51,9 @@ public class Hall extends BaseEntity {
         this.hallName = updateHallRequestDto.getHallName();
         this.hallAddress = updateHallRequestDto.getHallAddress();
     }
+
+    public void delete(Long id) {
+        super.delete(id);
+        hallSeats.forEach(hallSeat -> hallSeat.delete(id));
+    }
 }

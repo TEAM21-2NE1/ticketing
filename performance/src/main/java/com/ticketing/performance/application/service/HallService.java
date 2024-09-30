@@ -61,4 +61,10 @@ public class HallService {
         return UpdateHallResponseDto.of(hall);
     }
 
+    @Transactional
+    public void deleteHall(UUID hallId) {
+        Hall hall = hallRepository.findById(hallId)
+                .orElseThrow(() -> new RuntimeException("error"));
+        hall.delete(1L);
+    }
 }

@@ -51,4 +51,10 @@ public class HallController {
         UpdateHallResponseDto updateHallResponseDto = hallService.updateHall(hallId, updateHallRequestDto);
         return ResponseEntity.ok(CommonResponse.success("update success!", updateHallResponseDto));
     }
+
+    @DeleteMapping("{hallId}")
+    public ResponseEntity<CommonResponse> deleteHall(@PathVariable UUID hallId) {
+        hallService.deleteHall(hallId);
+        return ResponseEntity.ok(CommonResponse.success("delete success!"));
+    }
 }
