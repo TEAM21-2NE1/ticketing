@@ -41,4 +41,8 @@ public class Hall extends BaseEntity {
         this.hallSeats= seats;
         seats.forEach(seat -> seat.addHall(this));
     }
+
+    public Integer getTotalSeat() {
+        return this.getHallSeats().stream().mapToInt(i -> i.getSeatsPerRow() * i.getRows()).sum();
+    }
 }

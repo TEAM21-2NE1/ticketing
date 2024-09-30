@@ -23,12 +23,7 @@ public class CreateHallResponseDto {
                 .hallId(hall.getId())
                 .hallName(hall.getHallName())
                 .hallAddress(hall.getHallAddress())
-                .totalSeat(
-                        hall.getHallSeats()
-                                .stream()
-                                .mapToInt(i -> i.getSeatsPerRow() * i.getRows())
-                                .sum()
-                )
+                .totalSeat(hall.getTotalSeat())
                 .build();
     }
 }
