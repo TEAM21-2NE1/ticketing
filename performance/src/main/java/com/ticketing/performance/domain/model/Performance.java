@@ -1,6 +1,7 @@
 package com.ticketing.performance.domain.model;
 
 import com.ticketing.performance.common.auditor.BaseEntity;
+import com.ticketing.performance.presentation.dto.performance.UpdatePrfRequestDto;
 import jakarta.persistence.*;
 import lombok.*;
 import org.hibernate.annotations.Comment;
@@ -42,4 +43,16 @@ public class Performance extends BaseEntity {
     private Integer ticketLimit;
 
 
+    public void update(UpdatePrfRequestDto requestDto) {
+        this.hallId = requestDto.getHallId();
+        this.title = requestDto.getTitle();
+        this.description = requestDto.getDescription();
+        this.runningTime = requestDto.getRunningTime();
+        this.intermission = requestDto.getIntermission();
+        this.ageLimit = requestDto.getAgeLimit();
+        this.openDate = requestDto.getOpenDate();
+        this.performanceTime = requestDto.getPerformanceTime();
+        this.ticketOpenTime = requestDto.getTicketOpenTime();
+        this.ticketLimit = requestDto.getTicketLimit();
+    }
 }
