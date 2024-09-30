@@ -45,4 +45,10 @@ public class PerformanceController {
         UpdatePrfResponseDto responseDto = performanceService.updatePerformance(performanceId, requestDto);
         return ResponseEntity.ok(CommonResponse.success("update success!", responseDto));
     }
+
+    @DeleteMapping("/{performanceId}")
+    public ResponseEntity<CommonResponse<Void>> deletePerformance(@PathVariable UUID performanceId) {
+        performanceService.deletePerformance(performanceId);
+        return ResponseEntity.ok(CommonResponse.success("delete success!"));
+    }
 }

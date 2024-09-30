@@ -58,4 +58,13 @@ public class PerformanceService {
         return UpdatePrfResponseDto.of(performance);
 
     }
+
+    @Transactional
+    public void deletePerformance(UUID performanceId) {
+        Performance performance = performanceRepository.findById(performanceId)
+                .orElseThrow(() -> new RuntimeException("error"));
+
+        seatService.deleteSeatsByPerformanceId(performanceId);
+        performance.delete(1L);
+    }
 }

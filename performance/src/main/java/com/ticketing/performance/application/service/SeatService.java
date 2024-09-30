@@ -4,6 +4,7 @@ import com.ticketing.performance.application.dto.seat.SeatInfoResponseDto;
 import com.ticketing.performance.domain.repository.SeatRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 import java.util.UUID;
@@ -20,5 +21,12 @@ public class SeatService {
                 .stream()
                 .map(SeatInfoResponseDto::of)
                 .toList();
+    }
+
+
+
+    @Transactional
+    public void deleteSeatsByPerformanceId(UUID performanceId) {
+        seatRepository.softDeleteSeatsByPerformanceId(performanceId);
     }
 }

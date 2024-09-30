@@ -55,4 +55,9 @@ public class Performance extends BaseEntity {
         this.ticketOpenTime = requestDto.getTicketOpenTime();
         this.ticketLimit = requestDto.getTicketLimit();
     }
+
+    public void delete(Long userId) {
+        super.delete(userId);
+
+    }
 }
