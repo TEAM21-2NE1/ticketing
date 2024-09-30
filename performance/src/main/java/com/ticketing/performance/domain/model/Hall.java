@@ -23,7 +23,7 @@ public class Hall extends BaseEntity {
     private String hallName;
     private String hallAddress;
 
-    @OneToMany(mappedBy = "hall")
+    @OneToMany(mappedBy = "hall", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<HallSeat> hallSeats = new ArrayList<>();
 
 }

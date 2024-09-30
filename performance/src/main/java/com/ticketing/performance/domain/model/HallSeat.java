@@ -18,9 +18,9 @@ public class HallSeat extends BaseEntity {
     @GeneratedValue(strategy = GenerationType.UUID)
     private UUID id;
 
-    private String seatType;
-    private Integer seatRow;
-    private Integer seatNum;
+    private String section;
+    private Integer rows;
+    private Integer seatsPerRow;
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "hall_id")
