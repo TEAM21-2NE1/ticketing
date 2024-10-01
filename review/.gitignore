@@ -35,3 +35,11 @@ out/
 
 ### VS Code ###
 .vscode/
+
+### sts env ###
+./src/main/resources/properties/env.properties
+./.env
+
+### db data ###
+./db
+
