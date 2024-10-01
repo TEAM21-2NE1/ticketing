@@ -1,14 +1,17 @@
 package com.ticketing.performance.application.service;
 
+import com.ticketing.performance.application.dto.hall.HallInfoResponseDto;
+import com.ticketing.performance.application.dto.hall.HallSeatInfoResponseDto;
 import com.ticketing.performance.application.dto.seat.SeatInfoResponseDto;
+import com.ticketing.performance.domain.model.Seat;
 import com.ticketing.performance.domain.repository.SeatRepository;
-import com.ticketing.performance.presentation.dto.seat.RegisterSeatPriceRequestDto;
-import com.ticketing.performance.presentation.dto.seat.SeatTypePriceRequestDto;
+import com.ticketing.performance.presentation.dto.seat.CreateSeatRequestDto;
 import com.ticketing.performance.presentation.dto.seat.UpdateSeatPriceRequestDto;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
 
@@ -17,6 +20,7 @@ import java.util.UUID;
 public class SeatService {
 
     private final SeatRepository seatRepository;
+    private final HallService hallService;
 
 
     public List<SeatInfoResponseDto> getSeats(UUID performanceId) {
@@ -33,15 +37,32 @@ public class SeatService {
     }
 
     @Transactional
-    public void registerSeatsPrice(RegisterSeatPriceRequestDto requestDto) {
-        List<SeatTypePriceRequestDto> sections = requestDto.getSections();
-        for (SeatTypePriceRequestDto section : sections) {
-            seatRepository.updateSeatPriceBySeatType(
-                    section.getSeatType(),
-                    section.getPrice(),
-                    requestDto.getPerformanceId()
-            );
+    public void createSeat(CreateSeatRequestDto requestDto) {
+        UUID performanceId = requestDto.getPerformanceId();
+
+        HallInfoResponseDto hall = hallService.getHall(requestDto.getHallId());
+        List<HallSeatInfoResponseDto> hallSeats = hall.getSeats();
+
+        List<Seat> seats = new ArrayList<>();
+        for (HallSeatInfoResponseDto hallSeat : hallSeats) {
+            //todo : hall 좌석 구역과 요청 구역 검증
+            Integer price = requestDto.getSections()
+                    .stream()
+                    .filter(s -> hallSeat.getSeatType().equals(s.getSeatType()))
+                    .findFirst()
+                    .orElseThrow(() -> new RuntimeException("error"))
+                    .getPrice();
+
+
+            for (int seatRows = 1; seatRows <= hallSeat.getRows(); seatRows++) {
+                for (int seatNum = 1; seatNum < hallSeat.getSeatsPerRow(); seatNum++) {
+                    Seat seat = Seat.create(performanceId, hallSeat.getSeatType(), seatRows, seatNum, price);
+                    seats.add(seat);
+                }
+            }
         }
+
+        seatRepository.saveAll(seats);
     }
 
     @Transactional

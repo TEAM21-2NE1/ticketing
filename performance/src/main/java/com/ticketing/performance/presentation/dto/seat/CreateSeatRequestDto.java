@@ -11,9 +11,10 @@ import java.util.UUID;
 @AllArgsConstructor
 @NoArgsConstructor
 @Getter
-public class RegisterSeatPriceRequestDto {
+public class CreateSeatRequestDto {
 
     private UUID performanceId;
+    private UUID hallId;
     private List<SeatTypePriceRequestDto> sections;
 
 

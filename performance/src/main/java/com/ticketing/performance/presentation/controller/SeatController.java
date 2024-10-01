@@ -2,7 +2,7 @@ package com.ticketing.performance.presentation.controller;
 
 import com.ticketing.performance.application.service.SeatService;
 import com.ticketing.performance.common.response.CommonResponse;
-import com.ticketing.performance.presentation.dto.seat.RegisterSeatPriceRequestDto;
+import com.ticketing.performance.presentation.dto.seat.CreateSeatRequestDto;
 import com.ticketing.performance.presentation.dto.seat.UpdateSeatPriceRequestDto;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
@@ -16,9 +16,9 @@ public class SeatController {
     private final SeatService seatService;
 
     @PostMapping
-    public ResponseEntity<CommonResponse<Void>> registerSeatsPrice(@RequestBody RegisterSeatPriceRequestDto requestDto) {
-        seatService.registerSeatsPrice(requestDto);
-        return ResponseEntity.ok(CommonResponse.success("register success"));
+    public ResponseEntity<CommonResponse<Void>> createSeat(@RequestBody CreateSeatRequestDto requestDto) {
+        seatService.createSeat(requestDto);
+        return ResponseEntity.ok(CommonResponse.success("create success!"));
     }
 
     @PatchMapping

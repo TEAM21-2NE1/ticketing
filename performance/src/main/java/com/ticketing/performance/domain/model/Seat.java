@@ -33,4 +33,15 @@ public class Seat extends BaseEntity {
     @Enumerated(value = EnumType.STRING)
     private SeatStatus seatStatus;
 
+    public static Seat create(UUID performanceId, String seatType, Integer seatRow, Integer seatNum, Integer price) {
+
+        return Seat.builder()
+                .performanceId(performanceId)
+                .seatType(seatType)
+                .seatRow(seatRow)
+                .seatNum(seatNum)
+                .price(price)
+                .seatStatus(SeatStatus.AVAILABLE)
+                .build();
+    }
 }
