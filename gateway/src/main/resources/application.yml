@@ -9,10 +9,14 @@ spring:
   cloud:
     gateway:
       routes:  # Spring Cloud Gateway? ??? ??
-        - id: auth-service    # 19092
+        - id: auth-service
           uri: lb://user-service
           predicates:
             - Path=/api/v1/auth/**
+        - id: user-service
+          uri: lb://user-service
+          predicates:
+            - Path=/api/v1/users/**
       discovery:
         locator:
           enabled: true  # ??? ?????? ?? ???? ???? ????? ??
@@ -23,3 +27,12 @@ eureka:
     fetch-registry: true
     service-url:
       defaultZone: http://localhost:19090/eureka/
+
+service:
+  jwt:
+    access-expiration: 3600000  # 1시간
+    secret-key: "TVNB6rWs7KGw7J2YU3ByaW5nYm9vdOqwnOyduO2UhOuhnOygne2KuOyXkOyCrOyaqe2VoGp3dC1zZWNyZXQta2V57J6F64uI64ukLg=="
+
+logging:
+  level:
+    com.ticketing.gateway.filter.JwtAuthenticationFilter: DEBUG
