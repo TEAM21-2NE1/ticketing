@@ -8,9 +8,8 @@ import org.springframework.http.HttpStatus;
 @RequiredArgsConstructor
 public enum ErrorCode {
 
-  USER_NOT_FOUND(HttpStatus.NOT_FOUND, "해당 허브(물류센터)를 찾을 수 없습니다."),
-  USER_INVALID_INPUT(HttpStatus.BAD_REQUEST, "유효하지 않은 입력값입니다."),
-
+  REVIEW_NOT_FOUND(HttpStatus.NOT_FOUND, "요청하신 리뷰를 찾을 수 없습니다."),
+  REVIEW_INVALID_INPUT(HttpStatus.BAD_REQUEST, "유효하지 않은 입력값입니다."),
   ALREADY_EXISTS(HttpStatus.BAD_REQUEST, "이미 존재하는 값입니다.");
 
   private final HttpStatus httpStatus;
