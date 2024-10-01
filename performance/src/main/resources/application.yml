@@ -31,3 +31,11 @@ eureka:
     fetch-registry: true
     service-url:
       defaultZone: http://localhost:19090/eureka/
+
+
+s3:
+  credentials:
+    access-key: ${access-key}
+    secret-key: ${secret-key}
+    region: ap-northeast-2
+  bucket: dowon-image
