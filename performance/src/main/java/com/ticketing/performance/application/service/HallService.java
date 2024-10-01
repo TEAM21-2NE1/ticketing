@@ -4,6 +4,8 @@ import com.ticketing.performance.application.dto.hall.CreateHallResponseDto;
 import com.ticketing.performance.application.dto.hall.HallInfoResponseDto;
 import com.ticketing.performance.application.dto.hall.HallListResponseDto;
 import com.ticketing.performance.application.dto.hall.UpdateHallResponseDto;
+import com.ticketing.performance.common.exception.HallException;
+import com.ticketing.performance.common.response.ErrorCode;
 import com.ticketing.performance.domain.model.Hall;
 import com.ticketing.performance.domain.model.HallSeat;
 import com.ticketing.performance.domain.repository.HallRepository;
@@ -51,13 +53,13 @@ public class HallService {
     public HallInfoResponseDto getHall(UUID hallId) {
 
         return hallRepository.findById(hallId).map(HallInfoResponseDto::of)
-                .orElseThrow(() -> new RuntimeException("error"));
+                .orElseThrow(() -> new HallException(ErrorCode.HALL_NOT_FOUND));
     }
 
     @Transactional
     public UpdateHallResponseDto updateHall(UUID hallId, UpdateHallRequestDto updateHallRequestDto) {
         Hall hall = hallRepository.findById(hallId)
-                .orElseThrow(() -> new RuntimeException("error"));
+                .orElseThrow(() -> new HallException(ErrorCode.HALL_NOT_FOUND));
         hall.update(updateHallRequestDto);
         return UpdateHallResponseDto.of(hall);
     }
@@ -65,7 +67,7 @@ public class HallService {
     @Transactional
     public void deleteHall(UUID hallId) {
         Hall hall = hallRepository.findById(hallId)
-                .orElseThrow(() -> new RuntimeException("error"));
+                .orElseThrow(() -> new HallException(ErrorCode.HALL_NOT_FOUND));
         // todo: user Id로 변경
         hall.delete(1L);
     }
