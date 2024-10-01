@@ -53,7 +53,7 @@ public class AuthenticationFilter extends UsernamePasswordAuthenticationFilter {
         // 인증이 성공시, JWT 생성
 
         // authResult에서 사용자 이름, ID, 권한 정보 추출
-        Long userId = ((UserDetailsImpl) authResult.getPrincipal()).getUserId();  // 사용자 ID (예: UserDetails에서 추출)
+        Long userId = ((UserDetailsImpl)authResult.getPrincipal()).getUserId();  // 사용자 ID (예: UserDetails에서 추출)
         String userEmail = authResult.getName(); // username (principal)
         String role = authResult.getAuthorities().stream()
                 .findFirst()
@@ -69,5 +69,16 @@ public class AuthenticationFilter extends UsernamePasswordAuthenticationFilter {
         response.setContentType("application/json;charset=UTF-8");
         response.setStatus(HttpServletResponse.SC_OK); // HTTP 상태 코드 200
         response.getWriter().write("{\"message\": \"로그인을 성공했습니다.\"}");
+    }
+
+    @Override
+    protected void unsuccessfulAuthentication(HttpServletRequest request, HttpServletResponse response, AuthenticationException failed) throws IOException, ServletException {
+        // 로그로 인증 실패 원인 기록
+        log.error("Authentication failed: {}", failed.getMessage());
+
+        // 응답 메세지를 JSON으로 작성
+        response.setContentType("application/json;charset=UTF-8");
+        response.setStatus(HttpServletResponse.SC_UNAUTHORIZED); // HTTP 상태 코드 401
+        response.getWriter().write("{\"message\": \"로그인에 실패했습니다.\"}");
     }
 }
