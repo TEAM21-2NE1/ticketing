@@ -27,24 +27,35 @@ public class ReviewLike extends BaseEntity {
   private UUID id;
 
   @Column(nullable = false)
-  private UUID userId;
+  private long userId;
 
   @ManyToOne(fetch = FetchType.LAZY)
   @JoinColumn(name = "review_id")
   private Review review;
 
   @Builder
-  private ReviewLike(Review review, UUID userId) {
+  private ReviewLike(Review review, long userId) {
     this.review = review;
     this.userId = userId;
   }
 
-  public static ReviewLike create(Review review, UUID userId) {
+  public static ReviewLike create(Review review, long userId) {
     return ReviewLike.builder()
         .review(review)
         .userId(userId)
         .build();
   }
 
+  // 좋아요 취소
+  public void cancelReviewLike(long userId) {
+    this.setDeleted(userId);
+  }
+
+  // 좋아요 복원
+  public void addReviewLike(long userId) {
+    this.deletedAt = null;
+    this.deletedBy = null;
+    this.isDeleted = false;
+  }
 
 }

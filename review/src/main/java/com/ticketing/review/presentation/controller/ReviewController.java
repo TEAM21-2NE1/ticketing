@@ -3,7 +3,9 @@ package com.ticketing.review.presentation.controller;
 import com.ticketing.review.application.dto.request.CreateReviewRequestDto;
 import com.ticketing.review.application.dto.request.UpdateReviewRequestDto;
 import com.ticketing.review.application.dto.response.CreateReviewResponseDto;
+import com.ticketing.review.application.dto.response.ReviewLikeResponseDto;
 import com.ticketing.review.application.dto.response.UpdateReviewResponseDto;
+import com.ticketing.review.application.service.ReviewLikeService;
 import com.ticketing.review.application.service.ReviewService;
 import com.ticketing.review.common.response.CommonResponse;
 import java.util.UUID;
@@ -23,6 +25,7 @@ import org.springframework.web.bind.annotation.RestController;
 public class ReviewController {
 
   private final ReviewService reviewService;
+  private final ReviewLikeService reviewLikeService;
   // TODO 추후에 userId는 Filter로 분리할 예정
 
   /**
@@ -57,5 +60,20 @@ public class ReviewController {
         reviewService.updateReview(reviewId, requestDto, userId)));
   }
 
+
+  /**
+   * 리뷰 좋아요 관리
+   *
+   * @param reviewId
+   * @param userId
+   * @return
+   */
+  @PostMapping("/{reviewId}/like")
+  public ResponseEntity<CommonResponse<ReviewLikeResponseDto>> toggleReviewLike(
+      @PathVariable UUID reviewId, @RequestHeader("X-User-Id") long userId
+  ) {
+    return ResponseEntity.ok(CommonResponse.success("좋아요 처리에 성공하였습니다.",
+        reviewLikeService.toggleReviewLike(reviewId, userId)));
+  }
 
 }
