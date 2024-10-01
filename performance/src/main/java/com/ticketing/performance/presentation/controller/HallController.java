@@ -14,6 +14,7 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.data.web.PageableDefault;
 import org.springframework.http.ResponseEntity;
+import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.UUID;
@@ -26,8 +27,8 @@ public class HallController {
     private final HallService hallService;
 
     @PostMapping
-    public ResponseEntity<CommonResponse<CreateHallResponseDto>> createHall(@RequestBody CreateHallRequestDto createHallRequestDto) {
-        CreateHallResponseDto createHallResponseDto = hallService.createHall(createHallRequestDto);
+    public ResponseEntity<CommonResponse<CreateHallResponseDto>> createHall(@Validated @RequestBody CreateHallRequestDto requestDto) {
+        CreateHallResponseDto createHallResponseDto = hallService.createHall(requestDto);
         return ResponseEntity.ok(CommonResponse.success("create success!", createHallResponseDto));
     }
 
@@ -47,8 +48,8 @@ public class HallController {
 
     @PatchMapping("{hallId}")
     public ResponseEntity<CommonResponse<UpdateHallResponseDto>> updateHall(@PathVariable UUID hallId,
-                                                                            @RequestBody UpdateHallRequestDto updateHallRequestDto) {
-        UpdateHallResponseDto updateHallResponseDto = hallService.updateHall(hallId, updateHallRequestDto);
+                                                                            @Validated @RequestBody UpdateHallRequestDto requestDto) {
+        UpdateHallResponseDto updateHallResponseDto = hallService.updateHall(hallId, requestDto);
         return ResponseEntity.ok(CommonResponse.success("update success!", updateHallResponseDto));
     }
 
