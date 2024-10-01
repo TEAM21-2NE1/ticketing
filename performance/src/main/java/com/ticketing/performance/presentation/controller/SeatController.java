@@ -7,6 +7,7 @@ import com.ticketing.performance.presentation.dto.seat.CreateSeatRequestDto;
 import com.ticketing.performance.presentation.dto.seat.UpdateSeatPriceRequestDto;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
+import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -20,13 +21,13 @@ public class SeatController {
     private final SeatService seatService;
 
     @PostMapping
-    public ResponseEntity<CommonResponse<Void>> createSeat(@RequestBody CreateSeatRequestDto requestDto) {
+    public ResponseEntity<CommonResponse<Void>> createSeat(@Validated @RequestBody CreateSeatRequestDto requestDto) {
         seatService.createSeat(requestDto);
         return ResponseEntity.ok(CommonResponse.success("create success!"));
     }
 
     @PatchMapping
-    public ResponseEntity<CommonResponse<Void>> updateSeatPrice(@RequestBody UpdateSeatPriceRequestDto requestDto) {
+    public ResponseEntity<CommonResponse<Void>> updateSeatPrice(@Validated @RequestBody UpdateSeatPriceRequestDto requestDto) {
         seatService.updateSeatPrice(requestDto);
         return ResponseEntity.ok(CommonResponse.success("update success"));
     }

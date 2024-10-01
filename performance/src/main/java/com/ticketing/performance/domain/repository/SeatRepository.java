@@ -19,5 +19,5 @@ public interface SeatRepository extends JpaRepository<Seat, UUID> {
 
     @Modifying
     @Query("UPDATE Seat s SET s.price = :price WHERE s.performanceId = :performanceId and s.seatType = :seatType")
-    void updateSeatPriceBySeatType(@Param("seatType")String seatType, @Param("price") Integer price, @Param("performanceId") UUID performanceId);
+    int updateSeatPriceBySeatType(@Param("seatType")String seatType, @Param("price") Integer price, @Param("performanceId") UUID performanceId);
 }
