@@ -1,12 +1,16 @@
 package com.ticketing.review.domain.model;
 
 import com.ticketing.review.common.auditor.BaseEntity;
+import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
+import jakarta.persistence.OneToMany;
 import jakarta.persistence.Table;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.UUID;
 import lombok.AccessLevel;
 import lombok.Builder;
@@ -42,7 +46,8 @@ public class Review extends BaseEntity {
   @Column(nullable = false)
   private long likeCount;
 
-  // TODO ReviewLike 생성 후 반영 예정
+  @OneToMany(mappedBy = "review", cascade = CascadeType.REMOVE, orphanRemoval = true)
+  private List<ReviewLike> reviewLikes = new ArrayList<>();
 
   @Builder
   private Review(UUID performanceId, long userId, short rating, String title, String content) {
@@ -85,9 +90,5 @@ public class Review extends BaseEntity {
     }
   }
 
-  //
-  public void delete(long userId) {
-    super.setDeleted(userId);
-    // TODO reviewLike 에 대한 삭제 추가
-  }
+
 }
