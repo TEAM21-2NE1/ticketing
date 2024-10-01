@@ -1,11 +1,16 @@
 package com.ticketing.review.presentation.controller;
 
 import com.ticketing.review.application.dto.request.CreateReviewRequestDto;
+import com.ticketing.review.application.dto.request.UpdateReviewRequestDto;
 import com.ticketing.review.application.dto.response.CreateReviewResponseDto;
+import com.ticketing.review.application.dto.response.UpdateReviewResponseDto;
 import com.ticketing.review.application.service.ReviewService;
 import com.ticketing.review.common.response.CommonResponse;
+import java.util.UUID;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.PatchMapping;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestHeader;
@@ -32,6 +37,24 @@ public class ReviewController {
       @RequestBody CreateReviewRequestDto requestDto, @RequestHeader("X-User-Id") long userId) {
     return ResponseEntity.ok(CommonResponse.success("리뷰 등록에 성공하였습니다.",
         reviewService.createReview(requestDto, userId)));
+  }
+
+
+  /**
+   * 리뷰 수정
+   *
+   * @param reviewId
+   * @param userId
+   * @param requestDto
+   * @return
+   */
+  @PatchMapping("/{reviewId}")
+  public ResponseEntity<CommonResponse<UpdateReviewResponseDto>> updateReview(
+      @PathVariable UUID reviewId,
+      @RequestHeader("X-User-Id") long userId, @RequestBody UpdateReviewRequestDto requestDto) {
+
+    return ResponseEntity.ok(CommonResponse.success("리뷰 수정에 성공하였습니다.",
+        reviewService.updateReview(reviewId, requestDto, userId)));
   }
 
 

@@ -1,7 +1,9 @@
 package com.ticketing.review.application.service;
 
 import com.ticketing.review.application.dto.request.CreateReviewRequestDto;
+import com.ticketing.review.application.dto.request.UpdateReviewRequestDto;
 import com.ticketing.review.application.dto.response.CreateReviewResponseDto;
+import com.ticketing.review.application.dto.response.UpdateReviewResponseDto;
 import com.ticketing.review.common.exception.ReviewException;
 import com.ticketing.review.common.response.ErrorCode;
 import com.ticketing.review.domain.model.Review;
@@ -44,6 +46,38 @@ public class ReviewService {
     calculateRatingAvg(requestDto.performanceId());
 
     return CreateReviewResponseDto.fromEntity(savedReview, nickname);
+  }
+
+
+  /**
+   * 리뷰 수정
+   *
+   * @param reviewId
+   * @param requestDto
+   * @param userId
+   * @return
+   */
+  @Transactional(readOnly = false)
+  public UpdateReviewResponseDto updateReview(UUID reviewId, UpdateReviewRequestDto requestDto,
+      long userId) {
+    //DB에 reviewId에 대한 정보가 존재하는지 확인
+    Review findReview = reviewRepository.findById(reviewId).orElseThrow(
+        () -> new ReviewException(ErrorCode.REVIEW_NOT_FOUND)
+    );
+
+    // 등록한 리뷰의 사용자와 일치하는지 확인
+    // TODO 관리자의 경우 해당 로직을 타지 않도록 변경
+    if (userId != findReview.getUserId()) {
+      throw new ReviewException(ErrorCode.REVIEW_FORBIDDEN);
+    }
+
+    // TODO 리뷰 제목 및 내용에 부적절한 언행이 포함되었는지 AI에게 문의
+    // TODO User 서버에 userId에 대한 nickname 데이터 요청
+    String nickname = "test";
+    findReview.updateReview(requestDto.rating(), requestDto.title(), requestDto.content());
+    calculateRatingAvg(findReview.getPerformanceId());
+
+    return UpdateReviewResponseDto.fromEntity(findReview, nickname);
   }
 
 
