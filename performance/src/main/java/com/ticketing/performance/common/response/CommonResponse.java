@@ -10,7 +10,8 @@ import lombok.NonNull;
 public record CommonResponse<T> (
         @NonNull
         String message,
-        @JsonInclude(value = NON_NULL) T data
+        @JsonInclude(value = NON_NULL) T data,
+        @JsonInclude(value = NON_NULL) T errors
 ) {
 
     public static <T> CommonResponse<T> success(String message, T data) {
@@ -26,5 +27,12 @@ public record CommonResponse<T> (
 
     public static CommonResponse<Void> error(String message) {
         return CommonResponse.<Void>builder().message(message).build();
+    }
+
+    public static <T> CommonResponse<T> errors(T errors) {
+        return CommonResponse.<T>builder()
+                .message("Validation failed")
+                .errors(errors)
+                .build();
     }
 }
