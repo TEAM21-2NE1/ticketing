@@ -1,6 +1,7 @@
 package com.ticketing.performance.domain.model;
 
 import com.ticketing.performance.common.auditor.BaseEntity;
+import com.ticketing.performance.presentation.dto.performance.CreatePrfRequestDto;
 import com.ticketing.performance.presentation.dto.performance.UpdatePrfRequestDto;
 import jakarta.persistence.*;
 import lombok.*;
@@ -41,6 +42,23 @@ public class Performance extends BaseEntity {
 
     @Comment(value = "인당 최대 예매 가능 티켓 수")
     private Integer ticketLimit;
+
+    public static Performance create(CreatePrfRequestDto requestDto,Long userId, String posterUrl) {
+        return Performance.builder()
+                .hallId(requestDto.getHallId())
+                .managerId(userId)
+                .title(requestDto.getTitle())
+                .posterUrl(posterUrl)
+                .description(requestDto.getDescription())
+                .runningTime(requestDto.getRunningTime())
+                .intermission(requestDto.getIntermission())
+                .ageLimit(requestDto.getAgeLimit())
+                .openDate(requestDto.getOpenDate())
+                .performanceTime(requestDto.getPerformanceTime())
+                .ticketOpenTime(requestDto.getTicketOpenTime())
+                .ticketLimit(requestDto.getTicketLimit())
+                .build();
+    }
 
 
     public void update(UpdatePrfRequestDto requestDto) {

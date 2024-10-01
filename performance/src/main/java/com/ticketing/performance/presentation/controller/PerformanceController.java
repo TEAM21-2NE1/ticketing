@@ -1,10 +1,12 @@
 package com.ticketing.performance.presentation.controller;
 
+import com.ticketing.performance.application.dto.performance.CreatePrfResponseDto;
 import com.ticketing.performance.application.dto.performance.PrfInfoResponseDto;
 import com.ticketing.performance.application.dto.performance.PrfListResponseDto;
 import com.ticketing.performance.application.dto.performance.UpdatePrfResponseDto;
 import com.ticketing.performance.application.service.PerformanceService;
 import com.ticketing.performance.common.response.CommonResponse;
+import com.ticketing.performance.presentation.dto.performance.CreatePrfRequestDto;
 import com.ticketing.performance.presentation.dto.performance.UpdatePrfRequestDto;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -15,6 +17,7 @@ import org.springframework.data.web.PageableDefault;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.io.IOException;
 import java.util.UUID;
 
 @RestController
@@ -25,6 +28,12 @@ public class PerformanceController {
 
     private final PerformanceService performanceService;
 
+    @PostMapping(consumes = "multipart/form-data")
+    public ResponseEntity<CommonResponse<CreatePrfResponseDto>> createPerformance(
+            @ModelAttribute CreatePrfRequestDto createPrfRequestDto) throws IOException {
+        CreatePrfResponseDto responseDto = performanceService.createPerformance(createPrfRequestDto);
+        return ResponseEntity.ok(CommonResponse.success("create success!", responseDto));
+    }
 
     @GetMapping
     public ResponseEntity<CommonResponse<Page<PrfListResponseDto>>> getPerformances(

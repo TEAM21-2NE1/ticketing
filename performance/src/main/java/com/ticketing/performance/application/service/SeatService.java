@@ -61,7 +61,7 @@ public class SeatService {
                 }
             }
         }
-
+        // todo: jpa batch 이용해서 insert 한번에 하기
         seatRepository.saveAll(seats);
     }
 
