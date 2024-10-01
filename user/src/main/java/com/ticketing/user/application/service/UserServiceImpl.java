@@ -29,12 +29,12 @@ public class UserServiceImpl implements UserService {
 
         // 1. 이메일 중복 체크
         if (userRepository.existsByEmailAndIsDeletedFalse(requestDto.email())) {
-            throw new UserException(ErrorCode.ALREADY_EXISTS);
+            throw new UserException(ErrorCode.EMAIL_ALREADY_EXISTS);
         }
 
         // 2. 닉네임 중복 체크
         if (userRepository.existsByNicknameAndIsDeletedFalse(requestDto.nickname())) {
-            throw new UserException(ErrorCode.ALREADY_EXISTS);
+            throw new UserException(ErrorCode.NICKNAME_ALREADY_EXISTS);
         }
 
         // 3. 비밀번호 인코딩
