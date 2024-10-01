@@ -5,6 +5,7 @@ import com.ticketing.review.application.dto.request.UpdateReviewRequestDto;
 import com.ticketing.review.application.dto.response.CreateReviewResponseDto;
 import com.ticketing.review.application.dto.response.DeleteReviewResponseDto;
 import com.ticketing.review.application.dto.response.ReviewLikeResponseDto;
+import com.ticketing.review.application.dto.response.ReviewResponseDto;
 import com.ticketing.review.application.dto.response.UpdateReviewResponseDto;
 import com.ticketing.review.application.service.ReviewLikeService;
 import com.ticketing.review.application.service.ReviewService;
@@ -13,6 +14,7 @@ import java.util.UUID;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.DeleteMapping;
+import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PatchMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -92,6 +94,20 @@ public class ReviewController {
 
     return ResponseEntity.ok(CommonResponse.success("리뷰 삭제에 성공하였습니다.",
         reviewService.deleteReview(reviewId, userId)));
+  }
+
+
+  /**
+   * 리뷰 단건 조회
+   *
+   * @param reviewId
+   * @return
+   */
+  @GetMapping("/{reviewId}")
+  public ResponseEntity<CommonResponse<ReviewResponseDto>> getReview(
+      @PathVariable UUID reviewId) {
+    return ResponseEntity.ok(CommonResponse.success("리뷰 조회에 성공하였습니다.",
+        reviewService.getReview(reviewId)));
   }
 
 

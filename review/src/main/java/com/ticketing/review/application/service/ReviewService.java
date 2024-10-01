@@ -4,6 +4,7 @@ import com.ticketing.review.application.dto.request.CreateReviewRequestDto;
 import com.ticketing.review.application.dto.request.UpdateReviewRequestDto;
 import com.ticketing.review.application.dto.response.CreateReviewResponseDto;
 import com.ticketing.review.application.dto.response.DeleteReviewResponseDto;
+import com.ticketing.review.application.dto.response.ReviewResponseDto;
 import com.ticketing.review.application.dto.response.UpdateReviewResponseDto;
 import com.ticketing.review.common.exception.ReviewException;
 import com.ticketing.review.common.response.ErrorCode;
@@ -99,6 +100,24 @@ public class ReviewService {
     findReview.deleteReview(userId);
     calculateRatingAvg(findReview.getPerformanceId());
     return DeleteReviewResponseDto.fromEntity(findReview);
+  }
+
+
+  /**
+   * 리뷰 단건 조회
+   *
+   * @param reviewId
+   * @return
+   */
+  @Transactional(readOnly = true)
+  public ReviewResponseDto getReview(UUID reviewId) {
+    Review findReview = reviewRepository.findById(reviewId).orElseThrow(
+        () -> new ReviewException(ErrorCode.REVIEW_NOT_FOUND)
+    );
+
+    // TODO User 서버에 userId에 대한 nickname 데이터 요청
+    String nickname = "test";
+    return ReviewResponseDto.fromEntity(findReview, nickname);
   }
 
 
