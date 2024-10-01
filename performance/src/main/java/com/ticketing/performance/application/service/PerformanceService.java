@@ -6,6 +6,8 @@ import com.ticketing.performance.application.dto.performance.PrfInfoResponseDto;
 import com.ticketing.performance.application.dto.performance.PrfListResponseDto;
 import com.ticketing.performance.application.dto.performance.UpdatePrfResponseDto;
 import com.ticketing.performance.application.dto.seat.SeatInfoResponseDto;
+import com.ticketing.performance.common.exception.PerformanceException;
+import com.ticketing.performance.common.response.ErrorCode;
 import com.ticketing.performance.domain.model.Performance;
 import com.ticketing.performance.domain.model.SeatStatus;
 import com.ticketing.performance.domain.repository.PerformanceRepository;
@@ -17,7 +19,6 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.io.IOException;
 import java.util.List;
 import java.util.UUID;
 
@@ -32,7 +33,7 @@ public class PerformanceService {
     private final ImageUploadService imageUploadService;
 
     @Transactional
-    public CreatePrfResponseDto createPerformance(CreatePrfRequestDto requestDto) throws IOException {
+    public CreatePrfResponseDto createPerformance(CreatePrfRequestDto requestDto){
 
         String posterUrl = imageUploadService.upload(requestDto.getImage());
         //todo: 유저정보 받기
@@ -51,7 +52,7 @@ public class PerformanceService {
 
     public PrfInfoResponseDto getPerformance(UUID performanceId) {
         Performance performance = performanceRepository.findById(performanceId)
-                .orElseThrow(() -> new RuntimeException("error"));
+                .orElseThrow(() -> new PerformanceException(ErrorCode.PERFORMANCE_NOT_FOUND));
 
         HallInfoResponseDto hall = hallService.getHall(performance.getHallId());
 
@@ -69,7 +70,7 @@ public class PerformanceService {
     @Transactional
     public UpdatePrfResponseDto updatePerformance(UUID performanceId, UpdatePrfRequestDto requestDto) {
         Performance performance = performanceRepository.findById(performanceId)
-                .orElseThrow(() -> new RuntimeException("error"));
+                .orElseThrow(() -> new PerformanceException(ErrorCode.PERFORMANCE_NOT_FOUND));
 
         performance.update(requestDto);
 
@@ -80,7 +81,7 @@ public class PerformanceService {
     @Transactional
     public void deletePerformance(UUID performanceId) {
         Performance performance = performanceRepository.findById(performanceId)
-                .orElseThrow(() -> new RuntimeException("error"));
+                .orElseThrow(() -> new PerformanceException(ErrorCode.PERFORMANCE_NOT_FOUND));
 
         seatService.deleteSeatsByPerformanceId(performanceId);
         performance.delete(1L);

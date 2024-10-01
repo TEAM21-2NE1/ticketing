@@ -15,9 +15,9 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.data.web.PageableDefault;
 import org.springframework.http.ResponseEntity;
+import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
-import java.io.IOException;
 import java.util.UUID;
 
 @RestController
@@ -30,8 +30,8 @@ public class PerformanceController {
 
     @PostMapping(consumes = "multipart/form-data")
     public ResponseEntity<CommonResponse<CreatePrfResponseDto>> createPerformance(
-            @ModelAttribute CreatePrfRequestDto createPrfRequestDto) throws IOException {
-        CreatePrfResponseDto responseDto = performanceService.createPerformance(createPrfRequestDto);
+            @Validated @ModelAttribute CreatePrfRequestDto requestDto){
+        CreatePrfResponseDto responseDto = performanceService.createPerformance(requestDto);
         return ResponseEntity.ok(CommonResponse.success("create success!", responseDto));
     }
 
@@ -49,8 +49,10 @@ public class PerformanceController {
     }
 
     @PatchMapping("/{performanceId}")
-    public ResponseEntity<CommonResponse<UpdatePrfResponseDto>> updatePerformance(@PathVariable UUID performanceId,
-                                                                                  @RequestBody UpdatePrfRequestDto requestDto) {
+    public ResponseEntity<CommonResponse<UpdatePrfResponseDto>> updatePerformance(
+            @PathVariable UUID performanceId,
+            @Validated@RequestBody UpdatePrfRequestDto requestDto)
+    {
         UpdatePrfResponseDto responseDto = performanceService.updatePerformance(performanceId, requestDto);
         return ResponseEntity.ok(CommonResponse.success("update success!", responseDto));
     }
