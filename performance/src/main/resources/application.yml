@@ -38,4 +38,4 @@ s3:
     access-key: ${access-key}
     secret-key: ${secret-key}
     region: ap-northeast-2
-  bucket: dowon-image
+  bucket: ${bucket-name}
