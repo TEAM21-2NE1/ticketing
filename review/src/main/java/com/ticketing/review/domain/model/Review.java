@@ -1,7 +1,6 @@
 package com.ticketing.review.domain.model;
 
 import com.ticketing.review.common.auditor.BaseEntity;
-import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
@@ -46,7 +45,7 @@ public class Review extends BaseEntity {
   @Column(nullable = false)
   private long likeCount;
 
-  @OneToMany(mappedBy = "review", cascade = CascadeType.REMOVE, orphanRemoval = true)
+  @OneToMany(mappedBy = "review")
   private List<ReviewLike> reviewLikes = new ArrayList<>();
 
   @Builder
@@ -73,7 +72,7 @@ public class Review extends BaseEntity {
 
 
   public void updateLikeCount(long count) {
-    this.likeCount = count;
+    this.likeCount += count;
   }
 
   public void updateReview(Short rating, String title, String content) {
@@ -87,6 +86,15 @@ public class Review extends BaseEntity {
 
     if (content != null) {
       this.content = content;
+    }
+  }
+
+
+  public void deleteReview(long userId) {
+    super.setDeleted(userId);
+    this.likeCount = 0L;
+    for (ReviewLike reviewLike : this.reviewLikes) {
+      reviewLike.cancelReviewLike(this.userId);
     }
   }
 

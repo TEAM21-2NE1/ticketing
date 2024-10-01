@@ -3,6 +3,7 @@ package com.ticketing.review.application.service;
 import com.ticketing.review.application.dto.request.CreateReviewRequestDto;
 import com.ticketing.review.application.dto.request.UpdateReviewRequestDto;
 import com.ticketing.review.application.dto.response.CreateReviewResponseDto;
+import com.ticketing.review.application.dto.response.DeleteReviewResponseDto;
 import com.ticketing.review.application.dto.response.UpdateReviewResponseDto;
 import com.ticketing.review.common.exception.ReviewException;
 import com.ticketing.review.common.response.ErrorCode;
@@ -78,6 +79,26 @@ public class ReviewService {
     calculateRatingAvg(findReview.getPerformanceId());
 
     return UpdateReviewResponseDto.fromEntity(findReview, nickname);
+  }
+
+
+  /**
+   * 리뷰 삭제
+   *
+   * @param reviewId
+   * @param userId
+   * @return
+   */
+  @Transactional(readOnly = false)
+  public DeleteReviewResponseDto deleteReview(UUID reviewId, long userId) {
+    //DB에 reviewId에 대한 정보가 존재하는지 확인
+    Review findReview = reviewRepository.findById(reviewId).orElseThrow(
+        () -> new ReviewException(ErrorCode.REVIEW_NOT_FOUND)
+    );
+
+    findReview.deleteReview(userId);
+    calculateRatingAvg(findReview.getPerformanceId());
+    return DeleteReviewResponseDto.fromEntity(findReview);
   }
 
 

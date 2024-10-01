@@ -48,7 +48,7 @@ public class ReviewLike extends BaseEntity {
 
   // 좋아요 취소
   public void cancelReviewLike(long userId) {
-    this.setDeleted(userId);
+    super.setDeleted(userId);
   }
 
   // 좋아요 복원
