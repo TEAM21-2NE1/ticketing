@@ -44,4 +44,14 @@ public class Seat extends BaseEntity {
                 .seatStatus(SeatStatus.AVAILABLE)
                 .build();
     }
+
+    public void confirm(UUID orderId) {
+        this.seatStatus = SeatStatus.BOOKED;
+        this.orderId = orderId;
+    }
+
+    public void cancel() {
+        this.seatStatus = SeatStatus.AVAILABLE;
+        this.orderId = null;
+    }
 }
