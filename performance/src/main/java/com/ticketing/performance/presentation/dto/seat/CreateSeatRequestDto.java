@@ -1,7 +1,6 @@
 package com.ticketing.performance.presentation.dto.seat;
 
 
-import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -15,9 +14,9 @@ import java.util.UUID;
 @Getter
 public class CreateSeatRequestDto {
 
-    @NotBlank
+    @NotNull
     private UUID performanceId;
-    @NotBlank
+    @NotNull
     private UUID hallId;
     @NotNull
     private List<SeatTypePriceRequestDto> sections;
