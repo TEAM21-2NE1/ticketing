@@ -7,6 +7,7 @@ import com.ticketing.review.application.dto.response.DeleteReviewResponseDto;
 import com.ticketing.review.application.dto.response.ReviewListResponseDto;
 import com.ticketing.review.application.dto.response.ReviewResponseDto;
 import com.ticketing.review.application.dto.response.UpdateReviewResponseDto;
+import com.ticketing.review.common.context.UserContext;
 import com.ticketing.review.common.exception.ReviewException;
 import com.ticketing.review.common.response.ErrorCode;
 import com.ticketing.review.domain.model.Review;
@@ -31,13 +32,13 @@ public class ReviewService {
    * 리뷰 생성
    *
    * @param requestDto
-   * @param userId
    * @return
    */
   @Transactional(readOnly = false)
-  public CreateReviewResponseDto createReview(CreateReviewRequestDto requestDto, long userId) {
+  public CreateReviewResponseDto createReview(CreateReviewRequestDto requestDto) {
     // 같은 공연에 대해 리뷰를 등록함
-    if (reviewRepository.existsByUserIdAndPerformanceId(userId, requestDto.performanceId())) {
+    if (reviewRepository.existsByUserIdAndPerformanceId(UserContext.getUserId(),
+        requestDto.performanceId())) {
       throw new ReviewException(ErrorCode.ALREADY_EXISTS);
     }
 
@@ -49,7 +50,8 @@ public class ReviewService {
     // TODO User 서버에 userId에 대한 nickname 데이터 요청
     String nickname = "test";
 
-    Review savedReview = reviewRepository.save(CreateReviewRequestDto.toEntity(requestDto, userId));
+    Review savedReview = reviewRepository.save(
+        CreateReviewRequestDto.toEntity(requestDto, UserContext.getUserId()));
     calculateRatingAvg(requestDto.performanceId());
 
     return CreateReviewResponseDto.fromEntity(savedReview, nickname);
@@ -61,12 +63,10 @@ public class ReviewService {
    *
    * @param reviewId
    * @param requestDto
-   * @param userId
    * @return
    */
   @Transactional(readOnly = false)
-  public UpdateReviewResponseDto updateReview(UUID reviewId, UpdateReviewRequestDto requestDto,
-      long userId) {
+  public UpdateReviewResponseDto updateReview(UUID reviewId, UpdateReviewRequestDto requestDto) {
     //DB에 reviewId에 대한 정보가 존재하는지 확인
     Review findReview = reviewRepository.findById(reviewId).orElseThrow(
         () -> new ReviewException(ErrorCode.REVIEW_NOT_FOUND)
@@ -74,7 +74,7 @@ public class ReviewService {
 
     // 등록한 리뷰의 사용자와 일치하는지 확인
     // TODO 관리자의 경우 해당 로직을 타지 않도록 변경
-    if (userId != findReview.getUserId()) {
+    if (UserContext.getUserId() != findReview.getUserId()) {
       throw new ReviewException(ErrorCode.REVIEW_FORBIDDEN);
     }
 
@@ -92,17 +92,16 @@ public class ReviewService {
    * 리뷰 삭제
    *
    * @param reviewId
-   * @param userId
    * @return
    */
   @Transactional(readOnly = false)
-  public DeleteReviewResponseDto deleteReview(UUID reviewId, long userId) {
+  public DeleteReviewResponseDto deleteReview(UUID reviewId) {
     //DB에 reviewId에 대한 정보가 존재하는지 확인
     Review findReview = reviewRepository.findById(reviewId).orElseThrow(
         () -> new ReviewException(ErrorCode.REVIEW_NOT_FOUND)
     );
 
-    findReview.deleteReview(userId);
+    findReview.deleteReview(UserContext.getUserId());
     calculateRatingAvg(findReview.getPerformanceId());
     return DeleteReviewResponseDto.fromEntity(findReview);
   }

@@ -20,7 +20,6 @@ import org.springframework.web.bind.annotation.PatchMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestHeader;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
@@ -38,14 +37,13 @@ public class ReviewController {
    * 리뷰 등록
    *
    * @param requestDto
-   * @param userId
    * @return
    */
   @PostMapping()
   public ResponseEntity<CommonResponse<CreateReviewResponseDto>> createReview(
-      @RequestBody CreateReviewRequestDto requestDto, @RequestHeader("X-User-Id") long userId) {
+      @RequestBody CreateReviewRequestDto requestDto) {
     return ResponseEntity.ok(CommonResponse.success("리뷰 등록에 성공하였습니다.",
-        reviewService.createReview(requestDto, userId)));
+        reviewService.createReview(requestDto)));
   }
 
 
@@ -53,17 +51,15 @@ public class ReviewController {
    * 리뷰 수정
    *
    * @param reviewId
-   * @param userId
    * @param requestDto
    * @return
    */
   @PatchMapping("/{reviewId}")
   public ResponseEntity<CommonResponse<UpdateReviewResponseDto>> updateReview(
-      @PathVariable UUID reviewId,
-      @RequestHeader("X-User-Id") long userId, @RequestBody UpdateReviewRequestDto requestDto) {
+      @PathVariable UUID reviewId, @RequestBody UpdateReviewRequestDto requestDto) {
 
     return ResponseEntity.ok(CommonResponse.success("리뷰 수정에 성공하였습니다.",
-        reviewService.updateReview(reviewId, requestDto, userId)));
+        reviewService.updateReview(reviewId, requestDto)));
   }
 
 
@@ -71,31 +67,27 @@ public class ReviewController {
    * 리뷰 좋아요 관리
    *
    * @param reviewId
-   * @param userId
    * @return
    */
   @PostMapping("/{reviewId}/like")
   public ResponseEntity<CommonResponse<ReviewLikeResponseDto>> toggleReviewLike(
-      @PathVariable UUID reviewId, @RequestHeader("X-User-Id") long userId
-  ) {
+      @PathVariable UUID reviewId) {
     return ResponseEntity.ok(CommonResponse.success("좋아요 처리에 성공하였습니다.",
-        reviewLikeService.toggleReviewLike(reviewId, userId)));
+        reviewLikeService.toggleReviewLike(reviewId)));
   }
 
   /**
    * 리뷰 삭제
    *
    * @param reviewId
-   * @param userId
    * @return
    */
   @DeleteMapping("/{reviewId}")
   public ResponseEntity<CommonResponse<DeleteReviewResponseDto>> deleteReview(
-      @PathVariable UUID reviewId,
-      @RequestHeader("X-User-Id") long userId) {
+      @PathVariable UUID reviewId) {
 
     return ResponseEntity.ok(CommonResponse.success("리뷰 삭제에 성공하였습니다.",
-        reviewService.deleteReview(reviewId, userId)));
+        reviewService.deleteReview(reviewId)));
   }
 
 
