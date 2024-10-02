@@ -1,6 +1,26 @@
 spring:
+  config:
+    import: optional:classpath:.env[.properties]
   application:
     name: performance-service
+  datasource:
+    url: jdbc:postgresql://${url}/performance
+    username: ${username}
+    password: ${password}
+  jpa:
+    hibernate:
+      ddl-auto: update
+    properties:
+      hibernate:
+        show_sql: true
+        format_sql: true
+  data:
+    redis:
+      host: ${redis-url}
+      port: ${redis-port}
+      username: ${redis-username}
+      password: ${redis-password}
+
 
 server:
   port: 19094
@@ -11,3 +31,11 @@ eureka:
     fetch-registry: true
     service-url:
       defaultZone: http://localhost:19090/eureka/
+
+
+s3:
+  credentials:
+    access-key: ${access-key}
+    secret-key: ${secret-key}
+    region: ap-northeast-2
+  bucket: ${bucket-name}
