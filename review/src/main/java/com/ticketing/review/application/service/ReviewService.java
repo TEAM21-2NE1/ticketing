@@ -4,6 +4,7 @@ import com.ticketing.review.application.dto.request.CreateReviewRequestDto;
 import com.ticketing.review.application.dto.request.UpdateReviewRequestDto;
 import com.ticketing.review.application.dto.response.CreateReviewResponseDto;
 import com.ticketing.review.application.dto.response.DeleteReviewResponseDto;
+import com.ticketing.review.application.dto.response.ReviewListResponseDto;
 import com.ticketing.review.application.dto.response.ReviewResponseDto;
 import com.ticketing.review.application.dto.response.UpdateReviewResponseDto;
 import com.ticketing.review.common.exception.ReviewException;
@@ -13,6 +14,10 @@ import com.ticketing.review.domain.repository.ReviewRepository;
 import java.util.List;
 import java.util.UUID;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -121,19 +126,48 @@ public class ReviewService {
   }
 
 
+  @Transactional(readOnly = true)
+  public ReviewListResponseDto getReviews(UUID performanceId, int page, int size, boolean isAsc,
+      String sortBy,
+      String title, String content) {
+    Sort.Direction direction = isAsc ? Sort.Direction.ASC : Sort.Direction.DESC;
+    Pageable pageable = PageRequest.of(page, size, Sort.by(direction, sortBy));
+
+    double ratingAvg = calculateRatingAvg(performanceId);
+
+    // TODO User 서버에게 userId에 대한 nickname 데이터 요청 (bulk 방식으로 요청할 필요가 있음)
+    String nickname = "test";
+    Page<ReviewResponseDto> reviews = Page.empty();
+
+    if (title == null && content == null) {
+
+      reviews = reviewRepository.findAll(pageable)
+          .map(review -> ReviewResponseDto.fromEntity(review, nickname));
+    } else if (title == null) {
+      reviews = reviewRepository.findByContentContaining(content, pageable)
+          .map(review -> ReviewResponseDto.fromEntity(review, nickname));
+    } else if (content == null) {
+      reviews = reviewRepository.findByTitleContaining(title, pageable)
+          .map(review -> ReviewResponseDto.fromEntity(review, nickname));
+    } else {
+      reviews = reviewRepository.findByTitleContainingAndContentContaining(title, content, pageable)
+          .map(review -> ReviewResponseDto.fromEntity(review, nickname));
+    }
+
+    return ReviewListResponseDto.of(reviews, ratingAvg);
+
+  }
+
+
   /**
    * 평균 평점 계산
    *
    * @param performanceId
    */
   private double calculateRatingAvg(UUID performanceId) {
-    // TODO 추후에 레디스 캐싱 예정
     List<Review> reviews = reviewRepository.findByPerformanceId(performanceId);
-    double ratingAvg = 0.0;
-    if (reviews.isEmpty()) {
-      return 0.0;
-    }
-    return ratingAvg = reviews.stream()
+
+    return reviews.stream()
         .mapToDouble(Review::getRating)
         .average()
         .orElse(0.0);

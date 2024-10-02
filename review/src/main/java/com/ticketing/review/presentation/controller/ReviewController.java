@@ -5,6 +5,7 @@ import com.ticketing.review.application.dto.request.UpdateReviewRequestDto;
 import com.ticketing.review.application.dto.response.CreateReviewResponseDto;
 import com.ticketing.review.application.dto.response.DeleteReviewResponseDto;
 import com.ticketing.review.application.dto.response.ReviewLikeResponseDto;
+import com.ticketing.review.application.dto.response.ReviewListResponseDto;
 import com.ticketing.review.application.dto.response.ReviewResponseDto;
 import com.ticketing.review.application.dto.response.UpdateReviewResponseDto;
 import com.ticketing.review.application.service.ReviewLikeService;
@@ -21,6 +22,7 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestHeader;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 @RestController
@@ -108,6 +110,32 @@ public class ReviewController {
       @PathVariable UUID reviewId) {
     return ResponseEntity.ok(CommonResponse.success("리뷰 조회에 성공하였습니다.",
         reviewService.getReview(reviewId)));
+  }
+
+
+  /**
+   * 리뷰 목록 조회
+   *
+   * @param performanceId
+   * @param page
+   * @param size
+   * @param isAsc
+   * @param sortBy
+   * @param title
+   * @param content
+   * @return
+   */
+  @GetMapping()
+  public ResponseEntity<CommonResponse<ReviewListResponseDto>> getReviews(
+      @RequestParam(name = "performanceId", required = true) UUID performanceId,
+      @RequestParam(name = "page", defaultValue = "1") int page,
+      @RequestParam(name = "size", defaultValue = "10") int size,
+      @RequestParam(name = "isAsc", defaultValue = "true") boolean isAsc,
+      @RequestParam(name = "sortBy", defaultValue = "createdAt") String sortBy,
+      @RequestParam(name = "title", required = false) String title,
+      @RequestParam(name = "content", required = false) String content) {
+    return ResponseEntity.ok(CommonResponse.success("리뷰 목록 조회에 성공하였습니다.",
+        reviewService.getReviews(performanceId, page - 1, size, isAsc, sortBy, title, content)));
   }
 
 
