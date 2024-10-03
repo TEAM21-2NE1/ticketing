@@ -1,5 +1,6 @@
 package com.ticketing.performance.presentation.dto.hall;
 
+import jakarta.validation.constraints.NotBlank;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -9,6 +10,8 @@ import lombok.NoArgsConstructor;
 @Getter
 public class UpdateHallRequestDto {
 
+    @NotBlank
     private String hallName;
+    @NotBlank
     private String hallAddress;
 }

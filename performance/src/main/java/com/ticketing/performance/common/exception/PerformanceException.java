@@ -2,9 +2,9 @@ package com.ticketing.performance.common.exception;
 
 import com.ticketing.performance.common.response.ErrorCode;
 
-public class S3Exception extends BusinessException {
+public class PerformanceException extends BusinessException{
 
-    public S3Exception(ErrorCode errorCode) {
+    public PerformanceException(ErrorCode errorCode) {
         super(errorCode);
     }
 }

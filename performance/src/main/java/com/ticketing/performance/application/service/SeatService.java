@@ -3,6 +3,8 @@ package com.ticketing.performance.application.service;
 import com.ticketing.performance.application.dto.hall.HallInfoResponseDto;
 import com.ticketing.performance.application.dto.hall.HallSeatInfoResponseDto;
 import com.ticketing.performance.application.dto.seat.SeatInfoResponseDto;
+import com.ticketing.performance.common.exception.SeatException;
+import com.ticketing.performance.common.response.ErrorCode;
 import com.ticketing.performance.domain.model.Seat;
 import com.ticketing.performance.domain.repository.SeatRepository;
 import com.ticketing.performance.presentation.dto.seat.CreateSeatRequestDto;
@@ -24,8 +26,11 @@ public class SeatService {
 
 
     public List<SeatInfoResponseDto> getSeats(UUID performanceId) {
-        return seatRepository.findAllByPerformanceId(performanceId)
-                .stream()
+        List<Seat> seats = seatRepository.findAllByPerformanceId(performanceId);
+        if (seats.isEmpty()) {
+            throw new SeatException(ErrorCode.SEAT_NOT_FOUND);
+        }
+        return seats.stream()
                 .map(SeatInfoResponseDto::of)
                 .toList();
     }
@@ -33,7 +38,11 @@ public class SeatService {
 
     @Transactional
     public void deleteSeatsByPerformanceId(UUID performanceId) {
-        seatRepository.softDeleteSeatsByPerformanceId(performanceId);
+        int deleteCount = seatRepository.softDeleteSeatsByPerformanceId(performanceId);
+
+        if (deleteCount == 0) {
+            throw new SeatException(ErrorCode.SEAT_NOT_FOUND);
+        }
     }
 
     @Transactional
@@ -50,7 +59,7 @@ public class SeatService {
                     .stream()
                     .filter(s -> hallSeat.getSeatType().equals(s.getSeatType()))
                     .findFirst()
-                    .orElseThrow(() -> new RuntimeException("error"))
+                    .orElseThrow(() -> new SeatException(ErrorCode.SEAT_TYPE_NOT_EXIST))
                     .getPrice();
 
 
@@ -67,10 +76,13 @@ public class SeatService {
 
     @Transactional
     public void updateSeatPrice(UpdateSeatPriceRequestDto requestDto) {
-        seatRepository.updateSeatPriceBySeatType(
+        int updateCount = seatRepository.updateSeatPriceBySeatType(
                 requestDto.getSeatType(),
                 requestDto.getPrice(),
                 requestDto.getPerformanceId()
         );
+        if (updateCount == 0) {
+            throw new SeatException(ErrorCode.SEAT_NOT_FOUND);
+        }
     }
 }

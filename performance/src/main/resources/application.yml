@@ -35,7 +35,7 @@ eureka:
 
 s3:
   credentials:
-    access-key: ${access-key}
-    secret-key: ${secret-key}
+    access-key: ${s3-access-key}
+    secret-key: ${s3-secret-key}
     region: ap-northeast-2
-  bucket: ${bucket-name}
+  bucket: ${s3-bucket-name}
