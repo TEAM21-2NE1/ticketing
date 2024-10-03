@@ -3,12 +3,12 @@ server:
 
 spring:
   main:
-    web-application-type: reactive  # Spring ??????? ???? ? ???????? ??
+    web-application-type: reactive
   application:
     name: gateway-service
   cloud:
     gateway:
-      routes:  # Spring Cloud Gateway? ??? ??
+      routes:
         - id: auth-service
           uri: lb://user-service
           predicates:
@@ -17,9 +17,25 @@ spring:
           uri: lb://user-service
           predicates:
             - Path=/api/v1/users/**
+        - id: performance-service
+          uri: lb://performance-service
+          predicates:
+            - Path=/api/v1/performances/**, /api/v1/halls/**, /api/v1/seats/**
+        - id: order-service
+          uri: lb://order-service
+          predicates:
+            - Path=/api/v1/orders/**
+        - id: payment-service
+          uri: lb://payment-service
+          predicates:
+            - Path=/api/v1/payments/**
+        - id: review-service
+          uri: lb://review-service
+          predicates:
+            - Path=/api/v1/reviews/**
       discovery:
         locator:
-          enabled: true  # ??? ?????? ?? ???? ???? ????? ??
+          enabled: true
 
 eureka:
   client:
@@ -30,7 +46,6 @@ eureka:
 
 service:
   jwt:
-    access-expiration: 3600000  # 1시간
     secret-key: "TVNB6rWs7KGw7J2YU3ByaW5nYm9vdOqwnOyduO2UhOuhnOygne2KuOyXkOyCrOyaqe2VoGp3dC1zZWNyZXQta2V57J6F64uI64ukLg=="
 
 logging:
