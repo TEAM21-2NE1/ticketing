@@ -1,7 +1,6 @@
 package com.ticketing.performance.domain.repository;
 
 import com.ticketing.performance.domain.model.Seat;
-import jakarta.ws.rs.PATCH;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
@@ -20,4 +19,7 @@ public interface SeatRepository extends JpaRepository<Seat, UUID> {
     @Modifying
     @Query("UPDATE Seat s SET s.price = :price WHERE s.performanceId = :performanceId and s.seatType = :seatType")
     int updateSeatPriceBySeatType(@Param("seatType")String seatType, @Param("price") Integer price, @Param("performanceId") UUID performanceId);
+
+    @Query("Select s from Seat s where s.id in :seatIds")
+    List<Seat> findAllByIds(@Param("seatIds") List<UUID> seatIds);
 }

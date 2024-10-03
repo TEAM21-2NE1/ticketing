@@ -1,6 +1,7 @@
 package com.ticketing.performance.presentation.dto.performance;
 
 import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.NotNull;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -17,7 +18,7 @@ import java.util.UUID;
 @Setter
 public class CreatePrfRequestDto {
 
-    @NotBlank
+    @NotNull
     private UUID hallId;
     @NotBlank
     private String title;
