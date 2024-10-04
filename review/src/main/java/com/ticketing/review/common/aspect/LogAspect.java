@@ -13,7 +13,7 @@ import org.springframework.stereotype.Component;
 @Aspect
 @Slf4j
 @Component
-@Profile("local")
+@Profile({"dev", "local"})
 public class LogAspect {
 
 
