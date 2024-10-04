@@ -15,7 +15,7 @@ import org.springframework.stereotype.Component;
 @Component
 @Profile("local")
 public class LogAspect {
-  
+
 
   @Pointcut("execution(* com.ticketing.review..*Controller.*(..))")
   public void controller() {
@@ -50,7 +50,6 @@ public class LogAspect {
     } finally {
       long endTime = System.currentTimeMillis();
       long timeMs = endTime - startTime;
-      log.info("log={}", joinPoint.getSignature());
       log.info("timeMs = {}", timeMs);
 
     }
