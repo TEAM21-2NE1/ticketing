@@ -1,4 +1,4 @@
-package com.ticketing.review.common.utils;
+package com.ticketing.review.infrastructure.utils;
 
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.core.Authentication;
