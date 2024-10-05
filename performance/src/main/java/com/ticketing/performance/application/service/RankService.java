@@ -4,12 +4,12 @@ import com.querydsl.core.Tuple;
 import com.querydsl.core.types.dsl.Expressions;
 import com.ticketing.performance.application.dto.rank.RankingResponseDto;
 import com.ticketing.performance.domain.repository.RankRepository;
+import com.ticketing.performance.domain.repository.RankRepositoryImpl;
 import lombok.RequiredArgsConstructor;
 import org.springframework.cache.annotation.Cacheable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.atomic.AtomicInteger;
