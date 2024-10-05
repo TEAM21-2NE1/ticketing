@@ -4,16 +4,23 @@ spring:
   application:
     name: performance-service
   datasource:
-    url: jdbc:postgresql://${url}/performance
+    url: jdbc:postgresql://${url}/performance?rewriteBatchedInserts=true
     username: ${username}
     password: ${password}
   jpa:
     hibernate:
       ddl-auto: update
+    show-sql: true
     properties:
       hibernate:
-        show_sql: true
         format_sql: true
+        order_inserts: true
+        order_updates: true
+        jdbc:
+          batch_size: 1000
+    generate-ddl: true
+    database: postgresql
+
   data:
     redis:
       host: ${redis-url}
