@@ -3,19 +3,39 @@ server:
 
 spring:
   main:
-    web-application-type: reactive  # Spring ??????? ???? ? ???????? ??
+    web-application-type: reactive
   application:
     name: gateway-service
   cloud:
     gateway:
-      routes:  # Spring Cloud Gateway? ??? ??
-        - id: auth-service    # 19092
+      routes:
+        - id: auth-service
           uri: lb://user-service
           predicates:
             - Path=/api/v1/auth/**
+        - id: user-service
+          uri: lb://user-service
+          predicates:
+            - Path=/api/v1/users/**
+        - id: performance-service
+          uri: lb://performance-service
+          predicates:
+            - Path=/api/v1/performances/**, /api/v1/halls/**, /api/v1/seats/**
+        - id: order-service
+          uri: lb://order-service
+          predicates:
+            - Path=/api/v1/orders/**
+        - id: payment-service
+          uri: lb://payment-service
+          predicates:
+            - Path=/api/v1/payments/**
+        - id: review-service
+          uri: lb://review-service
+          predicates:
+            - Path=/api/v1/reviews/**
       discovery:
         locator:
-          enabled: true  # ??? ?????? ?? ???? ???? ????? ??
+          enabled: true
 
 eureka:
   client:
@@ -23,3 +43,11 @@ eureka:
     fetch-registry: true
     service-url:
       defaultZone: http://localhost:19090/eureka/
+
+service:
+  jwt:
+    secret-key: "TVNB6rWs7KGw7J2YU3ByaW5nYm9vdOqwnOyduO2UhOuhnOygne2KuOyXkOyCrOyaqe2VoGp3dC1zZWNyZXQta2V57J6F64uI64ukLg=="
+
+logging:
+  level:
+    com.ticketing.gateway.filter.JwtAuthenticationFilter: DEBUG
