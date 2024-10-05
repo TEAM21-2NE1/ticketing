@@ -5,9 +5,11 @@ import com.querydsl.core.types.dsl.Expressions;
 import com.ticketing.performance.application.dto.rank.RankingResponseDto;
 import com.ticketing.performance.domain.repository.RankRepository;
 import lombok.RequiredArgsConstructor;
+import org.springframework.cache.annotation.Cacheable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.atomic.AtomicInteger;
@@ -22,6 +24,7 @@ public class RankService {
     private final RankRepository rankRepository;
 
 
+    @Cacheable(cacheNames = "getRank", key = "'allRankings'")
     public List<RankingResponseDto> getRank() {
         List<Tuple> fetch = rankRepository.getRank();
 

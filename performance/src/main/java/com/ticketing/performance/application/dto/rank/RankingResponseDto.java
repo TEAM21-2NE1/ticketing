@@ -5,13 +5,14 @@ import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
+import java.io.Serializable;
 import java.time.LocalDateTime;
 import java.util.UUID;
 
 @NoArgsConstructor
 @Getter
 @Builder
-public class RankingResponseDto {
+public class RankingResponseDto implements Serializable {
 
     private UUID performanceId;
     private String title;
