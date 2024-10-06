@@ -15,6 +15,19 @@ services:
       - POSTGRES_PASSWORD=${REVIEW_POSTGRES_PASSWORD}
     env_file:
       - .env
+  review-redis:
+    image: "redis/redis-stack"
+    container_name: review-redis-local-1
+    restart: always
+    ports:
+      - "${REVIEW_REDIS_PORT}:6379"
+    environment:
+      REDIS_ARGS: "--requirepass ${REVIEW_REDIS_PASSWORD}"
+    volumes:
+      - review-redis-local-data:/data
+      - review-redis-config-file:/usr/local/etc/redis/redis.conf
 
 volumes:
   review-db-local-data:
+  review-redis-local-data:
+  review-redis-config-file:
