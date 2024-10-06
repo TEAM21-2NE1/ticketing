@@ -14,6 +14,7 @@ import com.ticketing.review.common.response.CommonResponse;
 import java.util.UUID;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PatchMapping;
@@ -31,7 +32,6 @@ public class ReviewController {
 
   private final ReviewService reviewService;
   private final ReviewLikeService reviewLikeService;
-  // TODO 추후에 userId는 Filter로 분리할 예정
 
   /**
    * 리뷰 등록
@@ -39,6 +39,7 @@ public class ReviewController {
    * @param requestDto
    * @return
    */
+  @PreAuthorize("hasRole('USER')")
   @PostMapping()
   public ResponseEntity<CommonResponse<CreateReviewResponseDto>> createReview(
       @RequestBody CreateReviewRequestDto requestDto) {
@@ -54,6 +55,7 @@ public class ReviewController {
    * @param requestDto
    * @return
    */
+  @PreAuthorize("hasAnyRole('USER','MANAGER')")
   @PatchMapping("/{reviewId}")
   public ResponseEntity<CommonResponse<UpdateReviewResponseDto>> updateReview(
       @PathVariable UUID reviewId, @RequestBody UpdateReviewRequestDto requestDto) {
@@ -69,6 +71,7 @@ public class ReviewController {
    * @param reviewId
    * @return
    */
+  @PreAuthorize("hasAnyRole('USER','MANAGER','P_MANAGER')")
   @PostMapping("/{reviewId}/like")
   public ResponseEntity<CommonResponse<ReviewLikeResponseDto>> toggleReviewLike(
       @PathVariable UUID reviewId) {
@@ -82,6 +85,7 @@ public class ReviewController {
    * @param reviewId
    * @return
    */
+  @PreAuthorize("hasAnyRole('USER','MANAGER')")
   @DeleteMapping("/{reviewId}")
   public ResponseEntity<CommonResponse<DeleteReviewResponseDto>> deleteReview(
       @PathVariable UUID reviewId) {

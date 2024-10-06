@@ -7,11 +7,11 @@ import com.ticketing.review.application.dto.response.DeleteReviewResponseDto;
 import com.ticketing.review.application.dto.response.ReviewListResponseDto;
 import com.ticketing.review.application.dto.response.ReviewResponseDto;
 import com.ticketing.review.application.dto.response.UpdateReviewResponseDto;
-import com.ticketing.review.common.context.UserContext;
 import com.ticketing.review.common.exception.ReviewException;
 import com.ticketing.review.common.response.ErrorCode;
 import com.ticketing.review.domain.model.Review;
 import com.ticketing.review.domain.repository.ReviewRepository;
+import com.ticketing.review.infrastructure.utils.SecurityUtils;
 import java.util.List;
 import java.util.UUID;
 import lombok.RequiredArgsConstructor;
@@ -37,7 +37,7 @@ public class ReviewService {
   @Transactional(readOnly = false)
   public CreateReviewResponseDto createReview(CreateReviewRequestDto requestDto) {
     // 같은 공연에 대해 리뷰를 등록함
-    if (reviewRepository.existsByUserIdAndPerformanceId(UserContext.getUserId(),
+    if (reviewRepository.existsByUserIdAndPerformanceId(SecurityUtils.getUserId(),
         requestDto.performanceId())) {
       throw new ReviewException(ErrorCode.ALREADY_EXISTS);
     }
@@ -51,7 +51,7 @@ public class ReviewService {
     String nickname = "test";
 
     Review savedReview = reviewRepository.save(
-        CreateReviewRequestDto.toEntity(requestDto, UserContext.getUserId()));
+        CreateReviewRequestDto.toEntity(requestDto, SecurityUtils.getUserId()));
     calculateRatingAvg(requestDto.performanceId());
 
     return CreateReviewResponseDto.fromEntity(savedReview, nickname);
@@ -74,7 +74,7 @@ public class ReviewService {
 
     // 등록한 리뷰의 사용자와 일치하는지 확인
     // TODO 관리자의 경우 해당 로직을 타지 않도록 변경
-    if (UserContext.getUserId() != findReview.getUserId()) {
+    if (SecurityUtils.getUserId() != findReview.getUserId()) {
       throw new ReviewException(ErrorCode.REVIEW_FORBIDDEN);
     }
 
@@ -101,7 +101,7 @@ public class ReviewService {
         () -> new ReviewException(ErrorCode.REVIEW_NOT_FOUND)
     );
 
-    findReview.deleteReview(UserContext.getUserId());
+    findReview.deleteReview(SecurityUtils.getUserId());
     calculateRatingAvg(findReview.getPerformanceId());
     return DeleteReviewResponseDto.fromEntity(findReview);
   }
