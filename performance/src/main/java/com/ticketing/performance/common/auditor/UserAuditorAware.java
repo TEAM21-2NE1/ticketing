@@ -1,18 +1,31 @@
 package com.ticketing.performance.common.auditor;
 
-import java.util.Optional;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.AuditorAware;
-import org.springframework.stereotype.Service;
+import org.springframework.security.authentication.AnonymousAuthenticationToken;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.stereotype.Component;
 
-@Service
+import java.util.Optional;
+
+@Component
+@Slf4j
 public class UserAuditorAware implements AuditorAware<Long> {
 
     @Override
     public Optional<Long> getCurrentAuditor() {
 
-        // TODO: 유저 정보 수정하기
-        Long modifiedById = 1L;
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
 
-        return Optional.of(modifiedById);
+        if (authentication == null || !authentication.isAuthenticated() || authentication instanceof AnonymousAuthenticationToken) {
+            log.info("인증정보가 존재하지 않습니다.");
+            return Optional.empty();
+        }
+
+        Long userId =(Long) authentication.getDetails();
+
+        return Optional.of(userId);
+
     }
 }
