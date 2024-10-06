@@ -53,8 +53,8 @@ public class Hall extends BaseEntity {
         this.hallAddress = updateHallRequestDto.getHallAddress();
     }
 
-    public void delete(Long id) {
-        super.delete(id);
-        hallSeats.forEach(hallSeat -> hallSeat.delete(id));
+    public void delete() {
+        super.delete();
+        hallSeats.forEach(HallSeat::delete);
     }
 }

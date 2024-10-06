@@ -42,7 +42,7 @@ public class HallSeat extends BaseEntity {
         this.hall = hall;
     }
 
-    public void delete(Long userId) {
-        super.delete(userId);
+    public void delete() {
+        super.delete();
     }
 }

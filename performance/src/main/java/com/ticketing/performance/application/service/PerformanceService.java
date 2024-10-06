@@ -84,6 +84,6 @@ public class PerformanceService {
                 .orElseThrow(() -> new PerformanceException(ErrorCode.PERFORMANCE_NOT_FOUND));
 
         seatService.deleteSeatsByPerformanceId(performanceId);
-        performance.delete(1L);
+        performance.delete();
     }
 }
