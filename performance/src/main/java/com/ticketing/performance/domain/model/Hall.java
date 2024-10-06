@@ -27,6 +27,7 @@ public class Hall extends BaseEntity {
     private String hallName;
     private String hallAddress;
 
+    @Builder.Default
     @OneToMany(mappedBy = "hall",fetch = FetchType.LAZY, cascade = CascadeType.ALL, orphanRemoval = true)
     private List<HallSeat> hallSeats = new ArrayList<>();
 
