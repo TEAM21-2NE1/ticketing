@@ -1,8 +1,9 @@
 package com.ticketing.performance.domain.repository;
 
-import com.querydsl.core.Tuple;
 import com.querydsl.core.types.dsl.Expressions;
 import com.querydsl.jpa.impl.JPAQueryFactory;
+import com.ticketing.performance.application.dto.rank.QRankingResponseDto;
+import com.ticketing.performance.application.dto.rank.RankingResponseDto;
 import com.ticketing.performance.domain.model.SeatStatus;
 import jakarta.persistence.EntityManager;
 import org.springframework.stereotype.Repository;
@@ -22,9 +23,9 @@ public class RankRepositoryImpl implements RankRepository{
     }
 
 
-    public List<Tuple> getRank() {
-        return queryFactory
-                .select(
+    public List<RankingResponseDto> getRank() {
+         return queryFactory
+                .select(new QRankingResponseDto(
                         performance.id,
                         performance.title,
                         performance.posterUrl,
@@ -35,7 +36,7 @@ public class RankRepositoryImpl implements RankRepository{
                                 .otherwise(
                                         seat.seatStatus.when(SeatStatus.BOOKED).then(1).otherwise(0).sum().doubleValue()
                                                 .divide(seat.count()).multiply(100.0)
-                                ).as("reservationRate")
+                                ).as("reservationRate"))
                 )
                 .from(performance)
                 .leftJoin(seat).on(seat.performanceId.eq(performance.id))
@@ -43,7 +44,5 @@ public class RankRepositoryImpl implements RankRepository{
                 .orderBy(Expressions.numberPath(Double.class, "reservationRate").desc())
                 .limit(50)
                 .fetch();
-
-
     }
 }
