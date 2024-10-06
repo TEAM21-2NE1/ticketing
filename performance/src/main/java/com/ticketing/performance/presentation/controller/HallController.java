@@ -14,6 +14,7 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.data.web.PageableDefault;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
@@ -26,6 +27,7 @@ public class HallController {
 
     private final HallService hallService;
 
+    @PreAuthorize("hasRole('MANAGER')")
     @PostMapping
     public ResponseEntity<CommonResponse<CreateHallResponseDto>> createHall(@Validated @RequestBody CreateHallRequestDto requestDto) {
         CreateHallResponseDto createHallResponseDto = hallService.createHall(requestDto);
@@ -46,6 +48,7 @@ public class HallController {
         return ResponseEntity.ok(CommonResponse.success("get info success!", hallInfo));
     }
 
+    @PreAuthorize("hasRole('MANAGER')")
     @PatchMapping("{hallId}")
     public ResponseEntity<CommonResponse<UpdateHallResponseDto>> updateHall(@PathVariable UUID hallId,
                                                                             @Validated @RequestBody UpdateHallRequestDto requestDto) {
@@ -53,6 +56,7 @@ public class HallController {
         return ResponseEntity.ok(CommonResponse.success("update success!", updateHallResponseDto));
     }
 
+    @PreAuthorize("hasRole('MANAGER')")
     @DeleteMapping("{hallId}")
     public ResponseEntity<CommonResponse<Void>> deleteHall(@PathVariable UUID hallId) {
         hallService.deleteHall(hallId);
