@@ -1,10 +1,10 @@
 package com.ticketing.performance.domain.repository;
 
-import com.querydsl.core.Tuple;
+import com.ticketing.performance.application.dto.rank.RankingResponseDto;
 
 import java.util.List;
 
 public interface RankRepository {
 
-    List<Tuple> getRank();
+    List<RankingResponseDto> getRank();
 }

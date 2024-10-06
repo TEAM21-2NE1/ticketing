@@ -1,15 +1,15 @@
 package com.ticketing.performance.application.dto.rank;
 
 import com.querydsl.core.annotations.QueryProjection;
-import lombok.Builder;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
+import jakarta.persistence.criteria.CriteriaBuilder;
+import lombok.*;
 
 import java.io.Serializable;
 import java.time.LocalDateTime;
 import java.util.UUID;
 
 @NoArgsConstructor
+@AllArgsConstructor
 @Getter
 @Builder
 public class RankingResponseDto implements Serializable {
@@ -19,15 +19,16 @@ public class RankingResponseDto implements Serializable {
     private String posterUrl;
     private LocalDateTime performanceTime;
     private Double reservationRate;
+    @Setter
     private Integer ranking;
 
     @QueryProjection
-    public RankingResponseDto(UUID performanceId, String title, String posterUrl, LocalDateTime performanceTime, Double reservationRate, Integer ranking) {
+    public RankingResponseDto(UUID performanceId, String title, String posterUrl, LocalDateTime performanceTime, Double reservationRate) {
         this.performanceId = performanceId;
         this.title = title;
         this.posterUrl = posterUrl;
         this.performanceTime = performanceTime;
         this.reservationRate = reservationRate;
-        this.ranking = ranking;
     }
+
 }
