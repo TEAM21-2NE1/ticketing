@@ -6,6 +6,8 @@ server:
   port: 19096
 
 eureka:
+  instance:
+    prefer-ip-address: true
   client:
     register-with-eureka: true
     fetch-registry: true
