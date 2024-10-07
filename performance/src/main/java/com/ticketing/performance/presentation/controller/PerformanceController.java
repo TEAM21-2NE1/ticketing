@@ -15,6 +15,7 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.data.web.PageableDefault;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
@@ -28,6 +29,7 @@ public class PerformanceController {
 
     private final PerformanceService performanceService;
 
+    @PreAuthorize("hasRole('P_MANAGER')")
     @PostMapping(consumes = "multipart/form-data")
     public ResponseEntity<CommonResponse<CreatePrfResponseDto>> createPerformance(
             @Validated @ModelAttribute CreatePrfRequestDto requestDto){
@@ -48,6 +50,7 @@ public class PerformanceController {
         return ResponseEntity.ok(CommonResponse.success("get success!", responseDto));
     }
 
+    @PreAuthorize("hasAnyRole('MANAGER','P_MANAGER')")
     @PatchMapping("/{performanceId}")
     public ResponseEntity<CommonResponse<UpdatePrfResponseDto>> updatePerformance(
             @PathVariable UUID performanceId,
@@ -57,6 +60,7 @@ public class PerformanceController {
         return ResponseEntity.ok(CommonResponse.success("update success!", responseDto));
     }
 
+    @PreAuthorize("hasAnyRole('MANAGER','P_MANAGER')")
     @DeleteMapping("/{performanceId}")
     public ResponseEntity<CommonResponse<Void>> deletePerformance(@PathVariable UUID performanceId) {
         performanceService.deletePerformance(performanceId);
