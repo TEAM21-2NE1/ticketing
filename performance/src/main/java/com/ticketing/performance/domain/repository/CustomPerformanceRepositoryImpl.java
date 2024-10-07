@@ -37,7 +37,7 @@ public class CustomPerformanceRepositoryImpl implements CustomPerformanceReposit
                 .from(performance)
                 .where(
                         containsKeyword(keyword),
-                        performance.openDate.before(LocalDate.now())
+                        performance.openDate.loe(LocalDate.now())
                 ).offset(pageable.getOffset())
                 .limit(pageable.getPageSize())
                 .orderBy(getOrderSpecifiers(pageable))
