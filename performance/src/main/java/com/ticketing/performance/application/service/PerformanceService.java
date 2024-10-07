@@ -22,6 +22,7 @@ import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.time.LocalDate;
 import java.util.List;
 import java.util.UUID;
 
@@ -104,8 +105,6 @@ public class PerformanceService {
             if (!userId.equals(managerId)) {
                 throw new ForbiddenAccessException(ErrorCode.FORBIDDEN_ACCESS);
             }
-        } else if (role.equals("ROLE_USER")) {
-            throw new ForbiddenAccessException(ErrorCode.FORBIDDEN_ACCESS);
         }
     }
 }

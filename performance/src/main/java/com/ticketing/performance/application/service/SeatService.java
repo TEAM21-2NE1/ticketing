@@ -99,8 +99,6 @@ public class SeatService {
             if (!userId.equals(managerId)) {
                 throw new ForbiddenAccessException(ErrorCode.FORBIDDEN_ACCESS);
             }
-        } else if (role.equals("ROLE_USER")) {
-            throw new ForbiddenAccessException(ErrorCode.FORBIDDEN_ACCESS);
         }
     }
 
