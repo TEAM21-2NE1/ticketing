@@ -1,5 +1,7 @@
 package com.ticketing.performance.common.util;
 
+import com.ticketing.performance.common.exception.ForbiddenAccessException;
+import com.ticketing.performance.common.response.ErrorCode;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.context.SecurityContextHolder;
 
@@ -17,6 +19,6 @@ public class SecurityUtil {
                 .stream()
                 .map(GrantedAuthority::getAuthority)
                 .findFirst()
-                .orElse("ROLE_USER");
+                .orElseThrow(()-> new ForbiddenAccessException(ErrorCode.FORBIDDEN_ACCESS));
     }
 }
