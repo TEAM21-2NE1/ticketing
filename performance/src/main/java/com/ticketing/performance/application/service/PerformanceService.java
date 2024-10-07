@@ -6,9 +6,8 @@ import com.ticketing.performance.application.dto.performance.PrfInfoResponseDto;
 import com.ticketing.performance.application.dto.performance.PrfListResponseDto;
 import com.ticketing.performance.application.dto.performance.UpdatePrfResponseDto;
 import com.ticketing.performance.application.dto.seat.SeatInfoResponseDto;
+import com.ticketing.performance.common.exception.ForbiddenAccessException;
 import com.ticketing.performance.common.exception.PerformanceException;
-import com.ticketing.performance.common.exception.SeatException;
-import com.ticketing.performance.common.exception.UnauthorizedAccessException;
 import com.ticketing.performance.common.response.ErrorCode;
 import com.ticketing.performance.common.util.SecurityUtil;
 import com.ticketing.performance.domain.model.Performance;
@@ -103,10 +102,10 @@ public class PerformanceService {
 
         if (role.equals("ROLE_P_MANAGER")) {
             if (!userId.equals(managerId)) {
-                throw new UnauthorizedAccessException(ErrorCode.UNAUTHORIZED_ACCESS);
+                throw new ForbiddenAccessException(ErrorCode.FORBIDDEN_ACCESS);
             }
         } else if (role.equals("ROLE_USER")) {
-            throw new UnauthorizedAccessException(ErrorCode.UNAUTHORIZED_ACCESS);
+            throw new ForbiddenAccessException(ErrorCode.FORBIDDEN_ACCESS);
         }
     }
 }

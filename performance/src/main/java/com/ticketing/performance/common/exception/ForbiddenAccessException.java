@@ -2,9 +2,9 @@ package com.ticketing.performance.common.exception;
 
 import com.ticketing.performance.common.response.ErrorCode;
 
-public class UnauthorizedAccessException extends BusinessException{
+public class ForbiddenAccessException extends BusinessException{
 
-    public UnauthorizedAccessException(ErrorCode errorCode) {
+    public ForbiddenAccessException(ErrorCode errorCode) {
         super(errorCode);
     }
 }
