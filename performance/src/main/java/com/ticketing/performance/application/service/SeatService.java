@@ -5,10 +5,13 @@ import com.ticketing.performance.application.dto.hall.HallSeatInfoResponseDto;
 import com.ticketing.performance.application.dto.performance.PrfInfoResponseDto;
 import com.ticketing.performance.application.dto.seat.SeatInfoResponseDto;
 import com.ticketing.performance.common.exception.ForbiddenAccessException;
+import com.ticketing.performance.common.exception.PerformanceException;
 import com.ticketing.performance.common.exception.SeatException;
 import com.ticketing.performance.common.response.ErrorCode;
 import com.ticketing.performance.common.util.SecurityUtil;
+import com.ticketing.performance.domain.model.Performance;
 import com.ticketing.performance.domain.model.Seat;
+import com.ticketing.performance.domain.repository.PerformanceRepository;
 import com.ticketing.performance.domain.repository.SeatRepository;
 import com.ticketing.performance.presentation.dto.seat.CreateSeatRequestDto;
 import com.ticketing.performance.presentation.dto.seat.UpdateSeatPriceRequestDto;
@@ -18,6 +21,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 import java.util.UUID;
 
 @Service
@@ -27,7 +31,7 @@ public class SeatService {
 
     private final SeatRepository seatRepository;
     private final HallService hallService;
-    private final PerformanceService performanceService;
+    private final PerformanceRepository performanceRepository;
 
 
     public List<SeatInfoResponseDto> getSeats(UUID performanceId) {
@@ -75,7 +79,8 @@ public class SeatService {
 
     @Transactional
     public void updateSeatPrice(UpdateSeatPriceRequestDto requestDto) {
-        PrfInfoResponseDto performance = performanceService.getPerformance(requestDto.getPerformanceId());
+        Performance performance = performanceRepository.findById(requestDto.getPerformanceId())
+                .orElseThrow(() -> new PerformanceException(ErrorCode.PERFORMANCE_NOT_FOUND));
 
         checkRole(performance.getManagerId());
 
