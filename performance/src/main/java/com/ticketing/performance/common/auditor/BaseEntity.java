@@ -10,6 +10,7 @@ import org.springframework.data.annotation.CreatedDate;
 import org.springframework.data.annotation.LastModifiedBy;
 import org.springframework.data.annotation.LastModifiedDate;
 import org.springframework.data.jpa.domain.support.AuditingEntityListener;
+import org.springframework.security.core.context.SecurityContextHolder;
 
 @Getter
 @MappedSuperclass
@@ -41,9 +42,9 @@ public class BaseEntity{
     @Column(name = "is_deleted", nullable = false, columnDefinition = "BOOLEAN DEFAULT false")
     private Boolean isDeleted = false;  // JPA 필드 초기화와 DB 기본값 설정을 함께 사용
 
-    protected void delete(Long userId) {
+    protected void delete() {
         this.deletedAt = LocalDateTime.now();
-        this.deletedBy = userId;
+        this.deletedBy = (Long) SecurityContextHolder.getContext().getAuthentication().getDetails();
         this.isDeleted = true;
     }
 }

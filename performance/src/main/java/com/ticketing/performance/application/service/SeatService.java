@@ -2,10 +2,16 @@ package com.ticketing.performance.application.service;
 
 import com.ticketing.performance.application.dto.hall.HallInfoResponseDto;
 import com.ticketing.performance.application.dto.hall.HallSeatInfoResponseDto;
+import com.ticketing.performance.application.dto.performance.PrfInfoResponseDto;
 import com.ticketing.performance.application.dto.seat.SeatInfoResponseDto;
+import com.ticketing.performance.common.exception.ForbiddenAccessException;
+import com.ticketing.performance.common.exception.PerformanceException;
 import com.ticketing.performance.common.exception.SeatException;
 import com.ticketing.performance.common.response.ErrorCode;
+import com.ticketing.performance.common.util.SecurityUtil;
+import com.ticketing.performance.domain.model.Performance;
 import com.ticketing.performance.domain.model.Seat;
+import com.ticketing.performance.domain.repository.PerformanceRepository;
 import com.ticketing.performance.domain.repository.SeatRepository;
 import com.ticketing.performance.presentation.dto.seat.CreateSeatRequestDto;
 import com.ticketing.performance.presentation.dto.seat.UpdateSeatPriceRequestDto;
@@ -15,6 +21,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 import java.util.UUID;
 
 @Service
@@ -24,13 +31,12 @@ public class SeatService {
 
     private final SeatRepository seatRepository;
     private final HallService hallService;
+    private final PerformanceRepository performanceRepository;
 
 
     public List<SeatInfoResponseDto> getSeats(UUID performanceId) {
         List<Seat> seats = seatRepository.findAllByPerformanceId(performanceId);
-        if (seats.isEmpty()) {
-            throw new SeatException(ErrorCode.SEAT_NOT_FOUND);
-        }
+
         return seats.stream()
                 .map(SeatInfoResponseDto::of)
                 .toList();
@@ -39,11 +45,7 @@ public class SeatService {
 
     @Transactional
     public void deleteSeatsByPerformanceId(UUID performanceId) {
-        int deleteCount = seatRepository.softDeleteSeatsByPerformanceId(performanceId);
-
-        if (deleteCount == 0) {
-            throw new SeatException(ErrorCode.SEAT_NOT_FOUND);
-        }
+        seatRepository.softDeleteSeatsByPerformanceId(performanceId);
     }
 
     @Transactional
@@ -77,13 +79,27 @@ public class SeatService {
 
     @Transactional
     public void updateSeatPrice(UpdateSeatPriceRequestDto requestDto) {
-        int updateCount = seatRepository.updateSeatPriceBySeatType(
+        Performance performance = performanceRepository.findById(requestDto.getPerformanceId())
+                .orElseThrow(() -> new PerformanceException(ErrorCode.PERFORMANCE_NOT_FOUND));
+
+        checkRole(performance.getManagerId());
+
+        seatRepository.updateSeatPriceBySeatType(
                 requestDto.getSeatType(),
                 requestDto.getPrice(),
                 requestDto.getPerformanceId()
         );
-        if (updateCount == 0) {
-            throw new SeatException(ErrorCode.SEAT_NOT_FOUND);
+    }
+
+    private void checkRole(Long managerId) {
+        Long userId = SecurityUtil.getId();
+        String role = SecurityUtil.getRole();
+
+        if (role.equals("ROLE_P_MANAGER")) {
+            if (!userId.equals(managerId)) {
+                throw new ForbiddenAccessException(ErrorCode.FORBIDDEN_ACCESS);
+            }
         }
     }
+
 }

@@ -6,8 +6,10 @@ import com.ticketing.performance.application.dto.performance.PrfInfoResponseDto;
 import com.ticketing.performance.application.dto.performance.PrfListResponseDto;
 import com.ticketing.performance.application.dto.performance.UpdatePrfResponseDto;
 import com.ticketing.performance.application.dto.seat.SeatInfoResponseDto;
+import com.ticketing.performance.common.exception.ForbiddenAccessException;
 import com.ticketing.performance.common.exception.PerformanceException;
 import com.ticketing.performance.common.response.ErrorCode;
+import com.ticketing.performance.common.util.SecurityUtil;
 import com.ticketing.performance.domain.model.Performance;
 import com.ticketing.performance.domain.model.SeatStatus;
 import com.ticketing.performance.domain.repository.PerformanceRepository;
@@ -16,9 +18,11 @@ import com.ticketing.performance.presentation.dto.performance.UpdatePrfRequestDt
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.time.LocalDate;
 import java.util.List;
 import java.util.UUID;
 
@@ -33,11 +37,10 @@ public class PerformanceService {
     private final ImageUploadService imageUploadService;
 
     @Transactional
-    public CreatePrfResponseDto createPerformance(CreatePrfRequestDto requestDto){
+    public CreatePrfResponseDto createPerformance(CreatePrfRequestDto requestDto) {
 
         String posterUrl = imageUploadService.upload(requestDto.getImage());
-        //todo: 유저정보 받기
-        Long userId = 1L;
+        Long userId = (Long) SecurityContextHolder.getContext().getAuthentication().getDetails();
         Performance performance = Performance.create(requestDto, userId, posterUrl);
 
         performanceRepository.save(performance);
@@ -69,8 +72,11 @@ public class PerformanceService {
 
     @Transactional
     public UpdatePrfResponseDto updatePerformance(UUID performanceId, UpdatePrfRequestDto requestDto) {
+
         Performance performance = performanceRepository.findById(performanceId)
                 .orElseThrow(() -> new PerformanceException(ErrorCode.PERFORMANCE_NOT_FOUND));
+
+        checkRole(performance.getManagerId());
 
         performance.update(requestDto);
 
@@ -83,7 +89,22 @@ public class PerformanceService {
         Performance performance = performanceRepository.findById(performanceId)
                 .orElseThrow(() -> new PerformanceException(ErrorCode.PERFORMANCE_NOT_FOUND));
 
+        checkRole(performance.getManagerId());
+
         seatService.deleteSeatsByPerformanceId(performanceId);
-        performance.delete(1L);
+
+        performance.delete();
+    }
+
+
+    private void checkRole(Long managerId) {
+        Long userId = SecurityUtil.getId();
+        String role = SecurityUtil.getRole();
+
+        if (role.equals("ROLE_P_MANAGER")) {
+            if (!userId.equals(managerId)) {
+                throw new ForbiddenAccessException(ErrorCode.FORBIDDEN_ACCESS);
+            }
+        }
     }
 }
