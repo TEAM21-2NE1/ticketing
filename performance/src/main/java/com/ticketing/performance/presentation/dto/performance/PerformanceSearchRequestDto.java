@@ -1,4 +1,4 @@
-package com.ticketing.performance.presentation.dto;
+package com.ticketing.performance.presentation.dto.performance;
 
 import jakarta.validation.constraints.Min;
 import jakarta.validation.constraints.Pattern;
