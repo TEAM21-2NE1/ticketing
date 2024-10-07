@@ -47,6 +47,9 @@ dependencies {
     // db
     runtimeOnly 'org.postgresql:postgresql'
 
+    //redis
+    implementation 'org.springframework.boot:spring-boot-starter-data-redis'
+    
     // security
     implementation 'org.springframework.boot:spring-boot-starter-security'
     testImplementation 'org.springframework.security:spring-security-test'

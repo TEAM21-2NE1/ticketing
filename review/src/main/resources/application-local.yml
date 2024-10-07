@@ -12,3 +12,9 @@ spring:
         format_sql: true # SQL 문 정렬하여 출력
         highlight_sql: true # SQL 문 색 부여
         use_sql_comments: true # 콘솔에 표시되는 쿼리문 위에 어떤 실행을 하려는지 HINT 표시
+  data:
+    redis:
+      host: ${REVIEW.LOCAL.REDIS.HOST}
+      port: ${REVIEW.LOCAL.REDIS.PORT}
+      username: ${REVIEW.LOCAL.REDIS.USERNAME}
+      password: ${REVIEW.LOCAL.REDIS.PASSWORD}

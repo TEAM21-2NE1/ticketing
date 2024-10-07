@@ -7,14 +7,17 @@ import com.ticketing.review.application.dto.response.DeleteReviewResponseDto;
 import com.ticketing.review.application.dto.response.ReviewListResponseDto;
 import com.ticketing.review.application.dto.response.ReviewResponseDto;
 import com.ticketing.review.application.dto.response.UpdateReviewResponseDto;
+import com.ticketing.review.application.event.AvgRatingEvent;
+import com.ticketing.review.application.event.RatingOperation;
 import com.ticketing.review.common.exception.ReviewException;
 import com.ticketing.review.common.response.ErrorCode;
 import com.ticketing.review.domain.model.Review;
+import com.ticketing.review.domain.repository.RedisRatingRepository;
 import com.ticketing.review.domain.repository.ReviewRepository;
 import com.ticketing.review.infrastructure.utils.SecurityUtils;
-import java.util.List;
 import java.util.UUID;
 import lombok.RequiredArgsConstructor;
+import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
@@ -27,6 +30,8 @@ import org.springframework.transaction.annotation.Transactional;
 public class ReviewService {
 
   private final ReviewRepository reviewRepository;
+  private final ApplicationEventPublisher eventPublisher;
+  private final RedisRatingRepository redisRatingRepository;
 
   /**
    * 리뷰 생성
@@ -52,7 +57,10 @@ public class ReviewService {
 
     Review savedReview = reviewRepository.save(
         CreateReviewRequestDto.toEntity(requestDto, SecurityUtils.getUserId()));
-    calculateRatingAvg(requestDto.performanceId());
+
+    eventPublisher.publishEvent(
+        AvgRatingEvent.toAvgRatingEvent(requestDto.performanceId(), (short) 0, requestDto.rating(),
+            RatingOperation.CREATE));
 
     return CreateReviewResponseDto.fromEntity(savedReview, nickname);
   }
@@ -81,9 +89,14 @@ public class ReviewService {
     // TODO 리뷰 제목 및 내용에 부적절한 언행이 포함되었는지 AI에게 문의
     // TODO User 서버에 userId에 대한 nickname 데이터 요청
     String nickname = "test";
-    findReview.updateReview(requestDto.rating(), requestDto.title(), requestDto.content());
-    calculateRatingAvg(findReview.getPerformanceId());
 
+    if (requestDto.rating() != null) {
+      eventPublisher.publishEvent(
+          AvgRatingEvent.toAvgRatingEvent(findReview.getPerformanceId(), findReview.getRating(),
+              requestDto.rating(), RatingOperation.UPDATE));
+    }
+
+    findReview.updateReview(requestDto.rating(), requestDto.title(), requestDto.content());
     return UpdateReviewResponseDto.fromEntity(findReview, nickname);
   }
 
@@ -102,7 +115,12 @@ public class ReviewService {
     );
 
     findReview.deleteReview(SecurityUtils.getUserId());
-    calculateRatingAvg(findReview.getPerformanceId());
+
+    eventPublisher.publishEvent(
+        AvgRatingEvent.toAvgRatingEvent(findReview.getPerformanceId(), findReview.getRating(),
+            (short) 0,
+            RatingOperation.DELETE));
+
     return DeleteReviewResponseDto.fromEntity(findReview);
   }
 
@@ -132,8 +150,6 @@ public class ReviewService {
     Sort.Direction direction = isAsc ? Sort.Direction.ASC : Sort.Direction.DESC;
     Pageable pageable = PageRequest.of(page, size, Sort.by(direction, sortBy));
 
-    double ratingAvg = calculateRatingAvg(performanceId);
-
     // TODO User 서버에게 userId에 대한 nickname 데이터 요청 (bulk 방식으로 요청할 필요가 있음)
     String nickname = "test";
     Page<ReviewResponseDto> reviews = Page.empty();
@@ -153,23 +169,9 @@ public class ReviewService {
           .map(review -> ReviewResponseDto.fromEntity(review, nickname));
     }
 
-    return ReviewListResponseDto.of(reviews, ratingAvg);
-
-  }
+    return ReviewListResponseDto.of(reviews, redisRatingRepository.getAvgRating(performanceId));
 
 
-  /**
-   * 평균 평점 계산
-   *
-   * @param performanceId
-   */
-  private double calculateRatingAvg(UUID performanceId) {
-    List<Review> reviews = reviewRepository.findByPerformanceId(performanceId);
-
-    return reviews.stream()
-        .mapToDouble(Review::getRating)
-        .average()
-        .orElse(0.0);
   }
 
 
