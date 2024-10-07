@@ -1,19 +1,18 @@
 package com.ticketing.performance.presentation.controller;
 
+import com.ticketing.performance.application.dto.PageResponse;
 import com.ticketing.performance.application.dto.performance.CreatePrfResponseDto;
 import com.ticketing.performance.application.dto.performance.PrfInfoResponseDto;
 import com.ticketing.performance.application.dto.performance.PrfListResponseDto;
 import com.ticketing.performance.application.dto.performance.UpdatePrfResponseDto;
 import com.ticketing.performance.application.service.PerformanceService;
 import com.ticketing.performance.common.response.CommonResponse;
+import com.ticketing.performance.presentation.dto.PerformanceSearchRequestDto;
 import com.ticketing.performance.presentation.dto.performance.CreatePrfRequestDto;
 import com.ticketing.performance.presentation.dto.performance.UpdatePrfRequestDto;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Page;
-import org.springframework.data.domain.Pageable;
-import org.springframework.data.domain.Sort;
-import org.springframework.data.web.PageableDefault;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.validation.annotation.Validated;
@@ -38,10 +37,11 @@ public class PerformanceController {
     }
 
     @GetMapping
-    public ResponseEntity<CommonResponse<Page<PrfListResponseDto>>> getPerformances(
-            @PageableDefault(page = 0, size = 10, sort = "createdAt", direction = Sort.Direction.DESC) Pageable pageable) {
-        Page<PrfListResponseDto> prfList = performanceService.getPerformances(pageable);
-        return ResponseEntity.ok(CommonResponse.success("get success!", prfList));
+    public ResponseEntity<CommonResponse<PageResponse<PrfListResponseDto>>> getPerformances(
+            @Validated @ModelAttribute PerformanceSearchRequestDto requestDto)
+    {
+        Page<PrfListResponseDto> prfList = performanceService.getPerformances(requestDto);
+        return ResponseEntity.ok(CommonResponse.success("get success!", PageResponse.of(prfList)));
     }
 
     @GetMapping("/{performanceId}")
