@@ -38,6 +38,8 @@ spring:
           enabled: true
 
 eureka:
+  instance:
+    prefer-ip-address: true
   client:
     register-with-eureka: true
     fetch-registry: true

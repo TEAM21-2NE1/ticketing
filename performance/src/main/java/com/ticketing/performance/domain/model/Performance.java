@@ -74,8 +74,8 @@ public class Performance extends BaseEntity {
         this.ticketLimit = requestDto.getTicketLimit();
     }
 
-    public void delete(Long userId) {
-        super.delete(userId);
+    public void delete() {
+        super.delete();
 
     }
 }

@@ -49,7 +49,6 @@ public class HallService {
     }
 
 
-    // todo: customException 으로 변경
     public HallInfoResponseDto getHall(UUID hallId) {
 
         return hallRepository.findById(hallId).map(HallInfoResponseDto::of)
@@ -68,7 +67,6 @@ public class HallService {
     public void deleteHall(UUID hallId) {
         Hall hall = hallRepository.findById(hallId)
                 .orElseThrow(() -> new HallException(ErrorCode.HALL_NOT_FOUND));
-        // todo: user Id로 변경
-        hall.delete(1L);
+        hall.delete();
     }
 }
