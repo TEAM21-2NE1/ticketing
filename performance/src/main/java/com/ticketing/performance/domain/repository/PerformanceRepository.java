@@ -1,6 +1,7 @@
 package com.ticketing.performance.domain.repository;
 
 import com.ticketing.performance.domain.model.Performance;
+import com.ticketing.performance.infrastructure.repository.CustomPerformanceRepository;
 import org.springframework.data.jpa.repository.JpaRepository;
 
 import java.time.LocalDateTime;

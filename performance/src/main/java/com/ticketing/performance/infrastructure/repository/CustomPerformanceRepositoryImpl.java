@@ -1,4 +1,4 @@
-package com.ticketing.performance.domain.repository;
+package com.ticketing.performance.infrastructure.repository;
 
 import com.querydsl.core.types.Order;
 import com.querydsl.core.types.OrderSpecifier;
