@@ -13,16 +13,16 @@ import com.ticketing.performance.common.util.SecurityUtil;
 import com.ticketing.performance.domain.model.Performance;
 import com.ticketing.performance.domain.model.SeatStatus;
 import com.ticketing.performance.domain.repository.PerformanceRepository;
+import com.ticketing.performance.presentation.dto.performance.PerformanceSearchRequestDto;
 import com.ticketing.performance.presentation.dto.performance.CreatePrfRequestDto;
 import com.ticketing.performance.presentation.dto.performance.UpdatePrfRequestDto;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Page;
-import org.springframework.data.domain.Pageable;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.time.LocalDate;
 import java.util.List;
 import java.util.UUID;
 
@@ -49,8 +49,10 @@ public class PerformanceService {
     }
 
 
-    public Page<PrfListResponseDto> getPerformances(Pageable pageable) {
-        return performanceRepository.findAll(pageable).map(PrfListResponseDto::of);
+    public Page<PrfListResponseDto> getPerformances(PerformanceSearchRequestDto requestDto) {
+        return performanceRepository
+                .findAllByKeyword(requestDto.getKeyword(), requestDto.toPageable())
+                .map(PrfListResponseDto::of);
     }
 
     public PrfInfoResponseDto getPerformance(UUID performanceId) {
