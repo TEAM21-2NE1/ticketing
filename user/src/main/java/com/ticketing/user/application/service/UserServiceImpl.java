@@ -1,6 +1,8 @@
 package com.ticketing.user.application.service;
 
 import com.ticketing.user.application.dto.request.CreateUserRequestDto;
+import com.ticketing.user.application.dto.request.GetNicknamesRequestDto;
+import com.ticketing.user.application.dto.response.GetNicknameResponseDto;
 import com.ticketing.user.common.exception.UserException;
 import com.ticketing.user.common.response.ErrorCode;
 import com.ticketing.user.domain.model.User;
@@ -62,5 +64,11 @@ public class UserServiceImpl implements UserService {
                 user.getPassword(),        // password 전달
                 authorities                // authorities 전달 (추가 가능)
         );
+    }
+
+    @Override
+    public List<GetNicknameResponseDto> getNicknamesByUserIds(GetNicknamesRequestDto requestDto) {
+
+        return userRepository.findNicknamesByUserIdsAndIsDeletedFalse(requestDto.userIds());
     }
 }

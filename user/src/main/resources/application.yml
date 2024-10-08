@@ -1,23 +1,12 @@
+server:
+  port: 19093
+
 spring:
   application:
     name: user-service
 
-  datasource:
-    url: jdbc:postgresql://localhost:5432/user
-    username: postgres
-    password: password
-    driver-class-name: org.postgresql.Driver
-
-  jpa:
-    hibernate:
-      ddl-auto: update
-    properties:
-      hibernate:
-        format_sql: true
-        show_sql: true
-
-server:
-  port: 19093
+  profiles:
+    active: local
 
 eureka:
   instance:
