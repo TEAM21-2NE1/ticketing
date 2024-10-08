@@ -1,0 +1,8 @@
+eureka:
+  instance:
+    prefer-ip-address: true
+  client:
+    register-with-eureka: true
+    fetch-registry: true
+    service-url:
+      defaultZone: http://${EUREKA_HOSTNAME}:19090/eureka/
