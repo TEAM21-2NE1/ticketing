@@ -1,8 +1,8 @@
 spring:
   datasource:
-    url: jdbc:postgresql://${USER_PROD_DB_HOST}:${USER_PROD_DB_PORT}/${USER_PROD_DB_NAME}
-    username: ${USER_PROD_DB_USERNAME}
-    password: ${USER_PROD_DB_PASSWORD}
+    url: jdbc:postgresql://${DB_HOST}:${DB_PORT}/${USER_PROD_DB_NAME}
+    username: ${DB_USERNAME}
+    password: ${DB_PASSWORD}
     driver-class-name: org.postgresql.Driver
 
   jpa:
@@ -12,3 +12,16 @@ spring:
       hibernate:
         format_sql: true
         show_sql: true
+
+eureka:
+  instance:
+    prefer-ip-address: true
+  client:
+    register-with-eureka: true
+    fetch-registry: true
+    service-url:
+      defaultZone: http://${EUREKA_HOSTNAME}:19090/eureka/
+
+service:
+  jwt:
+    secret-key: ${JWT_SECRET_KEY}
