@@ -8,7 +8,7 @@ import org.springframework.web.bind.annotation.RequestBody;
 
 import java.util.List;
 
-@FeignClient
+@FeignClient(name = "order-service")
 public interface OrderClient extends OrderService {
 
     // 임시로 만든 path

@@ -1,4 +1,4 @@
-package com.ticketing.performance.domain.repository;
+package com.ticketing.performance.infrastructure.repository;
 
 import com.ticketing.performance.domain.model.Performance;
 import org.springframework.data.domain.Page;

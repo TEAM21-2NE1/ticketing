@@ -1,10 +1,11 @@
-package com.ticketing.performance.domain.repository;
+package com.ticketing.performance.infrastructure.repository;
 
 import com.querydsl.core.types.dsl.Expressions;
 import com.querydsl.jpa.impl.JPAQueryFactory;
 import com.ticketing.performance.application.dto.rank.QRankingResponseDto;
 import com.ticketing.performance.application.dto.rank.RankingResponseDto;
 import com.ticketing.performance.domain.model.SeatStatus;
+import com.ticketing.performance.domain.repository.RankRepository;
 import jakarta.persistence.EntityManager;
 import org.springframework.stereotype.Repository;
 
@@ -14,7 +15,7 @@ import static com.ticketing.performance.domain.model.QPerformance.performance;
 import static com.ticketing.performance.domain.model.QSeat.seat;
 
 @Repository
-public class RankRepositoryImpl implements RankRepository{
+public class RankRepositoryImpl implements RankRepository {
 
     private final JPAQueryFactory queryFactory;
 
