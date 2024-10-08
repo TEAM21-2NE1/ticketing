@@ -1,8 +1,17 @@
 spring:
   datasource:
-    url: jdbc:postgresql://${REVIEW.PROD.DB.HOST}:${REVIEW.PROD.DB.PORT}/${REVIEW.PROD.DB.NAME}
-    username: ${REVIEW.PROD.DB.USERNAME}
-    password: ${REVIEW.PROD.DB.PASSWORD}
+    url: jdbc:postgresql://${DB_HOST}:${DB_PORT}/${REVIEW_PROD_DB_NAME}
+    username: ${DB_USERNAME}
+    password: ${DB_PASSWORD}
   jpa:
     hibernate:
       ddl-auto: none
+
+eureka:
+  instance:
+    prefer-ip-address: true
+  client:
+    register-with-eureka: true
+    fetch-registry: true
+    service-url:
+      defaultZone: http://${EUREKA_HOSTNAME}:19090/eureka/
