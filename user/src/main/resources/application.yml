@@ -3,6 +3,6 @@ server:
 
 spring:
   profiles:
-    active: local
+    active: prod
   application:
     name: user-service
