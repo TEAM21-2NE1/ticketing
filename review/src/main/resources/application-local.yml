@@ -18,3 +18,12 @@ spring:
       port: ${REVIEW.LOCAL.REDIS.PORT}
       username: ${REVIEW.LOCAL.REDIS.USERNAME}
       password: ${REVIEW.LOCAL.REDIS.PASSWORD}
+
+eureka:
+  instance:
+    prefer-ip-address: true
+  client:
+    register-with-eureka: true
+    fetch-registry: true
+    service-url:
+      defaultZone: http://localhost:19090/eureka/

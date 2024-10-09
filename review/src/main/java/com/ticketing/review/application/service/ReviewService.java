@@ -145,33 +145,18 @@ public class ReviewService {
 
   @Transactional(readOnly = true)
   public ReviewListResponseDto getReviews(UUID performanceId, int page, int size, boolean isAsc,
-      String sortBy,
-      String title, String content) {
+      String sortBy, String title, String content) {
+
     Sort.Direction direction = isAsc ? Sort.Direction.ASC : Sort.Direction.DESC;
     Pageable pageable = PageRequest.of(page, size, Sort.by(direction, sortBy));
-
     // TODO User 서버에게 userId에 대한 nickname 데이터 요청 (bulk 방식으로 요청할 필요가 있음)
     String nickname = "test";
-    Page<ReviewResponseDto> reviews = Page.empty();
 
-    if (title == null && content == null) {
-
-      reviews = reviewRepository.findAll(pageable)
-          .map(review -> ReviewResponseDto.fromEntity(review, nickname));
-    } else if (title == null) {
-      reviews = reviewRepository.findByContentContaining(content, pageable)
-          .map(review -> ReviewResponseDto.fromEntity(review, nickname));
-    } else if (content == null) {
-      reviews = reviewRepository.findByTitleContaining(title, pageable)
-          .map(review -> ReviewResponseDto.fromEntity(review, nickname));
-    } else {
-      reviews = reviewRepository.findByTitleContainingAndContentContaining(title, content, pageable)
-          .map(review -> ReviewResponseDto.fromEntity(review, nickname));
-    }
+    Page<ReviewResponseDto> reviews = reviewRepository.findAllReviewByPageAndSortAndSearch(
+            performanceId, pageable, title, content)
+        .map(review -> ReviewResponseDto.fromEntity(review, nickname));
 
     return ReviewListResponseDto.of(reviews, redisRatingRepository.getAvgRating(performanceId));
-
-
   }
 
 
