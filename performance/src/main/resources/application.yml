@@ -25,8 +25,8 @@ spring:
     redis:
       host: ${redis-url}
       port: ${redis-port}
-      username: ${redis-username}
-      password: ${redis-password}
+#      username: ${redis-username}
+#      password: ${redis-password}
 
 
 server:
