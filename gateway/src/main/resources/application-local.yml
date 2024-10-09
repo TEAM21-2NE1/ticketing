@@ -1,3 +1,6 @@
+server:
+  port: 19091
+
 service:
   jwt:
     secret-key: "TVNB6rWs7KGw7J2YU3ByaW5nYm9vdOqwnOyduO2UhOuhnOygne2KuOyXkOyCrOyaqe2VoGp3dC1zZWNyZXQta2V57J6F64uI64ukLg=="
