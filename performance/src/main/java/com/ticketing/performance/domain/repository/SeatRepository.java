@@ -26,4 +26,6 @@ public interface SeatRepository extends JpaRepository<Seat, UUID> {
     List<Seat> findAllByIds(@Param("seatIds") List<UUID> seatIds);
 
     List<Seat> findAllByPerformanceIdIn(List<UUID> performanceIds);
+
+    boolean existsByPerformanceId(UUID performanceId);
 }

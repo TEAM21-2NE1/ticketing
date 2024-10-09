@@ -27,8 +27,10 @@ public enum ErrorCode {
 
     //seat
     SEAT_TYPE_NOT_EXIST(HttpStatus.BAD_REQUEST, "seat type 이 존재 하지 않습니다."),
-    SEAT_NOT_FOUND(HttpStatus.NOT_FOUND,"해당 좌석을 찾을수 없습니다." )
+    SEAT_NOT_FOUND(HttpStatus.NOT_FOUND,"해당 좌석을 찾을수 없습니다." ),
 
+
+    SEAT_ALREADY_EXISTS(HttpStatus.BAD_REQUEST, "좌석 정보가 이미 존재 합니다.")
 
     ;
 
