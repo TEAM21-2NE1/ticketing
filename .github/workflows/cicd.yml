@@ -2,8 +2,7 @@ name: Spring boot CI/CD with AWS EC2, ECR
 
 on:
   push:
-    branches:
-      - main
+    branches: ["chore/-cicd"]
 
 env:
   ECR_NAMESPACE: ticketing
