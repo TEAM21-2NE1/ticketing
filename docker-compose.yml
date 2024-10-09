@@ -1,0 +1,23 @@
+services:
+  eureka:
+    build:
+      dockerfile: Dockerfile
+      args:
+        - FILE_DIRECTORY=./eureka
+    image: ${ECR_REGISTRY}/${ECR_NAMESPACE}/eureka
+
+  gateway:
+    build:
+      dockerfile: Dockerfile
+      args:
+        - FILE_DIRECTORY=./gateway
+    image: ${ECR_REGISTRY}/${ECR_NAMESPACE}/gateway
+    ports:
+      - "8080:8080"
+
+  user:
+    build:
+      dockerfile: Dockerfile
+      args:
+        - FILE_DIRECTORY=./user
+    image: ${ECR_REGISTRY}/${ECR_NAMESPACE}/user
