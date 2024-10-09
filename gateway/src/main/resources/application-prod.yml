@@ -3,10 +3,8 @@ service:
     secret-key: ${JWT_SECRET_KEY}
 
 eureka:
-  instance:
-    prefer-ip-address: true
   client:
     register-with-eureka: true
     fetch-registry: true
     service-url:
-      defaultZone: http://${EUREKA_HOSTNAME}:19090/eureka/
+      defaultZone: http://server:19090/eureka/
