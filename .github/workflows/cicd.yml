@@ -33,9 +33,6 @@ jobs:
           java-version: '17'
           distribution: 'zulu'
 
-      - name: gradlew 실행 권한 설정
-        run: chmod +x gradlew
-
       - name: Build with Gradle
         run: ./gradlew clean build
         working-directory: ${{ matrix.service }}
