@@ -19,7 +19,7 @@ public class SecurityConfig {
                 .csrf(ServerHttpSecurity.CsrfSpec::disable)
                 .authorizeExchange(exchanges -> exchanges
                         .pathMatchers("/api/v1/auth/**").permitAll()
-//                        .pathMatchers("/api/v1/users/**").hasRole("USER")
+                        .pathMatchers("/api/v1/orders/**").authenticated()
                         .anyExchange().authenticated()
                 )
                 .securityContextRepository(jwtAuthenticationFilter);
@@ -27,3 +27,4 @@ public class SecurityConfig {
         return http.build();
     }
 }
+
