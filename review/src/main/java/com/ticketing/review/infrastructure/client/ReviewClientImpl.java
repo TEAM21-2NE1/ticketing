@@ -1,9 +1,10 @@
 package com.ticketing.review.infrastructure.client;
 
 import com.ticketing.review.application.client.ReviewClient;
+import com.ticketing.review.application.client.dto.PerformanceInfoDto;
+import com.ticketing.review.application.client.dto.UserNicknameInfoDto;
 import com.ticketing.review.infrastructure.client.dto.GetNicknameResponseDto;
 import com.ticketing.review.infrastructure.client.dto.GetNicknamesRequestDto;
-import com.ticketing.review.infrastructure.client.dto.PrfInfoResponseDto;
 import com.ticketing.review.infrastructure.utils.SecurityUtils;
 import java.util.List;
 import java.util.UUID;
@@ -20,21 +21,22 @@ public class ReviewClientImpl implements ReviewClient {
 
 
   @Override
-  public PrfInfoResponseDto getPerformanceInfo(UUID performanceId) {
+  public PerformanceInfoDto getPerformanceInfo(UUID performanceId) {
     if (performanceId == null) {
       return null;
     }
 
     return performanceClient.getPerformance(SecurityUtils.getUserId(), SecurityUtils.getUserRole(),
-        SecurityUtils.getUserEmail(), performanceId).getBody().data();
+        SecurityUtils.getUserEmail(), performanceId).getBody().data().toPerformanceInfoDto();
   }
 
   @Override
-  public List<GetNicknameResponseDto> getUserNicknameList(List<Long> userIds) {
+  public List<UserNicknameInfoDto> getUserNicknameList(List<Long> userIds) {
     if (userIds == null) {
       return null;
     }
-    return userClient.nickname(GetNicknamesRequestDto.toGetNicknamesRequestDto(userIds)).getBody();
+    return userClient.nickname(GetNicknamesRequestDto.toGetNicknamesRequestDto(userIds)).getBody()
+        .stream().map(GetNicknameResponseDto::toUserNicknameInfoDto).toList();
   }
 
   // TODO Order 개발 후 구현 예정
