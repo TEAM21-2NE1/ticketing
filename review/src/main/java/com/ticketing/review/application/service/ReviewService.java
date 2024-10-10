@@ -17,7 +17,6 @@ import com.ticketing.review.common.response.ErrorCode;
 import com.ticketing.review.domain.model.Review;
 import com.ticketing.review.domain.repository.RedisRatingRepository;
 import com.ticketing.review.domain.repository.ReviewRepository;
-import com.ticketing.review.infrastructure.client.dto.GetNicknameResponseDto;
 import com.ticketing.review.infrastructure.utils.SecurityUtils;
 import feign.FeignException;
 import java.time.LocalDateTime;
@@ -59,8 +58,7 @@ public class ReviewService {
     // TODO order 서버에서 사용자가 해당 공연을 실제로 예매했던 게 맞는지 확인
 
     try {
-      PerformanceInfoDto prfInfo = reviewClient.getPerformanceInfo(requestDto.performanceId())
-          .toPerformanceInfoDto();
+      PerformanceInfoDto prfInfo = reviewClient.getPerformanceInfo(requestDto.performanceId());
       if (LocalDateTime.now().isBefore(prfInfo.performanceTime())) {
         throw new ReviewException(ErrorCode.EARLY_REVIEW);
       }
@@ -178,8 +176,7 @@ public class ReviewService {
 
     List<Long> userIds = reviews.getContent().stream().map(Review::getUserId).toList();
 
-    List<UserNicknameInfoDto> nicknames = reviewClient.getUserNicknameList(userIds).stream()
-        .map(GetNicknameResponseDto::toUserNicknameInfoDto).toList();
+    List<UserNicknameInfoDto> nicknames = reviewClient.getUserNicknameList(userIds);
 
     Page<ReviewResponseDto> reviewDtos = reviews.map(review -> {
       String nickname = nicknames.stream()
