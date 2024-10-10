@@ -11,6 +11,7 @@ import com.ticketing.review.application.dto.response.UpdateReviewResponseDto;
 import com.ticketing.review.application.service.ReviewLikeService;
 import com.ticketing.review.application.service.ReviewService;
 import com.ticketing.review.common.response.CommonResponse;
+import jakarta.validation.Valid;
 import java.util.UUID;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
@@ -42,7 +43,7 @@ public class ReviewController {
   @PreAuthorize("hasRole('USER')")
   @PostMapping()
   public ResponseEntity<CommonResponse<CreateReviewResponseDto>> createReview(
-      @RequestBody CreateReviewRequestDto requestDto) {
+      @RequestBody @Valid CreateReviewRequestDto requestDto) {
     return ResponseEntity.ok(CommonResponse.success("리뷰 등록에 성공하였습니다.",
         reviewService.createReview(requestDto)));
   }
@@ -58,7 +59,7 @@ public class ReviewController {
   @PreAuthorize("hasAnyRole('USER','MANAGER')")
   @PatchMapping("/{reviewId}")
   public ResponseEntity<CommonResponse<UpdateReviewResponseDto>> updateReview(
-      @PathVariable UUID reviewId, @RequestBody UpdateReviewRequestDto requestDto) {
+      @PathVariable UUID reviewId, @RequestBody @Valid UpdateReviewRequestDto requestDto) {
 
     return ResponseEntity.ok(CommonResponse.success("리뷰 수정에 성공하였습니다.",
         reviewService.updateReview(reviewId, requestDto)));
