@@ -1,6 +1,12 @@
+server:
+  port: 19095
+
 spring:
+  profiles:
+    active: local
   application:
     name: order-service
+    
   jpa:
     hibernate:
       ddl-auto: create-drop
@@ -10,9 +16,6 @@ spring:
     username: postgres
     password: ${password}
 
-server:
-  port: 19095
-
   data:
     redis:
       host: ${redis-url}
@@ -20,12 +23,4 @@ server:
 
 scheduler:
   enabled: true
-
-eureka:
-  instance:
-    prefer-ip-address: true
-  client:
-    register-with-eureka: true
-    fetch-registry: true
-    service-url:
-      defaultZone: http://localhost:19090/eureka/
+  

@@ -2,22 +2,7 @@ server:
   port: 19093
 
 spring:
+  profiles:
+    active: prod
   application:
     name: user-service
-
-  profiles:
-    active: local
-
-eureka:
-  instance:
-    prefer-ip-address: true
-  client:
-    register-with-eureka: true
-    fetch-registry: true
-    service-url:
-      defaultZone: http://localhost:19090/eureka/
-
-service:
-  jwt:
-    access-expiration: 3600000  # 1시간
-    secret-key: "TVNB6rWs7KGw7J2YU3ByaW5nYm9vdOqwnOyduO2UhOuhnOygne2KuOyXkOyCrOyaqe2VoGp3dC1zZWNyZXQta2V57J6F64uI64ukLg=="

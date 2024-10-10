@@ -1,15 +1,8 @@
-spring:
-  application:
-    name: auth-service
-
 server:
   port: 19092
 
-eureka:
-  instance:
-    prefer-ip-address: true
-  client:
-    register-with-eureka: true
-    fetch-registry: true
-    service-url:
-      defaultZone: http://localhost:19090/eureka/
+spring:
+  profiles:
+    active: local
+  application:
+    name: auth-service

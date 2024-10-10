@@ -1,7 +1,6 @@
-server:
-  port: 19091
-
 spring:
+  profiles:
+    active: prod
   main:
     web-application-type: reactive
   application:
@@ -36,20 +35,3 @@ spring:
       discovery:
         locator:
           enabled: true
-
-eureka:
-  instance:
-    prefer-ip-address: true
-  client:
-    register-with-eureka: true
-    fetch-registry: true
-    service-url:
-      defaultZone: http://localhost:19090/eureka/
-
-service:
-  jwt:
-    secret-key: "TVNB6rWs7KGw7J2YU3ByaW5nYm9vdOqwnOyduO2UhOuhnOygne2KuOyXkOyCrOyaqe2VoGp3dC1zZWNyZXQta2V57J6F64uI64ukLg=="
-
-logging:
-  level:
-    com.ticketing.gateway.filter.JwtAuthenticationFilter: DEBUG
