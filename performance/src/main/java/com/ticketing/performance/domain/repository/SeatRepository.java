@@ -1,17 +1,16 @@
 package com.ticketing.performance.domain.repository;
 
-import com.ticketing.performance.domain.model.Performance;
 import com.ticketing.performance.domain.model.Seat;
+import com.ticketing.performance.infrastructure.repository.SeatJdbcRepository;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 
-import java.time.LocalDateTime;
 import java.util.List;
 import java.util.UUID;
 
-public interface SeatRepository extends JpaRepository<Seat, UUID> {
+public interface SeatRepository extends JpaRepository<Seat, UUID>, SeatJdbcRepository {
     List<Seat> findAllByPerformanceId(UUID performanceId);
 
     @Modifying

@@ -2,7 +2,7 @@ spring:
   config:
     import: optional:classpath:.env[.properties]
   datasource:
-    url: jdbc:postgresql://${url}/performance?rewriteBatchedInserts=true
+    url: jdbc:postgresql://${url}/performance?reWriteBatchedInserts=true
     username: ${username}
     password: ${password}
   jpa:
@@ -41,3 +41,20 @@ eureka:
     fetch-registry: true
     service-url:
       defaultZone: http://localhost:19090/eureka/
+
+management:
+  endpoints:
+    web:
+      exposure:
+        include: '*'
+      base-path: "/api/v1/performances/actuator"
+  endpoint:
+    health:
+      show-details: always
+
+    prometheus:
+      enabled: true
+
+logging:
+  level:
+    sql: info
