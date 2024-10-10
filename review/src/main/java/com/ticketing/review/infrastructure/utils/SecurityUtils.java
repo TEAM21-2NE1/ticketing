@@ -25,7 +25,7 @@ public class SecurityUtils {
 
     String userRole = null;
     if (authentication != null) {
-      userRole = authentication.getAuthorities().toString();
+      userRole = authentication.getAuthorities().stream().findFirst().get().getAuthority();
       log.info("userRole = {}", userRole);
     }
 

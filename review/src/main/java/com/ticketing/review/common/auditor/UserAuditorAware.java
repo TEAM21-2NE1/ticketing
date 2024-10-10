@@ -1,5 +1,6 @@
 package com.ticketing.review.common.auditor;
 
+import com.ticketing.review.infrastructure.utils.SecurityUtils;
 import java.util.Optional;
 import org.springframework.data.domain.AuditorAware;
 import org.springframework.stereotype.Service;
@@ -10,9 +11,11 @@ public class UserAuditorAware implements AuditorAware<Long> {
   @Override
   public Optional<Long> getCurrentAuditor() {
 
-    // TODO: 유저 정보 수정하기
-    Long modifiedById = 1L;
-
-    return Optional.of(modifiedById);
+    Long userId = SecurityUtils.getUserId();
+    if (userId != null && userId > 0L) {
+      return Optional.of(SecurityUtils.getUserId());
+    } else {
+      return Optional.empty();
+    }
   }
 }
