@@ -1,4 +1,6 @@
 spring:
+  config:
+    import: optional:classpath:properties/env.properties
   datasource:
     url: jdbc:postgresql://${REVIEW.LOCAL.DB.HOST}:${REVIEW.LOCAL.DB.PORT}/${REVIEW.LOCAL.DB.NAME}
     username: ${REVIEW.LOCAL.DB.USERNAME}
