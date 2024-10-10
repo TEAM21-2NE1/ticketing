@@ -50,7 +50,12 @@ public class SeatService {
 
     @Transactional
     public void createSeat(CreateSeatRequestDto requestDto) {
+
         UUID performanceId = requestDto.getPerformanceId();
+
+        if (seatRepository.existsByPerformanceId(performanceId)) {
+            throw new SeatException(ErrorCode.SEAT_ALREADY_EXISTS);
+        }
 
         HallInfoResponseDto hall = hallService.getHall(requestDto.getHallId());
         List<HallSeatInfoResponseDto> hallSeats = hall.getSeats();
@@ -67,7 +72,7 @@ public class SeatService {
 
 
             for (int seatRows = 1; seatRows <= hallSeat.getRows(); seatRows++) {
-                for (int seatNum = 1; seatNum < hallSeat.getSeatsPerRow(); seatNum++) {
+                for (int seatNum = 1; seatNum <= hallSeat.getSeatsPerRow(); seatNum++) {
                     Seat seat = Seat.create(performanceId, hallSeat.getSeatType(), seatRows, seatNum, price);
                     seats.add(seat);
                 }
