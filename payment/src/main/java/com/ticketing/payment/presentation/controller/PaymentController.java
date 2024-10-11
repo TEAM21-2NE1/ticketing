@@ -20,12 +20,12 @@ public class PaymentController {
 
     private final PaymentService paymentService;
 
-    @PostMapping
+/*    @PostMapping
     public ResponseEntity<CommonResponse<Mono<PaymentResponseDTO>>> paymentCreate(@RequestBody PaymentRequestDTO paymentRequestDTO) {
 
         Mono<PaymentResponseDTO> paymentResponseDTO = paymentService.paymentCreate(userId, orderId, paymentRequestDTO);
 
         return ResponseEntity.ok().body(CommonResponse.success("결제 요청 성공", paymentResponseDTO));
-    }
+    }*/
 
 }

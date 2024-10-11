@@ -37,7 +37,7 @@ public class PaymentService {
     private String merchantUid;
 
     // 수기 결제 처리
-    @Transactional
+/*    @Transactional
     public Mono<PaymentResponseDTO> paymentCreate(Long userId,
                                                   UUID orderId,
                                                   PaymentRequestDTO paymentRequestDTO) {
@@ -80,7 +80,7 @@ public class PaymentService {
                     .subscribeOn(Schedulers.boundedElastic())
                     .thenReturn(paymentResponse);
         });
-    }
+    }*/
 
     // 결제 요청
     private Mono<PaymentResponseDTO> sendPaymentRequest(PaymentRequestDTO paymentRequestDTO) {
