@@ -24,6 +24,10 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
 import lombok.RequiredArgsConstructor;
+import org.springframework.cache.annotation.CacheEvict;
+import org.springframework.cache.annotation.CachePut;
+import org.springframework.cache.annotation.Cacheable;
+import org.springframework.cache.annotation.Caching;
 import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
@@ -47,6 +51,7 @@ public class ReviewService {
    * @param requestDto
    * @return
    */
+  @CacheEvict(cacheNames = "reviewSearchCache", allEntries = true, cacheManager = "reviewCacheManager")
   @Transactional(readOnly = false)
   public CreateReviewResponseDto createReview(CreateReviewRequestDto requestDto) {
     // 같은 공연에 대해 리뷰를 등록함
@@ -92,6 +97,9 @@ public class ReviewService {
    * @return
    */
   @Transactional(readOnly = false)
+  @CachePut(cacheNames = "reviewCache", key = "#result.reviewId", cacheManager = "reviewCacheManager")
+  @CacheEvict(cacheNames = {
+      "reviewSearchCache"}, allEntries = true, cacheManager = "reviewCacheManager")
   public UpdateReviewResponseDto updateReview(UUID reviewId, UpdateReviewRequestDto requestDto) {
     //DB에 reviewId에 대한 정보가 존재하는지 확인
     Review findReview = reviewRepository.findById(reviewId).orElseThrow(
@@ -127,6 +135,11 @@ public class ReviewService {
    * @return
    */
   @Transactional(readOnly = false)
+  @Caching(evict = {
+      @CacheEvict(cacheNames = "reviewCache", key = "args[0]", cacheManager = "reviewCacheManager"),
+      @CacheEvict(cacheNames = {
+          "reviewSearchCache"}, allEntries = true, cacheManager = "reviewCacheManager")
+  })
   public DeleteReviewResponseDto deleteReview(UUID reviewId) {
     //DB에 reviewId에 대한 정보가 존재하는지 확인
     Review findReview = reviewRepository.findById(reviewId).orElseThrow(
@@ -151,6 +164,7 @@ public class ReviewService {
    * @return
    */
   @Transactional(readOnly = true)
+  @Cacheable(cacheNames = "reviewCache", key = "args[0]", cacheManager = "reviewCacheManager")
   public ReviewResponseDto getReview(UUID reviewId) {
     Review findReview = reviewRepository.findById(reviewId).orElseThrow(
         () -> new ReviewException(ErrorCode.REVIEW_NOT_FOUND)
@@ -165,6 +179,12 @@ public class ReviewService {
 
 
   @Transactional(readOnly = true)
+  @Cacheable(
+      cacheNames = "reviewSearchCache",
+      key = "{ #performanceId, #page, #size, #isAsc, #sortBy, #title, #content}",
+      cacheManager = "reviewCacheManager"
+
+  )
   public ReviewListResponseDto getReviews(UUID performanceId, int page, int size, boolean isAsc,
       String sortBy, String title, String content) {
 
