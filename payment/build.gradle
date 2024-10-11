@@ -27,9 +27,15 @@ ext {
 	set('springCloudVersion', "2023.0.3")
 }
 
+allprojects {
+	repositories {
+		maven { url 'https://jitpack.io' }
+	}
+}
+
 dependencies {
 	// jpa
-//	implementation 'org.springframework.boot:spring-boot-starter-data-jpa'
+    implementation 'org.springframework.boot:spring-boot-starter-data-jpa'
 
 	// valid
 	implementation 'org.springframework.boot:spring-boot-starter-validation'
@@ -46,6 +52,12 @@ dependencies {
 
 	testImplementation 'org.springframework.boot:spring-boot-starter-test'
 	testRuntimeOnly 'org.junit.platform:junit-platform-launcher'
+	implementation 'com.fasterxml.jackson.core:jackson-databind'
+	implementation 'org.springframework.boot:spring-boot-starter-webflux'
+
+	implementation 'com.github.iamport:iamport-rest-client-java:0.2.21'
+
+	runtimeOnly 'org.postgresql:postgresql:42.7.2'
 }
 
 dependencyManagement {

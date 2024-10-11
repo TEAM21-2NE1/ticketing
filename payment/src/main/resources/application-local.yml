@@ -6,3 +6,26 @@ eureka:
     fetch-registry: true
     service-url:
       defaultZone: http://localhost:19090/eureka/
+
+spring:
+  datasource:
+    driver-class-name: org.postgresql.Driver
+    url: ${LOCAL_DB_URL}
+    username: ${LOCAL_DB_USER}
+    password: ${LOCAL_DB_PASSWORD}
+
+  jpa:
+    hibernate:
+      ddl-auto: update
+    properties:
+      dialect: org.hibernate.dialect.PostgreSQLDialect
+      hibernate:
+        show_sql: true
+    open-in-view: false
+
+imp:
+  api:
+    key: ${IMP_KEY}
+    secret:
+      key: ${IMP_SECRET_KEY}
+    uid: ${IMP_UID}
