@@ -3,15 +3,16 @@ package com.ticketing.review.application.dto.request;
 
 import com.ticketing.review.domain.model.Review;
 import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Size;
 import java.util.UUID;
 import org.hibernate.validator.constraints.Range;
 
 public record CreateReviewRequestDto(
-    @NotBlank(message = "공연 ID는 필수 값입니다.")
+    @NotNull(message = "공연 ID는 필수 값입니다.")
     UUID performanceId,
 
-    @NotBlank(message = "평점은 필수 입력 값입니다.")
+    @NotNull(message = "평점은 필수 입력 값입니다.")
     @Range(min = 1, max = 5, message = "평점은 1에서 5 사이여야 합니다.")
     short rating,
 

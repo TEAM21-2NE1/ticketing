@@ -2,7 +2,6 @@ package com.ticketing.performance.application.service;
 
 import com.ticketing.performance.application.dto.hall.HallInfoResponseDto;
 import com.ticketing.performance.application.dto.hall.HallSeatInfoResponseDto;
-import com.ticketing.performance.application.dto.performance.PrfInfoResponseDto;
 import com.ticketing.performance.application.dto.seat.SeatInfoResponseDto;
 import com.ticketing.performance.common.exception.ForbiddenAccessException;
 import com.ticketing.performance.common.exception.PerformanceException;
@@ -21,7 +20,6 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Optional;
 import java.util.UUID;
 
 @Service
@@ -50,7 +48,12 @@ public class SeatService {
 
     @Transactional
     public void createSeat(CreateSeatRequestDto requestDto) {
+
         UUID performanceId = requestDto.getPerformanceId();
+
+        if (seatRepository.existsByPerformanceId(performanceId)) {
+            throw new SeatException(ErrorCode.SEAT_ALREADY_EXISTS);
+        }
 
         HallInfoResponseDto hall = hallService.getHall(requestDto.getHallId());
         List<HallSeatInfoResponseDto> hallSeats = hall.getSeats();
@@ -67,13 +70,12 @@ public class SeatService {
 
 
             for (int seatRows = 1; seatRows <= hallSeat.getRows(); seatRows++) {
-                for (int seatNum = 1; seatNum < hallSeat.getSeatsPerRow(); seatNum++) {
+                for (int seatNum = 1; seatNum <= hallSeat.getSeatsPerRow(); seatNum++) {
                     Seat seat = Seat.create(performanceId, hallSeat.getSeatType(), seatRows, seatNum, price);
                     seats.add(seat);
                 }
             }
         }
-        // todo: jpa batch 이용해서 insert 한번에 하기
         seatRepository.saveAll(seats);
     }
 
