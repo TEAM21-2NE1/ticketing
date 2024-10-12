@@ -98,35 +98,39 @@ public class SeatOrderHashServiceImpl implements SeatOrderService {
     }
 
     @Override
-    public void confirm(List<SeatInfoResponseDto> seats) {
-        seats.forEach(seat -> {
-            SeatInfoResponseDto seatInfo = (SeatInfoResponseDto) redisTemplate.opsForHash()
-                    .get(generateKey(seat.getPerformanceId())
-                            , seat.getSeatId().toString());
+    public void confirm(List<UUID> seatIds, UUID performanceId) {
+        seatIds.forEach(seatId -> {
+            SeatInfoResponseDto seatInfo = getSeatFromRedis(performanceId, seatId);
 
             if (seatInfo == null) {
                 throw new SeatException(ErrorCode.SEAT_NOT_FOUND);
             }
 
-            seatInfo.confirm(seat.getOrderId());
-            redisTemplate.opsForHash().put(generateKey(seat.getPerformanceId()), seat.getSeatId().toString(), seatInfo);
+            if (!SecurityUtil.getId().equals(seatInfo.getUserId())) {
+                throw new SeatException(ErrorCode.SEAT_NOT_SELECTED_BY_USER);
+            }
+
+            seatInfo.confirm(seatId);
+            redisTemplate.opsForHash().put(generateKey(performanceId), seatId.toString(), seatInfo);
         });
     }
 
     @Override
-    public void cancel(List<SeatInfoResponseDto> seats) {
+    public void cancel(List<UUID> seatIds, UUID performanceId) {
 
-        seats.forEach(seat -> {
-            SeatInfoResponseDto seatInfo = (SeatInfoResponseDto) redisTemplate.opsForHash()
-                    .get(generateKey(seat.getPerformanceId())
-                            , seat.getSeatId().toString());
+        seatIds.forEach(seatId -> {
+            SeatInfoResponseDto seatInfo = getSeatFromRedis(performanceId, seatId);
 
             if (seatInfo == null) {
                 throw new SeatException(ErrorCode.SEAT_NOT_FOUND);
             }
 
+            if (!SecurityUtil.getId().equals(seatInfo.getUserId())) {
+                throw new SeatException(ErrorCode.SEAT_NOT_SELECTED_BY_USER);
+            }
+
             seatInfo.cancel();
-            redisTemplate.opsForHash().put(generateKey(seat.getPerformanceId()), seat.getSeatId().toString(), seatInfo);
+            redisTemplate.opsForHash().put(generateKey(performanceId), seatId.toString(), seatInfo);
         });
     }
 
