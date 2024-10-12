@@ -2,6 +2,7 @@ package com.ticketing.performance.application.service;
 
 import com.ticketing.performance.application.dto.seat.CancelSeatResponseDto;
 import com.ticketing.performance.application.dto.seat.ConfirmSeatResponseDto;
+import com.ticketing.performance.application.dto.seat.SeatInfoResponseDto;
 import com.ticketing.performance.domain.model.Seat;
 import com.ticketing.performance.domain.repository.SeatRepository;
 import com.ticketing.performance.presentation.dto.seat.CancelSeatRequestDto;
@@ -20,7 +21,7 @@ import java.util.List;
 public class SeatStatusServiceImpl implements SeatStatusService{
 
     private final SeatRepository seatRepository;
-
+    private final SeatOrderService seatOrderService;
 
     @Override
     public ConfirmSeatResponseDto confirmSeat(ConfirmSeatRequestDto requestDto) {
@@ -28,6 +29,8 @@ public class SeatStatusServiceImpl implements SeatStatusService{
         List<Seat> seats = seatRepository.findAllByIds(requestDto.getSeatIds());
 
         seats.forEach(seat -> seat.confirm(requestDto.getOrderId()));
+
+        seatOrderService.confirm(seats.stream().map(SeatInfoResponseDto::of).toList());
 
         return ConfirmSeatResponseDto.of(seats);
     }
@@ -38,6 +41,8 @@ public class SeatStatusServiceImpl implements SeatStatusService{
         List<Seat> seats = seatRepository.findAllByIds(requestDto.getSeatIds());
 
         seats.forEach(Seat::cancel);
+
+        seatOrderService.cancel(seats.stream().map(SeatInfoResponseDto::of).toList());
 
         return CancelSeatResponseDto.of(seats);
     }
