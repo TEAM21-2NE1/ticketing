@@ -41,6 +41,55 @@ services:
       - review-redis-prod-data:/data
       - review-redis-config-file:/usr/local/etc/redis/redis.conf
 
+  performance:
+    build:
+      dockerfile: Dockerfile
+      args:
+        - FILE_DIRECTORY=./performance
+    image: ${ECR_REGISTRY}/${ECR_NAMESPACE}/performance
+
+  performance-redis:
+    image: "redis/redis-stack"
+    container_name: performance-redis-prod
+    restart: always
+    ports:
+      - "${PERFORMANCE_REDIS_PORT}:6379"
+    environment:
+      - REDIS_ARGS=--requirepass ${PERFORMANCE_REDIS_PASSWORD}
+    volumes:
+      - performance-redis-prod-data:/data
+      - performance-redis-config-file:/usr/local/etc/redis/redis.conf
+
+  order:
+    build:
+      dockerfile: Dockerfile
+      args:
+        - FILE_DIRECTORY=./order
+    image: ${ECR_REGISTRY}/${ECR_NAMESPACE}/order
+
+  order-redis:
+    image: "redis/redis-stack"
+    container_name: order-redis-prod
+    restart: always
+    ports:
+      - "${ORDER_REDIS_PORT}:6379"
+    environment:
+      - REDIS_ARGS=--requirepass ${ORDER_REDIS_PASSWORD}
+    volumes:
+      - order-redis-prod-data:/data
+      - order-redis-config-file:/usr/local/etc/redis/redis.conf
+
+  payment:
+    build:
+      dockerfile: Dockerfile
+      args:
+        - FILE_DIRECTORY=./payment
+    image: ${ECR_REGISTRY}/${ECR_NAMESPACE}/payment
+
 volumes:
   review-redis-prod-data:
   review-redis-config-file:
+  performance-redis-prod-data:
+  performance-redis-config-file:
+  order-redis-prod-data:
+  order-redis-config-file:

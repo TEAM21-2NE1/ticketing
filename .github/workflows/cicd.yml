@@ -25,10 +25,27 @@ jobs:
       REVIEW_REDIS_PORT: ${{ secrets.REVIEW_REDIS_PORT }}
       REVIEW_REDIS_USERNAME: ${{ secrets.REVIEW_REDIS_USERNAME }}
       REVIEW_REDIS_PASSWORD: ${{ secrets.REVIEW_REDIS_PASSWORD }}
+      # performance
+      PERFORMANCE_PROD_DB_NAME: ${{ secrets.PERFORMANCE_PROD_DB_NAME }}
+      PERFORMANCE_REDIS_HOST: ${{ secrets.PERFORMANCE_REDIS_HOST }}
+      PERFORMANCE_REDIS_PORT: ${{ secrets.PERFORMANCE_REDIS_PORT }}
+      PERFORMANCE_REDIS_USERNAME: ${{ secrets.PERFORMANCE_REDIS_USERNAME }}
+      PERFORMANCE_REDIS_PASSWORD: ${{ secrets.PERFORMANCE_REDIS_PASSWORD }}
+      S3_ACCESS_KEY: ${{ secrets.S3_ACCESS_KEY }}
+      S3_SECRET_KEY: ${{ secrets.S3_SECRET_KEY }}
+      S3_BUCKET_NAME: ${{ secrets.S3_BUCKET_NAME }}
+      # order
+      ORDER_PROD_DB_NAME: ${{ secrets.ORDER_PROD_DB_NAME }}
+      ORDER_REDIS_HOST: ${{ secrets.ORDER_REDIS_HOST }}
+      ORDER_REDIS_PORT: ${{ secrets.ORDER_REDIS_PORT }}
+      ORDER_REDIS_USERNAME: ${{ secrets.ORDER_REDIS_USERNAME }}
+      ORDER_REDIS_PASSWORD: ${{ secrets.ORDER_REDIS_PASSWORD }}
+      # payment
+      PAYMENT_PROD_DB_NAME: ${{ secrets.REVIEW_PROD_DB_NAME }}
 
     strategy:
       matrix:
-        service: [eureka, gateway, user, review]
+        service: [eureka, gateway, user, review, performance, order, payment]
 
     steps:
       - name: Checkout
