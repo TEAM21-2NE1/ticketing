@@ -5,6 +5,8 @@ services:
       args:
         - FILE_DIRECTORY=./eureka
     image: ${ECR_REGISTRY}/${ECR_NAMESPACE}/eureka
+    environment:
+      - EUREKA_HOST=${EC2_HOST}
 
   gateway:
     build:
@@ -14,6 +16,7 @@ services:
     image: ${ECR_REGISTRY}/${ECR_NAMESPACE}/gateway
     environment:
       - JWT_SECRET_KEY=${JWT_SECRET_KEY}
+      - EUREKA_HOST=${EC2_HOST}
 
     ports:
       - "8080:8080"
@@ -31,6 +34,7 @@ services:
       - DB_PASSWORD=${DB_PASSWORD}
       - JWT_SECRET_KEY=${JWT_SECRET_KEY}
       - USER_PROD_DB_NAME=${USER_PROD_DB_NAME}
+      - EUREKA_HOST=${EC2_HOST}
 
   review:
     build:
@@ -48,6 +52,7 @@ services:
       - REVIEW_REDIS_PORT=${REVIEW_REDIS_PORT}
       - REVIEW_REDIS_USERNAME=${REVIEW_REDIS_USERNAME}
       - REVIEW_REDIS_PASSWORD=${REVIEW_REDIS_PASSWORD}
+      - EUREKA_HOST=${EC2_HOST}
 
   review-redis:
     image: "redis/redis-stack"
@@ -80,6 +85,7 @@ services:
       - S3_ACCESS_KEY=${S3_ACCESS_KEY}
       - S3_SECRET_KEY=${S3_SECRET_KEY}
       - S3_BUCKET_NAME=${S3_BUCKET_NAME}
+      - EUREKA_HOST=${EC2_HOST}
 
   performance-redis:
     image: "redis/redis-stack"
@@ -109,6 +115,7 @@ services:
       - ORDER_REDIS_PORT=${ORDER_REDIS_PORT}
       - ORDER_REDIS_USERNAME=${ORDER_REDIS_USERNAME}
       - ORDER_REDIS_PASSWORD=${ORDER_REDIS_PASSWORD}
+      - EUREKA_HOST=${EC2_HOST}
 
   order-redis:
     image: "redis/redis-stack"
@@ -134,6 +141,7 @@ services:
       - DB_USERNAME=${DB_USERNAME}
       - DB_PASSWORD=${DB_PASSWORD}
       - PAYMENT_PROD_DB_NAME=${PAYMENT_PROD_DB_NAME}
+      - EUREKA_HOST=${EC2_HOST}
 
 volumes:
   review-redis-prod-data:

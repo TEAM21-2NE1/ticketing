@@ -18,7 +18,7 @@ eureka:
     register-with-eureka: true
     fetch-registry: true
     service-url:
-      defaultZone: http://server:19090/eureka/
+      defaultZone: http://${EUREKA_HOST}:19090/eureka/
 
 service:
   jwt:
