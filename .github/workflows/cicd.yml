@@ -41,7 +41,7 @@ jobs:
       ORDER_REDIS_USERNAME: ${{ secrets.ORDER_REDIS_USERNAME }}
       ORDER_REDIS_PASSWORD: ${{ secrets.ORDER_REDIS_PASSWORD }}
       # payment
-      PAYMENT_PROD_DB_NAME: ${{ secrets.REVIEW_PROD_DB_NAME }}
+      PAYMENT_PROD_DB_NAME: ${{ secrets.PAYMENT_PROD_DB_NAME }}
 
     strategy:
       matrix:
