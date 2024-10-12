@@ -2,7 +2,7 @@ package com.ticketing.performance.application.service;
 
 import com.ticketing.performance.application.dto.hall.HallInfoResponseDto;
 import com.ticketing.performance.application.dto.hall.HallSeatInfoResponseDto;
-import com.ticketing.performance.application.dto.performance.PrfInfoResponseDto;
+import com.ticketing.performance.application.dto.performance.PrfRedisInfoDto;
 import com.ticketing.performance.application.dto.seat.SeatInfoResponseDto;
 import com.ticketing.performance.common.exception.ForbiddenAccessException;
 import com.ticketing.performance.common.exception.PerformanceException;
@@ -19,9 +19,9 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Optional;
 import java.util.UUID;
 
 @Service
@@ -32,14 +32,30 @@ public class SeatService {
     private final SeatRepository seatRepository;
     private final HallService hallService;
     private final PerformanceRepository performanceRepository;
+    private final SeatOrderService seatOrderService;
 
 
     public List<SeatInfoResponseDto> getSeats(UUID performanceId) {
-        List<Seat> seats = seatRepository.findAllByPerformanceId(performanceId);
+        List<SeatInfoResponseDto> seatsFromRedis = seatOrderService.getSeatsFromRedis(performanceId);
+        if (!seatsFromRedis.isEmpty()) {
+            return seatsFromRedis;
+        }
+        PrfRedisInfoDto prfRedisInfoDto = performanceRepository.findById(performanceId).map(PrfRedisInfoDto::of)
+                .orElseThrow(() -> new PerformanceException(ErrorCode.PERFORMANCE_NOT_FOUND));
 
-        return seats.stream()
+        if (prfRedisInfoDto.getTicketOpenTime().isAfter(LocalDateTime.now())
+                || prfRedisInfoDto.getPerformanceTime().isBefore(LocalDateTime.now())) {
+            throw new SeatException(ErrorCode.SEAT_QUERY_PERIOD_INVALID);
+        }
+
+        List<Seat> seats = seatRepository.findAllByPerformanceId(performanceId);
+        List<SeatInfoResponseDto> seatList = seats.stream()
                 .map(SeatInfoResponseDto::of)
                 .toList();
+
+        seatOrderService.saveSeatsToRedis(prfRedisInfoDto, seatList);
+
+        return seatList;
     }
 
 
@@ -50,7 +66,12 @@ public class SeatService {
 
     @Transactional
     public void createSeat(CreateSeatRequestDto requestDto) {
+
         UUID performanceId = requestDto.getPerformanceId();
+
+        if (seatRepository.existsByPerformanceId(performanceId)) {
+            throw new SeatException(ErrorCode.SEAT_ALREADY_EXISTS);
+        }
 
         HallInfoResponseDto hall = hallService.getHall(requestDto.getHallId());
         List<HallSeatInfoResponseDto> hallSeats = hall.getSeats();
@@ -67,13 +88,12 @@ public class SeatService {
 
 
             for (int seatRows = 1; seatRows <= hallSeat.getRows(); seatRows++) {
-                for (int seatNum = 1; seatNum < hallSeat.getSeatsPerRow(); seatNum++) {
+                for (int seatNum = 1; seatNum <= hallSeat.getSeatsPerRow(); seatNum++) {
                     Seat seat = Seat.create(performanceId, hallSeat.getSeatType(), seatRows, seatNum, price);
                     seats.add(seat);
                 }
             }
         }
-        // todo: jpa batch 이용해서 insert 한번에 하기
         seatRepository.saveAll(seats);
     }
 

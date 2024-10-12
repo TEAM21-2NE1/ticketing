@@ -1,16 +1,17 @@
 package com.ticketing.performance.common.auditor;
 
+import com.ticketing.performance.common.util.SecurityUtil;
 import jakarta.persistence.Column;
 import jakarta.persistence.EntityListeners;
 import jakarta.persistence.MappedSuperclass;
-import java.time.LocalDateTime;
 import lombok.Getter;
 import org.springframework.data.annotation.CreatedBy;
 import org.springframework.data.annotation.CreatedDate;
 import org.springframework.data.annotation.LastModifiedBy;
 import org.springframework.data.annotation.LastModifiedDate;
 import org.springframework.data.jpa.domain.support.AuditingEntityListener;
-import org.springframework.security.core.context.SecurityContextHolder;
+
+import java.time.LocalDateTime;
 
 @Getter
 @MappedSuperclass
@@ -44,7 +45,7 @@ public class BaseEntity{
 
     protected void delete() {
         this.deletedAt = LocalDateTime.now();
-        this.deletedBy = (Long) SecurityContextHolder.getContext().getAuthentication().getDetails();
+        this.deletedBy = SecurityUtil.getId();
         this.isDeleted = true;
     }
 }

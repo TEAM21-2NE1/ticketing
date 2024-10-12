@@ -1,5 +1,6 @@
 package com.ticketing.performance.common.auditor;
 
+import com.ticketing.performance.common.util.SecurityUtil;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.AuditorAware;
 import org.springframework.security.authentication.AnonymousAuthenticationToken;
@@ -23,7 +24,7 @@ public class UserAuditorAware implements AuditorAware<Long> {
             return Optional.empty();
         }
 
-        Long userId =(Long) authentication.getDetails();
+        Long userId = SecurityUtil.getId();
 
         return Optional.of(userId);
 

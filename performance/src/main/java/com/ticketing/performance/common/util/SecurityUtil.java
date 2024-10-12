@@ -8,7 +8,7 @@ import org.springframework.security.core.context.SecurityContextHolder;
 public class SecurityUtil {
 
     public static Long getId() {
-        return (Long) SecurityContextHolder.getContext().getAuthentication().getDetails();
+        return Long.parseLong((String) SecurityContextHolder.getContext().getAuthentication().getDetails());
     }
 
     public static String getRole() {

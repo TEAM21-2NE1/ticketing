@@ -1,5 +1,8 @@
 package com.ticketing.review.application.service;
 
+import com.ticketing.review.application.client.ReviewClient;
+import com.ticketing.review.application.client.dto.PerformanceInfoDto;
+import com.ticketing.review.application.client.dto.UserNicknameInfoDto;
 import com.ticketing.review.application.dto.request.CreateReviewRequestDto;
 import com.ticketing.review.application.dto.request.UpdateReviewRequestDto;
 import com.ticketing.review.application.dto.response.CreateReviewResponseDto;
@@ -15,8 +18,16 @@ import com.ticketing.review.domain.model.Review;
 import com.ticketing.review.domain.repository.RedisRatingRepository;
 import com.ticketing.review.domain.repository.ReviewRepository;
 import com.ticketing.review.infrastructure.utils.SecurityUtils;
+import feign.FeignException;
+import java.time.LocalDateTime;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.UUID;
 import lombok.RequiredArgsConstructor;
+import org.springframework.cache.annotation.CacheEvict;
+import org.springframework.cache.annotation.CachePut;
+import org.springframework.cache.annotation.Cacheable;
+import org.springframework.cache.annotation.Caching;
 import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
@@ -32,6 +43,7 @@ public class ReviewService {
   private final ReviewRepository reviewRepository;
   private final ApplicationEventPublisher eventPublisher;
   private final RedisRatingRepository redisRatingRepository;
+  private final ReviewClient reviewClient;
 
   /**
    * 리뷰 생성
@@ -39,6 +51,7 @@ public class ReviewService {
    * @param requestDto
    * @return
    */
+  @CacheEvict(cacheNames = "reviewSearchCache", allEntries = true, cacheManager = "reviewCacheManager")
   @Transactional(readOnly = false)
   public CreateReviewResponseDto createReview(CreateReviewRequestDto requestDto) {
     // 같은 공연에 대해 리뷰를 등록함
@@ -48,12 +61,22 @@ public class ReviewService {
     }
 
     // TODO order 서버에서 사용자가 해당 공연을 실제로 예매했던 게 맞는지 확인
-    // TODO performance 서버에서 현재 시간이 등록하려는 공연의 시작 시간 이후 인지 확인
-    // TODO 취소된 공연에 대한 리뷰 등록인지 확인
+
+    try {
+      PerformanceInfoDto prfInfo = reviewClient.getPerformanceInfo(requestDto.performanceId());
+      if (LocalDateTime.now().isBefore(prfInfo.performanceTime())) {
+        throw new ReviewException(ErrorCode.EARLY_REVIEW);
+      }
+    } catch (FeignException.NotFound e) {
+      throw new ReviewException(ErrorCode.PERFORMANCE_NOT_FOUND);
+    }
+
     // TODO 리뷰 제목 및 내용에 부적절한 언행이 포함되었는지 AI에게 문의
 
-    // TODO User 서버에 userId에 대한 nickname 데이터 요청
-    String nickname = "test";
+    List<Long> userIds = new ArrayList<>();
+
+    userIds.add(SecurityUtils.getUserId());
+    String nickname = reviewClient.getUserNicknameList(userIds).get(0).nickname();
 
     Review savedReview = reviewRepository.save(
         CreateReviewRequestDto.toEntity(requestDto, SecurityUtils.getUserId()));
@@ -74,6 +97,9 @@ public class ReviewService {
    * @return
    */
   @Transactional(readOnly = false)
+  @CachePut(cacheNames = "reviewCache", key = "#result.reviewId", cacheManager = "reviewCacheManager")
+  @CacheEvict(cacheNames = {
+      "reviewSearchCache"}, allEntries = true, cacheManager = "reviewCacheManager")
   public UpdateReviewResponseDto updateReview(UUID reviewId, UpdateReviewRequestDto requestDto) {
     //DB에 reviewId에 대한 정보가 존재하는지 확인
     Review findReview = reviewRepository.findById(reviewId).orElseThrow(
@@ -81,14 +107,15 @@ public class ReviewService {
     );
 
     // 등록한 리뷰의 사용자와 일치하는지 확인
-    // TODO 관리자의 경우 해당 로직을 타지 않도록 변경
-    if (SecurityUtils.getUserId() != findReview.getUserId()) {
+    if (SecurityUtils.getUserRole().equals("ROLE_USER")
+        && SecurityUtils.getUserId() != findReview.getUserId()) {
       throw new ReviewException(ErrorCode.REVIEW_FORBIDDEN);
     }
 
     // TODO 리뷰 제목 및 내용에 부적절한 언행이 포함되었는지 AI에게 문의
-    // TODO User 서버에 userId에 대한 nickname 데이터 요청
-    String nickname = "test";
+    List<Long> userIds = new ArrayList<>();
+    userIds.add(findReview.getUserId());
+    String nickname = reviewClient.getUserNicknameList(userIds).get(0).nickname();
 
     if (requestDto.rating() != null) {
       eventPublisher.publishEvent(
@@ -108,6 +135,11 @@ public class ReviewService {
    * @return
    */
   @Transactional(readOnly = false)
+  @Caching(evict = {
+      @CacheEvict(cacheNames = "reviewCache", key = "args[0]", cacheManager = "reviewCacheManager"),
+      @CacheEvict(cacheNames = {
+          "reviewSearchCache"}, allEntries = true, cacheManager = "reviewCacheManager")
+  })
   public DeleteReviewResponseDto deleteReview(UUID reviewId) {
     //DB에 reviewId에 대한 정보가 존재하는지 확인
     Review findReview = reviewRepository.findById(reviewId).orElseThrow(
@@ -132,31 +164,50 @@ public class ReviewService {
    * @return
    */
   @Transactional(readOnly = true)
+  @Cacheable(cacheNames = "reviewCache", key = "args[0]", cacheManager = "reviewCacheManager")
   public ReviewResponseDto getReview(UUID reviewId) {
     Review findReview = reviewRepository.findById(reviewId).orElseThrow(
         () -> new ReviewException(ErrorCode.REVIEW_NOT_FOUND)
     );
 
-    // TODO User 서버에 userId에 대한 nickname 데이터 요청
-    String nickname = "test";
+    List<Long> userIds = new ArrayList<>();
+    userIds.add(findReview.getUserId());
+    String nickname = reviewClient.getUserNicknameList(userIds).get(0).nickname();
+
     return ReviewResponseDto.fromEntity(findReview, nickname);
   }
 
 
   @Transactional(readOnly = true)
+  @Cacheable(
+      cacheNames = "reviewSearchCache",
+      key = "{ #performanceId, #page, #size, #isAsc, #sortBy, #title, #content}",
+      cacheManager = "reviewCacheManager"
+
+  )
   public ReviewListResponseDto getReviews(UUID performanceId, int page, int size, boolean isAsc,
       String sortBy, String title, String content) {
 
     Sort.Direction direction = isAsc ? Sort.Direction.ASC : Sort.Direction.DESC;
     Pageable pageable = PageRequest.of(page, size, Sort.by(direction, sortBy));
-    // TODO User 서버에게 userId에 대한 nickname 데이터 요청 (bulk 방식으로 요청할 필요가 있음)
-    String nickname = "test";
 
-    Page<ReviewResponseDto> reviews = reviewRepository.findAllReviewByPageAndSortAndSearch(
-            performanceId, pageable, title, content)
-        .map(review -> ReviewResponseDto.fromEntity(review, nickname));
+    Page<Review> reviews = reviewRepository.findAllReviewByPageAndSortAndSearch(
+        performanceId, pageable, title, content);
 
-    return ReviewListResponseDto.of(reviews, redisRatingRepository.getAvgRating(performanceId));
+    List<Long> userIds = reviews.getContent().stream().map(Review::getUserId).toList();
+
+    List<UserNicknameInfoDto> nicknames = reviewClient.getUserNicknameList(userIds);
+
+    Page<ReviewResponseDto> reviewDtos = reviews.map(review -> {
+      String nickname = nicknames.stream()
+          .filter(nicknameInfo -> review.getUserId() == nicknameInfo.userId())
+          .findFirst()
+          .map(UserNicknameInfoDto::nickname)
+          .orElse(null);
+      return ReviewResponseDto.fromEntity(review, nickname);
+    });
+
+    return ReviewListResponseDto.of(reviewDtos, redisRatingRepository.getAvgRating(performanceId));
   }
 
 

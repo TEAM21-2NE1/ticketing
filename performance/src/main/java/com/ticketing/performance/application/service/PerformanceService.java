@@ -13,13 +13,11 @@ import com.ticketing.performance.common.util.SecurityUtil;
 import com.ticketing.performance.domain.model.Performance;
 import com.ticketing.performance.domain.model.SeatStatus;
 import com.ticketing.performance.domain.repository.PerformanceRepository;
-import com.ticketing.performance.presentation.dto.performance.PerformanceSearchRequestDto;
 import com.ticketing.performance.presentation.dto.performance.CreatePrfRequestDto;
+import com.ticketing.performance.presentation.dto.performance.PerformanceSearchRequestDto;
 import com.ticketing.performance.presentation.dto.performance.UpdatePrfRequestDto;
 import lombok.RequiredArgsConstructor;
-import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Page;
-import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -40,7 +38,7 @@ public class PerformanceService {
     public CreatePrfResponseDto createPerformance(CreatePrfRequestDto requestDto) {
 
         String posterUrl = imageUploadService.upload(requestDto.getImage());
-        Long userId = (Long) SecurityContextHolder.getContext().getAuthentication().getDetails();
+        Long userId = SecurityUtil.getId();
         Performance performance = Performance.create(requestDto, userId, posterUrl);
 
         performanceRepository.save(performance);

@@ -24,19 +24,13 @@ public class CreatePrfRequestDto {
     private String title;
     @NotBlank
     private String description;
-    @NotBlank
+
     private Integer runningTime;
-    @NotBlank
     private Integer intermission;
-    @NotBlank
     private Integer ageLimit;
-    @NotBlank
     private LocalDate openDate;
-    @NotBlank
     private LocalDateTime performanceTime;
-    @NotBlank
     private LocalDateTime ticketOpenTime;
-    @NotBlank
     private Integer ticketLimit;
     private MultipartFile image;
 }

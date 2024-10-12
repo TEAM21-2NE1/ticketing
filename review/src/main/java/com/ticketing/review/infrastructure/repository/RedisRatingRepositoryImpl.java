@@ -32,6 +32,11 @@ public class RedisRatingRepositoryImpl implements RedisRatingRepository {
   public Double getAvgRating(UUID performanceId) {
     List<String> keys = Collections.emptyList();
     Object[] args = {performanceId.toString()};
-    return Double.parseDouble(redisTemplate.execute(getAvgRatingScript, keys, args));
+
+    String avgRating = redisTemplate.execute(getAvgRatingScript, keys, args);
+    if (avgRating == null || avgRating.equals("nil")) {
+      return 0.0;
+    }
+    return Double.parseDouble(avgRating);
   }
 }

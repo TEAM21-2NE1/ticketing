@@ -1,6 +1,7 @@
 package com.ticketing.review.application.dto.response;
 
 import com.ticketing.review.domain.model.Review;
+import java.io.Serializable;
 import java.time.LocalDateTime;
 import java.util.UUID;
 
@@ -14,7 +15,7 @@ public record CreateReviewResponseDto(
     String content,
     long likeCount,
     LocalDateTime createdAt
-) {
+) implements Serializable {
 
   public static CreateReviewResponseDto fromEntity(Review review, String nickname) {
     return new CreateReviewResponseDto(

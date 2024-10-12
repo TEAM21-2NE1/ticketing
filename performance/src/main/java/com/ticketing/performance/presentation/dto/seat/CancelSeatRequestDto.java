@@ -15,5 +15,6 @@ public class CancelSeatRequestDto {
 
     private List<UUID> seatIds;
     private UUID orderId;
+    private UUID performanceId;
 
 }
