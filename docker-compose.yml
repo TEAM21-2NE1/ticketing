@@ -13,7 +13,7 @@ services:
         - FILE_DIRECTORY=./gateway
     image: ${ECR_REGISTRY}/${ECR_NAMESPACE}/gateway
     environment:
-      - JWT_SECRET_KEY: ${{ secrets.JWT_SECRET_KEY }}
+      - JWT_SECRET_KEY=${JWT_SECRET_KEY}
 
     ports:
       - "8080:8080"
@@ -106,9 +106,9 @@ services:
       - DB_PASSWORD=${DB_PASSWORD}
       - ORDER_PROD_DB_NAME=${ORDER_PROD_DB_NAME}
       - ORDER_REDIS_HOST=${ORDER_REDIS_HOST}
-      - ORDER_REDIS_PORT=${ ORDER_REDIS_PORT }
-      - ORDER_REDIS_USERNAME=${ ORDER_REDIS_USERNAME }
-      - ORDER_REDIS_PASSWORD=${ ORDER_REDIS_PASSWORD }
+      - ORDER_REDIS_PORT=${ORDER_REDIS_PORT}
+      - ORDER_REDIS_USERNAME=${ORDER_REDIS_USERNAME}
+      - ORDER_REDIS_PASSWORD=${ORDER_REDIS_PASSWORD}
 
   order-redis:
     image: "redis/redis-stack"
