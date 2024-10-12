@@ -1,5 +1,6 @@
 package com.ticketing.performance.infrastructure.service;
 
+import com.ticketing.performance.application.dto.performance.PrfRedisInfoDto;
 import com.ticketing.performance.application.dto.seat.SeatInfoResponseDto;
 import com.ticketing.performance.application.service.SeatOrderService;
 import com.ticketing.performance.common.exception.SeatException;
@@ -25,22 +26,20 @@ public class SeatOrderHashServiceImpl implements SeatOrderService {
 
     private final RedisTemplate<String, Object> redisTemplate;
     private final String TICKET_LIMIT = "ticketLimit";
+    private final String TICKET_OPEN_TIME = "ticketOpenTime";
 
-    public void saveSeatsToRedis(UUID performanceId,
-                                 LocalDateTime performanceTime,
-                                 List<SeatInfoResponseDto> seatList,
-                                 int ticketLimit) {
-        String key = generateKey(performanceId);
+    public void saveSeatsToRedis(PrfRedisInfoDto prfRedisInfoDto, List<SeatInfoResponseDto> seatList) {
+        String key = generateKey(prfRedisInfoDto.getPerformanceId());
         Map<String, SeatInfoResponseDto> seatMap = seatList.stream()
                 .collect(Collectors.toMap(
                         seat -> seat.getSeatId().toString(),
                         seat -> seat
                 ));
         redisTemplate.opsForHash().putAll(key, seatMap);
+        redisTemplate.opsForHash().put(key, TICKET_LIMIT, String.valueOf(prfRedisInfoDto.getTicketLimit()));
+        redisTemplate.opsForHash().put(key, TICKET_OPEN_TIME, prfRedisInfoDto.getTicketOpenTime().toString());
 
-        redisTemplate.opsForHash().put(key, TICKET_LIMIT, String.valueOf(ticketLimit));
-
-        Duration ttlDuration = Duration.between(LocalDateTime.now(), performanceTime.plusDays(1));
+        Duration ttlDuration = Duration.between(LocalDateTime.now(), prfRedisInfoDto.getPerformanceTime().plusDays(1));
 
         if (ttlDuration.isNegative() || ttlDuration.isZero()) {
             redisTemplate.delete(key);
@@ -84,8 +83,15 @@ public class SeatOrderHashServiceImpl implements SeatOrderService {
     }
 
     public List<SeatInfoResponseDto> getSeatsFromRedis(UUID performanceId) {
-        Map<Object, Object> seatMap = redisTemplate.opsForHash().entries(generateKey(performanceId));
+        String key = generateKey(performanceId);
+        String openTimeStr = (String) redisTemplate.opsForHash().get(key, TICKET_OPEN_TIME);
+
+        if (openTimeStr != null && LocalDateTime.now().isBefore(LocalDateTime.parse(openTimeStr))) {
+            throw new SeatException(ErrorCode.TICKET_NOT_OPEN);
+        }
+        Map<Object, Object> seatMap = redisTemplate.opsForHash().entries(key);
         seatMap.remove(TICKET_LIMIT);
+        seatMap.remove(TICKET_OPEN_TIME);
         return seatMap.values().stream()
                 .map(value -> (SeatInfoResponseDto) value)
                 .toList();
