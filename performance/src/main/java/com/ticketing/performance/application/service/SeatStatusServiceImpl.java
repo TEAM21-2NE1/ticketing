@@ -2,7 +2,6 @@ package com.ticketing.performance.application.service;
 
 import com.ticketing.performance.application.dto.seat.CancelSeatResponseDto;
 import com.ticketing.performance.application.dto.seat.ConfirmSeatResponseDto;
-import com.ticketing.performance.application.dto.seat.SeatInfoResponseDto;
 import com.ticketing.performance.domain.model.Seat;
 import com.ticketing.performance.domain.repository.SeatRepository;
 import com.ticketing.performance.presentation.dto.seat.CancelSeatRequestDto;
@@ -13,6 +12,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
+import java.util.UUID;
 
 @Service
 @RequiredArgsConstructor
@@ -26,11 +26,12 @@ public class SeatStatusServiceImpl implements SeatStatusService{
     @Override
     public ConfirmSeatResponseDto confirmSeat(ConfirmSeatRequestDto requestDto) {
 
-        List<Seat> seats = seatRepository.findAllByIds(requestDto.getSeatIds());
+        List<UUID> seatIds = requestDto.getSeatIds();
+        seatOrderService.confirm(seatIds, requestDto.getPerformanceId());
 
+        List<Seat> seats = seatRepository.findAllByIds(requestDto.getSeatIds());
         seats.forEach(seat -> seat.confirm(requestDto.getOrderId()));
 
-        seatOrderService.confirm(seats.stream().map(SeatInfoResponseDto::of).toList());
 
         return ConfirmSeatResponseDto.of(seats);
     }
@@ -38,11 +39,12 @@ public class SeatStatusServiceImpl implements SeatStatusService{
     @Override
     public CancelSeatResponseDto cancelSeat(CancelSeatRequestDto requestDto) {
 
-        List<Seat> seats = seatRepository.findAllByIds(requestDto.getSeatIds());
+        List<UUID> seatIds = requestDto.getSeatIds();
+        seatOrderService.cancel(seatIds, requestDto.getPerformanceId());
 
+        List<Seat> seats = seatRepository.findAllByIds(requestDto.getSeatIds());
         seats.forEach(Seat::cancel);
 
-        seatOrderService.cancel(seats.stream().map(SeatInfoResponseDto::of).toList());
 
         return CancelSeatResponseDto.of(seats);
     }

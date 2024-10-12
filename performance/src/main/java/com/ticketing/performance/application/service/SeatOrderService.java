@@ -16,7 +16,7 @@ public interface SeatOrderService {
 
     SeatInfoResponseDto getSeatFromRedis(UUID performanceId, UUID seatId);
 
-    void confirm(List<SeatInfoResponseDto> seats);
+    void confirm(List<UUID> seatIds, UUID performanceId);
 
-    void cancel(List<SeatInfoResponseDto> seats);
+    void cancel(List<UUID> seaIds, UUID performanceId);
 }
