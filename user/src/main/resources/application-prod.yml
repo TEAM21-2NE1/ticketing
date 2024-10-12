@@ -22,4 +22,5 @@ eureka:
 
 service:
   jwt:
+    access-expiration: 3600000  # 1시간
     secret-key: ${JWT_SECRET_KEY}
