@@ -43,7 +43,6 @@ public class SeatInfoResponseDto implements Serializable {
     public void confirm(UUID orderId) {
         this.orderId = orderId;
         this.seatStatus = SeatStatus.BOOKED;
-        this.userId = null;
 
     }
 
