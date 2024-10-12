@@ -23,10 +23,15 @@ public class JwtAuthorizationFilter extends OncePerRequestFilter {
   @Override
   protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response,
       FilterChain filterChain) throws ServletException, IOException {
+
+    if (request.getRequestURI().startsWith("/api/v1/performances/actuator")) {;
+      filterChain.doFilter(request, response);
+      return;
+    }
     // 헤더에서 사용자 정보와 역할(Role)을 추출
     String userEmail = request.getHeader("X-User-Email");
     String userRole = request.getHeader("X-User-Role");
-    Long userId = Long.parseLong(request.getHeader("X-User-Id"));
+    String userId = request.getHeader("X-User-Id");
 
 
     if (userEmail != null && userRole != null) {
