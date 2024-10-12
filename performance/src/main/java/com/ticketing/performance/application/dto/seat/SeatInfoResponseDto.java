@@ -1,5 +1,6 @@
 package com.ticketing.performance.application.dto.seat;
 
+import com.ticketing.performance.common.util.SecurityUtil;
 import com.ticketing.performance.domain.model.Seat;
 import com.ticketing.performance.domain.model.SeatStatus;
 import lombok.AllArgsConstructor;
@@ -7,13 +8,14 @@ import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
+import java.io.Serializable;
 import java.util.UUID;
 
 @AllArgsConstructor
 @NoArgsConstructor
 @Getter
 @Builder
-public class SeatInfoResponseDto {
+public class SeatInfoResponseDto implements Serializable {
 
     private UUID seatId;
     private UUID performanceId;
@@ -23,6 +25,7 @@ public class SeatInfoResponseDto {
     private Integer seatNum;
     private Integer price;
     private SeatStatus seatStatus;
+    private Long userId;
 
     public static SeatInfoResponseDto of(Seat seat) {
         return SeatInfoResponseDto.builder()
@@ -36,4 +39,24 @@ public class SeatInfoResponseDto {
                 .seatStatus(seat.getSeatStatus())
                 .build();
     }
+
+    public void confirm(UUID orderId) {
+        this.orderId = orderId;
+        this.seatStatus = SeatStatus.BOOKED;
+        this.userId = null;
+
+    }
+
+    public void hold() {
+        this.userId = SecurityUtil.getId();
+        this.seatStatus = SeatStatus.HOLD;
+    }
+
+    public void cancel() {
+        this.orderId = null;
+        this.seatStatus = SeatStatus.AVAILABLE;
+        this.userId = null;
+    }
+
+
 }
