@@ -2,8 +2,10 @@ package com.ticketing.performance.presentation.controller;
 
 import com.ticketing.performance.application.dto.seat.CancelSeatResponseDto;
 import com.ticketing.performance.application.dto.seat.ConfirmSeatResponseDto;
+import com.ticketing.performance.application.service.SeatOrderService;
 import com.ticketing.performance.application.service.SeatStatusService;
 import com.ticketing.performance.common.response.CommonResponse;
+import com.ticketing.performance.presentation.dto.HoldSeatRequestDto;
 import com.ticketing.performance.presentation.dto.seat.CancelSeatRequestDto;
 import com.ticketing.performance.presentation.dto.seat.ConfirmSeatRequestDto;
 import lombok.RequiredArgsConstructor;
@@ -19,6 +21,7 @@ import org.springframework.web.bind.annotation.RestController;
 public class SeatStatusController {
 
     private final SeatStatusService seatStatusService;
+    private final SeatOrderService seatOrderService;
 
     @PatchMapping("/confirm")
     public ResponseEntity<CommonResponse<ConfirmSeatResponseDto>> confirmSeat(@RequestBody ConfirmSeatRequestDto requestDto) {
@@ -32,4 +35,9 @@ public class SeatStatusController {
         return ResponseEntity.ok(CommonResponse.success("좌석 예매 취소 성공", responseDto));
     }
 
+    @PatchMapping("/hold")
+    public ResponseEntity<CommonResponse<Void>> holdSeat(@RequestBody HoldSeatRequestDto requestDto) {
+        seatOrderService.holdSeat(requestDto.getPerformanceId(), requestDto.getSeatId());
+        return ResponseEntity.ok(CommonResponse.success("좌석 업데이트 성공"));
+    }
 }

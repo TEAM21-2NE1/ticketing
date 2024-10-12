@@ -1,20 +1,16 @@
-package com.ticketing.performance.presentation.dto.seat;
-
+package com.ticketing.performance.presentation.dto;
 
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
-import java.util.List;
 import java.util.UUID;
 
 @AllArgsConstructor
 @NoArgsConstructor
 @Getter
-public class CancelSeatRequestDto {
+public class HoldSeatRequestDto {
 
-    private List<UUID> seatIds;
-    private UUID orderId;
     private UUID performanceId;
-
+    private UUID seatId;
 }

@@ -14,5 +14,6 @@ public class ConfirmSeatRequestDto {
 
     private List<UUID> seatIds;
     private UUID orderId;
+    private UUID performanceId;
 
 }

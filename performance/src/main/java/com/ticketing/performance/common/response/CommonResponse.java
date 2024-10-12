@@ -29,6 +29,11 @@ public record CommonResponse<T> (
         return CommonResponse.<Void>builder().message(message).build();
     }
 
+    public static <T> CommonResponse<T> errorWithData(String message, T data) {
+        return CommonResponse.<T>builder().message(message).data(data).build();
+    }
+
+
     public static <T> CommonResponse<T> errors(T errors) {
         return CommonResponse.<T>builder()
                 .message("Validation failed")
