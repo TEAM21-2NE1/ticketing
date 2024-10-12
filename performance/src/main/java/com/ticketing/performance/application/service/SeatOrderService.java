@@ -1,14 +1,14 @@
 package com.ticketing.performance.application.service;
 
+import com.ticketing.performance.application.dto.performance.PrfRedisInfoDto;
 import com.ticketing.performance.application.dto.seat.SeatInfoResponseDto;
 
-import java.time.LocalDateTime;
 import java.util.List;
 import java.util.UUID;
 
 public interface SeatOrderService {
 
-    void saveSeatsToRedis(UUID performanceId, LocalDateTime performanceTime, List<SeatInfoResponseDto> seatList, int ticketLimit);
+    void saveSeatsToRedis(PrfRedisInfoDto prfRedisInfoDto, List<SeatInfoResponseDto> seatList);
 
     void holdSeat(UUID performanceId, UUID seatId);
 

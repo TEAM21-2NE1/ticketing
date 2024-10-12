@@ -2,6 +2,7 @@ package com.ticketing.performance.application.service;
 
 import com.ticketing.performance.application.dto.hall.HallInfoResponseDto;
 import com.ticketing.performance.application.dto.hall.HallSeatInfoResponseDto;
+import com.ticketing.performance.application.dto.performance.PrfRedisInfoDto;
 import com.ticketing.performance.application.dto.seat.SeatInfoResponseDto;
 import com.ticketing.performance.common.exception.ForbiddenAccessException;
 import com.ticketing.performance.common.exception.PerformanceException;
@@ -39,10 +40,11 @@ public class SeatService {
         if (!seatsFromRedis.isEmpty()) {
             return seatsFromRedis;
         }
-        Performance performance = performanceRepository.findById(performanceId)
+        PrfRedisInfoDto prfRedisInfoDto = performanceRepository.findById(performanceId).map(PrfRedisInfoDto::of)
                 .orElseThrow(() -> new PerformanceException(ErrorCode.PERFORMANCE_NOT_FOUND));
 
-        if (performance.getTicketOpenTime().isAfter(LocalDateTime.now()) || performance.getPerformanceTime().isBefore(LocalDateTime.now())) {
+        if (prfRedisInfoDto.getTicketOpenTime().isAfter(LocalDateTime.now())
+                || prfRedisInfoDto.getPerformanceTime().isBefore(LocalDateTime.now())) {
             throw new SeatException(ErrorCode.SEAT_QUERY_PERIOD_INVALID);
         }
 
@@ -51,7 +53,7 @@ public class SeatService {
                 .map(SeatInfoResponseDto::of)
                 .toList();
 
-        seatOrderService.saveSeatsToRedis(performanceId, performance.getPerformanceTime(), seatList, performance.getTicketLimit());
+        seatOrderService.saveSeatsToRedis(prfRedisInfoDto, seatList);
 
         return seatList;
     }

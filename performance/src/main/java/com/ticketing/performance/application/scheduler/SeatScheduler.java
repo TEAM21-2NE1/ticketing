@@ -1,5 +1,6 @@
 package com.ticketing.performance.application.scheduler;
 
+import com.ticketing.performance.application.dto.performance.PrfRedisInfoDto;
 import com.ticketing.performance.application.dto.seat.SeatInfoResponseDto;
 import com.ticketing.performance.application.service.SeatOrderService;
 import com.ticketing.performance.domain.model.Performance;
@@ -42,12 +43,7 @@ public class SeatScheduler {
                     .filter(seat -> seat.getPerformanceId().equals(performance.getId()))
                     .toList();
 
-            seatOrderService.saveSeatsToRedis(
-                    performance.getId(),
-                    performance.getPerformanceTime(),
-                    seatsForPerformance,
-                    performance.getTicketLimit()
-            );
+            seatOrderService.saveSeatsToRedis(PrfRedisInfoDto.of(performance), seatsForPerformance);
         });
     }
 }
