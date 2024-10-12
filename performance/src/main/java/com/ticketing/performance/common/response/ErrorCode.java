@@ -38,7 +38,8 @@ public enum ErrorCode {
     SEAT_SELECT_EXCEEDED(HttpStatus.BAD_REQUEST,"선택 가능 좌석수를 초과 했습니다." ),
 
     SEAT_STATUS_NOT_EXIST(HttpStatus.BAD_REQUEST, "존재 하지 않는 Seat Status 입니다."),
-    TICKET_NOT_OPEN(HttpStatus.BAD_REQUEST,"티켓 오픈 시간이 아닙니다." );
+    TICKET_NOT_OPEN(HttpStatus.BAD_REQUEST,"티켓 오픈 시간이 아닙니다." ),
+    SEAT_NOT_SELECTED_BY_USER(HttpStatus.BAD_REQUEST,"본인이 선택한 좌석이 아닙니다." );
 
 
 
