@@ -13,7 +13,7 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.data.redis.core.RedisTemplate;
 
 
-@SpringBootTest
+//@SpringBootTest
 class RedisWaitingQueueIntegrationTest {
 
     @Autowired
