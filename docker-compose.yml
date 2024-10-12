@@ -12,6 +12,9 @@ services:
       args:
         - FILE_DIRECTORY=./gateway
     image: ${ECR_REGISTRY}/${ECR_NAMESPACE}/gateway
+    environment:
+      - JWT_SECRET_KEY: ${{ secrets.JWT_SECRET_KEY }}
+
     ports:
       - "8080:8080"
 
@@ -21,6 +24,13 @@ services:
       args:
         - FILE_DIRECTORY=./user
     image: ${ECR_REGISTRY}/${ECR_NAMESPACE}/user
+    environment:
+      - DB_HOST: ${{ secrets.DB_HOST }}
+      - DB_PORT: ${{ secrets.DB_PORT }}
+      - DB_USERNAME: ${{ secrets.DB_USERNAME }}
+      - DB_PASSWORD: ${{ secrets.DB_PASSWORD }}
+      - JWT_SECRET_KEY: ${{ secrets.JWT_SECRET_KEY }}
+      - USER_PROD_DB_NAME: ${{ secrets.USER_PROD_DB_NAME }}
 
   review:
     build:
@@ -28,6 +38,16 @@ services:
       args:
         - FILE_DIRECTORY=./review
     image: ${ECR_REGISTRY}/${ECR_NAMESPACE}/review
+    environment:
+      - DB_HOST: ${{ secrets.DB_HOST }}
+      - DB_PORT: ${{ secrets.DB_PORT }}
+      - DB_USERNAME: ${{ secrets.DB_USERNAME }}
+      - DB_PASSWORD: ${{ secrets.DB_PASSWORD }}
+      - REVIEW_PROD_DB_NAME: ${{ secrets.REVIEW_PROD_DB_NAME }}
+      - REVIEW_REDIS_HOST: ${{ secrets.REVIEW_REDIS_HOST }}
+      - REVIEW_REDIS_PORT: ${{ secrets.REVIEW_REDIS_PORT }}
+      - REVIEW_REDIS_USERNAME: ${{ secrets.REVIEW_REDIS_USERNAME }}
+      - REVIEW_REDIS_PASSWORD: ${{ secrets.REVIEW_REDIS_PASSWORD }}
 
   review-redis:
     image: "redis/redis-stack"
@@ -47,6 +67,19 @@ services:
       args:
         - FILE_DIRECTORY=./performance
     image: ${ECR_REGISTRY}/${ECR_NAMESPACE}/performance
+    environment:
+      - DB_HOST: ${{ secrets.DB_HOST }}
+      - DB_PORT: ${{ secrets.DB_PORT }}
+      - DB_USERNAME: ${{ secrets.DB_USERNAME }}
+      - DB_PASSWORD: ${{ secrets.DB_PASSWORD }}
+      - PERFORMANCE_PROD_DB_NAME: ${{ secrets.PERFORMANCE_PROD_DB_NAME }}
+      - PERFORMANCE_REDIS_HOST: ${{ secrets.PERFORMANCE_REDIS_HOST }}
+      - PERFORMANCE_REDIS_PORT: ${{ secrets.PERFORMANCE_REDIS_PORT }}
+      - PERFORMANCE_REDIS_USERNAME: ${{ secrets.PERFORMANCE_REDIS_USERNAME }}
+      - PERFORMANCE_REDIS_PASSWORD: ${{ secrets.PERFORMANCE_REDIS_PASSWORD }}
+      - S3_ACCESS_KEY: ${{ secrets.S3_ACCESS_KEY }}
+      - S3_SECRET_KEY: ${{ secrets.S3_SECRET_KEY }}
+      - S3_BUCKET_NAME: ${{ secrets.S3_BUCKET_NAME }}
 
   performance-redis:
     image: "redis/redis-stack"
@@ -66,6 +99,16 @@ services:
       args:
         - FILE_DIRECTORY=./order
     image: ${ECR_REGISTRY}/${ECR_NAMESPACE}/order
+    environment:
+      - DB_HOST: ${{ secrets.DB_HOST }}
+      - DB_PORT: ${{ secrets.DB_PORT }}
+      - DB_USERNAME: ${{ secrets.DB_USERNAME }}
+      - DB_PASSWORD: ${{ secrets.DB_PASSWORD }}
+      - ORDER_PROD_DB_NAME: ${{ secrets.ORDER_PROD_DB_NAME }}
+      - ORDER_REDIS_HOST: ${{ secrets.ORDER_REDIS_HOST }}
+      - ORDER_REDIS_PORT: ${{ secrets.ORDER_REDIS_PORT }}
+      - ORDER_REDIS_USERNAME: ${{ secrets.ORDER_REDIS_USERNAME }}
+      - ORDER_REDIS_PASSWORD: ${{ secrets.ORDER_REDIS_PASSWORD }}
 
   order-redis:
     image: "redis/redis-stack"
@@ -85,6 +128,12 @@ services:
       args:
         - FILE_DIRECTORY=./payment
     image: ${ECR_REGISTRY}/${ECR_NAMESPACE}/payment
+    environment:
+      - DB_HOST: ${{ secrets.DB_HOST }}
+      - DB_PORT: ${{ secrets.DB_PORT }}
+      - DB_USERNAME: ${{ secrets.DB_USERNAME }}
+      - DB_PASSWORD: ${{ secrets.DB_PASSWORD }}
+      - PAYMENT_PROD_DB_NAME: ${{ secrets.PAYMENT_PROD_DB_NAME }}
 
 volumes:
   review-redis-prod-data:
