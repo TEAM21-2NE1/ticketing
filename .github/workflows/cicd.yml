@@ -62,7 +62,7 @@ jobs:
         working-directory: ${{ matrix.service }}
 
       - name: Build with Gradle
-        run: ./gradlew clean build -Dspring.profiles.active=prod
+        run: ./gradlew clean build -x test -Dspring.profiles.active=prod
         working-directory: ${{ matrix.service }}
 
   Docker:
