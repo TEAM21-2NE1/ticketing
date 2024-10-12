@@ -5,8 +5,8 @@ services:
       args:
         - FILE_DIRECTORY=./eureka
     image: ${ECR_REGISTRY}/${ECR_NAMESPACE}/eureka
-    environment:
-      - EUREKA_HOST=${EUREKA_HOST}
+    env_file:
+      - .env
 
   gateway:
     build:
@@ -14,10 +14,8 @@ services:
       args:
         - FILE_DIRECTORY=./gateway
     image: ${ECR_REGISTRY}/${ECR_NAMESPACE}/gateway
-    environment:
-      - JWT_SECRET_KEY=${JWT_SECRET_KEY}
-      - EUREKA_HOST=${EUREKA_HOST}
-
+    env_file:
+      - .env
     ports:
       - "8080:8080"
 
@@ -27,14 +25,8 @@ services:
       args:
         - FILE_DIRECTORY=./user
     image: ${ECR_REGISTRY}/${ECR_NAMESPACE}/user
-    environment:
-      - DB_HOST=${DB_HOST}
-      - DB_PORT=${DB_PORT}
-      - DB_USERNAME=${DB_USERNAME}
-      - DB_PASSWORD=${DB_PASSWORD}
-      - JWT_SECRET_KEY=${JWT_SECRET_KEY}
-      - USER_PROD_DB_NAME=${USER_PROD_DB_NAME}
-      - EUREKA_HOST=${EUREKA_HOST}
+    env_file:
+      - .env
 
   review:
     build:
