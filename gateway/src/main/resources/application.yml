@@ -1,6 +1,6 @@
 spring:
   profiles:
-    active: prod
+    active: local
   main:
     web-application-type: reactive
   application:
