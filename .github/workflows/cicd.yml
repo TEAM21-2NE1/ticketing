@@ -16,7 +16,7 @@ jobs:
       DB_PORT: ${{ secrets.DB_PORT }}
       DB_USERNAME: ${{ secrets.DB_USERNAME }}
       DB_PASSWORD: ${{ secrets.DB_PASSWORD }}
-      EUREKA_HOST: ${{ secrets.EC2_HOST }}
+      EUREKA_HOST: ${{ secrets.EUREKA_HOST }}
       # user
       USER_PROD_DB_NAME: ${{ secrets.USER_PROD_DB_NAME }}
       JWT_SECRET_KEY: ${{ secrets.JWT_SECRET_KEY }}
