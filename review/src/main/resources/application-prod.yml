@@ -6,6 +6,12 @@ spring:
   jpa:
     hibernate:
       ddl-auto: none
+  data:
+    redis:
+      host: ${REVIEW_REDIS_HOST}
+      port: ${REVIEW_REDIS_PORT}
+      username: ${REVIEW_REDIS_USERNAME}
+      password: ${REVIEW_REDIS_PASSWORD}
 
 eureka:
   client:

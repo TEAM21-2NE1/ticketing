@@ -21,3 +21,30 @@ services:
       args:
         - FILE_DIRECTORY=./user
     image: ${ECR_REGISTRY}/${ECR_NAMESPACE}/user
+
+  review:
+    build:
+      dockerfile: Dockerfile
+      args:
+        - FILE_DIRECTORY=./review
+    image: ${ECR_REGISTRY}/${ECR_NAMESPACE}/review
+    environment:
+      - REDIS_HOST=review-redis
+      - REDIS_PORT=${REVIEW_REDIS_PORT}
+      - REDIS_PASSWORD=${REVIEW_REDIS_PASSWORD}
+
+  review-redis:
+    image: "redis/redis-stack"
+    container_name: review-redis-prod
+    restart: always
+    ports:
+      - "${REVIEW_REDIS_PORT}:6379"
+    environment:
+      - REDIS_ARGS=--requirepass ${REVIEW_REDIS_PASSWORD}
+    volumes:
+      - review-redis-prod-data:/data
+      - review-redis-config-file:/usr/local/etc/redis/redis.conf
+
+volumes:
+  review-redis-prod-data:
+  review-redis-config-file:

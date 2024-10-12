@@ -14,14 +14,21 @@ jobs:
     env:
       DB_HOST: ${{ secrets.DB_HOST }}
       DB_PORT: ${{ secrets.DB_PORT }}
-      USER_PROD_DB_NAME: ${{ secrets.USER_PROD_DB_NAME }}
       DB_USERNAME: ${{ secrets.DB_USERNAME }}
       DB_PASSWORD: ${{ secrets.DB_PASSWORD }}
+      # user
+      USER_PROD_DB_NAME: ${{ secrets.USER_PROD_DB_NAME }}
       JWT_SECRET_KEY: ${{ secrets.JWT_SECRET_KEY }}
+      # review
+      REVIEW_PROD_DB_NAME: ${{ secrets.REVIEW_PROD_DB_NAME }}
+      REVIEW_REDIS_HOST: ${{ secrets.REVIEW_REDIS_HOST }}
+      REVIEW_REDIS_PORT: ${{ secrets.REVIEW_REDIS_PORT }}
+      REVIEW_REDIS_USERNAME: ${{ secrets.REVIEW_REDIS_USERNAME }}
+      REVIEW_REDIS_PASSWORD: ${{ secrets.REVIEW_REDIS_PASSWORD }}
 
     strategy:
       matrix:
-        service: [eureka, gateway, user]
+        service: [eureka, gateway, user, review]
 
     steps:
       - name: Checkout
