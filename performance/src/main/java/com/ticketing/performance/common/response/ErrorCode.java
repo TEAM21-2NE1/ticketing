@@ -39,7 +39,8 @@ public enum ErrorCode {
 
     SEAT_STATUS_NOT_EXIST(HttpStatus.BAD_REQUEST, "존재 하지 않는 Seat Status 입니다."),
     TICKET_NOT_OPEN(HttpStatus.BAD_REQUEST,"티켓 오픈 시간이 아닙니다." ),
-    SEAT_NOT_SELECTED_BY_USER(HttpStatus.BAD_REQUEST,"본인이 선택한 좌석이 아닙니다." );
+    SEAT_NOT_SELECTED_BY_USER(HttpStatus.BAD_REQUEST,"본인이 선택한 좌석이 아닙니다." ),
+    UNAUTHORIZED_PERFORMANCE_ACCESS(HttpStatus.UNAUTHORIZED,"해당 공연에 접근 권한이 없습니다.");
 
 
 

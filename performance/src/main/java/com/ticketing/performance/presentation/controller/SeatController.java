@@ -36,8 +36,8 @@ public class SeatController {
     }
 
     @GetMapping("/performances/{performanceId}")
-    public ResponseEntity<CommonResponse<List<SeatInfoResponseDto>>> getSeats(@PathVariable UUID performanceId) {
-        List<SeatInfoResponseDto> seats = seatService.getSeats(performanceId);
+    public ResponseEntity<CommonResponse<List<SeatInfoResponseDto>>> getOrderSeats(@PathVariable UUID performanceId) {
+        List<SeatInfoResponseDto> seats = seatService.getOrderSeats(performanceId);
         return ResponseEntity.ok(CommonResponse.success("get success!", seats));
     }
 
