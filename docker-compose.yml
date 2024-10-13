@@ -65,7 +65,7 @@ services:
     container_name: performance-redis
     restart: always
     ports:
-      - "${PERFORMANCE_REDIS_PORT}:6379"
+      -  "6380:6379"
     environment:
       - REDIS_ARGS=--requirepass ${PERFORMANCE_REDIS_PASSWORD}
     volumes:
@@ -86,7 +86,7 @@ services:
     container_name: order-redis
     restart: always
     ports:
-      - "${ORDER_REDIS_PORT}:6379"
+      - "6381:6379"
     environment:
       - REDIS_ARGS=--requirepass ${ORDER_REDIS_PASSWORD}
     volumes:
