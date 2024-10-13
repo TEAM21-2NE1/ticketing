@@ -41,7 +41,7 @@ services:
 
   review-redis:
     image: "redis/redis-stack"
-    container_name: review-redis-prod
+    container_name: review-redis
     restart: always
     ports:
       - "${REVIEW_REDIS_PORT}:6379"
@@ -62,7 +62,7 @@ services:
 
   performance-redis:
     image: "redis/redis-stack"
-    container_name: performance-redis-prod
+    container_name: performance-redis
     restart: always
     ports:
       - "${PERFORMANCE_REDIS_PORT}:6379"
@@ -83,7 +83,7 @@ services:
 
   order-redis:
     image: "redis/redis-stack"
-    container_name: order-redis-prod
+    container_name: order-redis
     restart: always
     ports:
       - "${ORDER_REDIS_PORT}:6379"
