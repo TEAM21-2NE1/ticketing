@@ -58,9 +58,7 @@ public class PerformanceService {
         Performance performance = performanceRepository.findById(performanceId)
                 .orElseThrow(() -> new PerformanceException(ErrorCode.PERFORMANCE_NOT_FOUND));
 
-        if (performance.getOpenDate().isAfter(LocalDate.now())) {
-            throw new PerformanceException(ErrorCode.PERFORMANCE_NOT_FOUND);
-        }
+        checkRoleGetPerformance(performance);
 
         HallInfoResponseDto hall = hallService.getHall(performance.getHallId());
 
@@ -101,6 +99,20 @@ public class PerformanceService {
         performance.delete();
     }
 
+
+    private void checkRoleGetPerformance(Performance performance) {
+        if (SecurityUtil.getRole().equals("ROLE_USER")) {
+            if (performance.getOpenDate().isAfter(LocalDate.now())) {
+                throw new PerformanceException(ErrorCode.PERFORMANCE_NOT_FOUND);
+            }
+        }
+
+        if (SecurityUtil.getRole().equals("ROLE_P_MANAGER")) {
+            if (!performance.getManagerId().equals(SecurityUtil.getId())) {
+                throw new PerformanceException(ErrorCode.UNAUTHORIZED_PERFORMANCE_ACCESS);
+            }
+        }
+    }
 
     private void checkRole(Long managerId) {
         Long userId = SecurityUtil.getId();
