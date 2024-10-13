@@ -7,12 +7,6 @@ services:
     image: ${ECR_REGISTRY}/${ECR_NAMESPACE}/eureka
     env_file:
       - .env
-    healthcheck:
-      test: ["CMD-SHELL", "curl -f http://eureka:19090/eureka/ || exit 1"]
-      interval: 30s
-      timeout: 10s
-      retries: 10
-    restart: always
 
   gateway:
     build:
@@ -25,8 +19,7 @@ services:
     ports:
       - "8080:8080"
     depends_on:
-      eureka:
-        condition: service_healthy
+      - eureka
 
   user:
     build:
@@ -36,9 +29,15 @@ services:
     image: ${ECR_REGISTRY}/${ECR_NAMESPACE}/user
     env_file:
       - .env
-    depends_on:
-      eureka:
-        condition: service_healthy
+
+  review:
+    build:
+      dockerfile: Dockerfile
+      args:
+        - FILE_DIRECTORY=./review
+    image: ${ECR_REGISTRY}/${ECR_NAMESPACE}/review
+    env_file:
+      - .env
 
   review-redis:
     image: "redis/redis-stack"
@@ -51,25 +50,15 @@ services:
     volumes:
       - review-redis-prod-data:/data
       - review-redis-config-file:/usr/local/etc/redis/redis.conf
-    healthcheck:
-      test: ["CMD", "redis-cli", "ping"]
-      interval: 30s
-      timeout: 10s
-      retries: 5
 
-  review:
+  performance:
     build:
       dockerfile: Dockerfile
       args:
-        - FILE_DIRECTORY=./review
-    image: ${ECR_REGISTRY}/${ECR_NAMESPACE}/review
+        - FILE_DIRECTORY=./performance
+    image: ${ECR_REGISTRY}/${ECR_NAMESPACE}/performance
     env_file:
       - .env
-    depends_on:
-      eureka:
-        condition: service_healthy
-      review-redis:
-        condition: service_healthy
 
   performance-redis:
     image: "redis/redis-stack"
@@ -82,25 +71,15 @@ services:
     volumes:
       - performance-redis-prod-data:/data
       - performance-redis-config-file:/usr/local/etc/redis/redis.conf
-    healthcheck:
-      test: ["CMD", "redis-cli", "ping"]
-      interval: 30s
-      timeout: 10s
-      retries: 5
 
-  performance:
+  order:
     build:
       dockerfile: Dockerfile
       args:
-        - FILE_DIRECTORY=./performance
-    image: ${ECR_REGISTRY}/${ECR_NAMESPACE}/performance
+        - FILE_DIRECTORY=./order
+    image: ${ECR_REGISTRY}/${ECR_NAMESPACE}/order
     env_file:
       - .env
-    depends_on:
-      eureka:
-        condition: service_healthy
-      performance-redis:
-        condition: service_healthy
 
   order-redis:
     image: "redis/redis-stack"
@@ -113,25 +92,6 @@ services:
     volumes:
       - order-redis-prod-data:/data
       - order-redis-config-file:/usr/local/etc/redis/redis.conf
-    healthcheck:
-      test: ["CMD", "redis-cli", "ping"]
-      interval: 30s
-      timeout: 10s
-      retries: 5
-
-  order:
-    build:
-      dockerfile: Dockerfile
-      args:
-        - FILE_DIRECTORY=./order
-    image: ${ECR_REGISTRY}/${ECR_NAMESPACE}/order
-    env_file:
-      - .env
-    depends_on:
-      eureka:
-        condition: service_healthy
-      order-redis:
-        condition: service_healthy
 
   payment:
     build:
@@ -141,9 +101,6 @@ services:
     image: ${ECR_REGISTRY}/${ECR_NAMESPACE}/payment
     env_file:
       - .env
-    depends_on:
-      eureka:
-        condition: service_healthy
 
 volumes:
   review-redis-prod-data:
