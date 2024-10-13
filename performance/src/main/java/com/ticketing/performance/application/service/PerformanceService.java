@@ -21,6 +21,7 @@ import org.springframework.data.domain.Page;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.time.LocalDate;
 import java.util.List;
 import java.util.UUID;
 
@@ -56,6 +57,10 @@ public class PerformanceService {
     public PrfInfoResponseDto getPerformance(UUID performanceId) {
         Performance performance = performanceRepository.findById(performanceId)
                 .orElseThrow(() -> new PerformanceException(ErrorCode.PERFORMANCE_NOT_FOUND));
+
+        if (performance.getOpenDate().isAfter(LocalDate.now())) {
+            throw new PerformanceException(ErrorCode.PERFORMANCE_NOT_FOUND);
+        }
 
         HallInfoResponseDto hall = hallService.getHall(performance.getHallId());
 
