@@ -20,7 +20,7 @@ public class RedisConfig {
         redisTemplate.setHashKeySerializer(StringRedisSerializer.UTF_8);
         redisTemplate.setHashValueSerializer(new GenericJackson2JsonRedisSerializer());
         redisTemplate.setConnectionFactory(redisConnectionFactory);
+        redisTemplate.setEnableTransactionSupport(true); // 트랜잭션 지원 활성화
         return redisTemplate;
     }
-
 }
