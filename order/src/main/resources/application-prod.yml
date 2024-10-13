@@ -12,7 +12,6 @@ spring:
     redis:
       host: ${ORDER_REDIS_HOST}
       port: ${ORDER_REDIS_PORT}
-      username: ${ORDER_REDIS_USERNAME}
       password: ${ORDER_REDIS_PASSWORD}
 
 eureka:
