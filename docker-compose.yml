@@ -11,7 +11,8 @@ services:
       test: ["CMD-SHELL", "curl -f http://eureka:19090/eureka/ || exit 1"]
       interval: 30s
       timeout: 10s
-      retries: 5
+      retries: 10
+    restart: always
 
   gateway:
     build:
