@@ -34,8 +34,14 @@ public class SeatService {
     private final PerformanceRepository performanceRepository;
     private final SeatOrderService seatOrderService;
 
-
     public List<SeatInfoResponseDto> getSeats(UUID performanceId) {
+        return seatRepository.findAllByPerformanceId(performanceId)
+                .stream()
+                .map(SeatInfoResponseDto::of)
+                .toList();
+    }
+
+    public List<SeatInfoResponseDto> getOrderSeats(UUID performanceId) {
         List<SeatInfoResponseDto> seatsFromRedis = seatOrderService.getSeatsFromRedis(performanceId);
         if (!seatsFromRedis.isEmpty()) {
             return seatsFromRedis;
@@ -44,7 +50,7 @@ public class SeatService {
                 .orElseThrow(() -> new PerformanceException(ErrorCode.PERFORMANCE_NOT_FOUND));
 
         if (prfRedisInfoDto.getTicketOpenTime().isAfter(LocalDateTime.now())
-                || prfRedisInfoDto.getPerformanceTime().isBefore(LocalDateTime.now())) {
+                || (prfRedisInfoDto.getPerformanceTime().plusDays(1)).isBefore(LocalDateTime.now())) {
             throw new SeatException(ErrorCode.SEAT_QUERY_PERIOD_INVALID);
         }
 
