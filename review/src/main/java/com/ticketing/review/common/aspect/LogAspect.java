@@ -43,9 +43,10 @@ public class LogAspect {
       }
 
       Object result = joinPoint.proceed();
-
-      log.info("return type = {}", result.getClass().getSimpleName());
-      log.info("return value = {}", result);
+      if (result != null) {
+        log.info("return type = {}", result.getClass().getSimpleName());
+        log.info("return value = {}", result);
+      }
       return result;
     } finally {
       long endTime = System.currentTimeMillis();
