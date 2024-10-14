@@ -5,11 +5,17 @@ spring:
     password: ${DB_PASSWORD}
   jpa:
     hibernate:
-      ddl-auto: none
+      ddl-auto: update
+  data:
+    redis:
+      host: ${REVIEW_REDIS_HOST}
+      port: ${REVIEW_REDIS_PORT}
+      username: ${REVIEW_REDIS_USERNAME}
+      password: ${REVIEW_REDIS_PASSWORD}
 
 eureka:
   client:
     register-with-eureka: true
     fetch-registry: true
     service-url:
-      defaultZone: http://server:19090/eureka/
+      defaultZone: http://${EUREKA_HOST}:19090/eureka/

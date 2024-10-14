@@ -1,3 +1,18 @@
+spring:
+  jpa:
+    hibernate:
+      ddl-auto: create-drop
+    show-sql: true
+  datasource:
+    url: jdbc:postgresql://localhost:5432/order
+    username: postgres
+    password: ${password}
+
+  data:
+    redis:
+      host: ${redis-url}
+      port: ${redis-port}
+
 eureka:
   instance:
     prefer-ip-address: true

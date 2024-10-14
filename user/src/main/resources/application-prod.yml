@@ -18,8 +18,9 @@ eureka:
     register-with-eureka: true
     fetch-registry: true
     service-url:
-      defaultZone: http://server:19090/eureka/
+      defaultZone: http://${EUREKA_HOST}:19090/eureka/
 
 service:
   jwt:
+    access-expiration: 3600000  # 1시간
     secret-key: ${JWT_SECRET_KEY}
