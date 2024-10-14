@@ -21,7 +21,6 @@ spring:
     redis:
       host: ${PERFORMANCE_REDIS_HOST}
       port: ${PERFORMANCE_REDIS_PORT}
-      username: ${PERFORMANCE_REDIS_USERNAME}
       password: ${PERFORMANCE_REDIS_PASSWORD}
 
 s3:
