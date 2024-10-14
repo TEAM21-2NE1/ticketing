@@ -1,0 +1,36 @@
+spring:
+  datasource:
+    url: jdbc:postgresql://${DB_HOST}:${DB_PORT}/${ORDER_PROD_DB_NAME}
+    username: ${DB_USERNAME}
+    password: ${DB_PASSWORD}
+  jpa:
+    hibernate:
+      ddl-auto: update
+    show-sql: true
+
+  data:
+    redis:
+      host: ${ORDER_REDIS_HOST}
+      port: ${ORDER_REDIS_PORT}
+      password: ${ORDER_REDIS_PASSWORD}
+
+eureka:
+  client:
+    register-with-eureka: true
+    fetch-registry: true
+    service-url:
+       defaultZone: http://${EUREKA_HOST}:19090/eureka/
+
+
+management:
+  endpoints:
+    web:
+      exposure:
+        include: '*'
+      base-path: "/api/v1/performances/actuator"
+  endpoint:
+    health:
+      show-details: always
+
+    prometheus:
+      enabled: true

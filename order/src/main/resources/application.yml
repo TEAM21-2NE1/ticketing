@@ -1,0 +1,12 @@
+server:
+  port: 19095
+
+spring:
+  profiles:
+    active: local
+  application:
+    name: order-service
+
+scheduler:
+  enabled: true
+  

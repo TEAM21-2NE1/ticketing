@@ -1,0 +1,8 @@
+server:
+  port: 19092
+
+spring:
+  profiles:
+    active: local
+  application:
+    name: auth-service

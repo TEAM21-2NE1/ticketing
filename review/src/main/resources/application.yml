@@ -1,0 +1,14 @@
+server:
+  port: 19097
+
+spring:
+  profiles:
+    active: local
+  application:
+    name: review-service
+  datasource:
+    driver-class-name: org.postgresql.Driver
+  jpa:
+    properties:
+      hibernate:
+        dialect: org.hibernate.dialect.PostgreSQLDialect

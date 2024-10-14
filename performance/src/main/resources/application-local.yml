@@ -1,0 +1,60 @@
+spring:
+  config:
+    import: optional:classpath:.env[.properties]
+  datasource:
+    url: jdbc:postgresql://${url}/performance?reWriteBatchedInserts=true
+    username: ${username}
+    password: ${password}
+  jpa:
+    hibernate:
+      ddl-auto: update
+    show-sql: true
+    properties:
+      hibernate:
+        format_sql: true
+        order_inserts: true
+        order_updates: true
+        jdbc:
+          batch_size: 1000
+    generate-ddl: true
+    database: postgresql
+
+  data:
+    redis:
+      host: ${redis-url}
+      port: ${redis-port}
+      username: ${redis-username}
+      password: ${redis-password}
+
+s3:
+  credentials:
+    access-key: ${s3-access-key}
+    secret-key: ${s3-secret-key}
+    region: ap-northeast-2
+  bucket: ${s3-bucket-name}
+
+eureka:
+  instance:
+    prefer-ip-address: true
+  client:
+    register-with-eureka: true
+    fetch-registry: true
+    service-url:
+      defaultZone: http://localhost:19090/eureka/
+
+management:
+  endpoints:
+    web:
+      exposure:
+        include: '*'
+      base-path: "/api/v1/performances/actuator"
+  endpoint:
+    health:
+      show-details: always
+
+    prometheus:
+      enabled: true
+
+logging:
+  level:
+    sql: info

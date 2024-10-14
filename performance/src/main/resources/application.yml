@@ -1,0 +1,8 @@
+server:
+  port: 19094
+
+spring:
+  profiles:
+    active: local
+  application:
+    name: performance-service

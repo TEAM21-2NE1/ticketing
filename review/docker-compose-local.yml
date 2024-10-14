@@ -1,0 +1,33 @@
+version: "3"
+services:
+  review-db:
+    image: "postgres"
+    container_name: review-db-local-1
+    restart: always
+    ports:
+      - "${REVIEW_DB_PORT}:5432"
+    volumes:
+      - review-db-local-data:/var/lib/postgresql/data
+      - ./db/init.sql:/docker-entrypoint-initdb.d/init.sql
+    environment:
+      - POSTGRES_DB=postgres
+      - POSTGRES_USER=${REVIEW_POSTGRES_USER}
+      - POSTGRES_PASSWORD=${REVIEW_POSTGRES_PASSWORD}
+    env_file:
+      - .env
+  review-redis:
+    image: "redis/redis-stack"
+    container_name: review-redis-local-1
+    restart: always
+    ports:
+      - "${REVIEW_REDIS_PORT}:6379"
+    environment:
+      REDIS_ARGS: "--requirepass ${REVIEW_REDIS_PASSWORD}"
+    volumes:
+      - review-redis-local-data:/data
+      - review-redis-config-file:/usr/local/etc/redis/redis.conf
+
+volumes:
+  review-db-local-data:
+  review-redis-local-data:
+  review-redis-config-file:
