@@ -30,9 +30,11 @@ public class OrderController {
     @PostMapping
     public ResponseEntity<SuccessResponse<CreateOrderResponseDto>> createOrder(
             @RequestBody CreateOrderRequestDto requestDto,
-            @RequestHeader(value = "X-User-Id") String userId
+            @RequestHeader(value = "X-User-Id") String userId,
+            @RequestHeader("X-User-Role") String userRole,
+            @RequestHeader("X-User-Email") String email
     ) {
-        CreateOrderResponseDto responseDto = orderService.createOrder(requestDto, userId);
+        CreateOrderResponseDto responseDto = orderService.createOrder(requestDto, userId, userRole, email);
         log.info(userId, "controller");
         if ("WAITING".equals(responseDto.orderStatus())) {
             // 대기 상태인 경우

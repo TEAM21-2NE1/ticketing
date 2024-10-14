@@ -23,7 +23,8 @@ public record CreateOrderResponseDto(
     public static record SeatDetail(
             UUID seatId,
             Integer seatNum,
-            Integer seatRow
+            Integer seatRow,
+            String seatType
     ) {
 
     }

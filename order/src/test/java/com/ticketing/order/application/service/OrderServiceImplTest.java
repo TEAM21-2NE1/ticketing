@@ -39,7 +39,6 @@ class OrderServiceImplTest {
     private RedisTemplate<String, User> redisTemplate; // RedisTemplate 주입
 
     private WaitingQueue waitingQueue;
-
     private OrderRepository orderRepository;
     private PerformanceClient performanceClient;
     private OrderService orderService;
@@ -51,11 +50,9 @@ class OrderServiceImplTest {
     public void setUp() {
         orderRepository = Mockito.mock(OrderRepository.class);
         performanceClient = Mockito.mock(PerformanceClient.class);
-
         waitingQueue = new RedisWaitingQueue(redisTemplate);
 
-        orderService = new OrderServiceImpl(orderRepository, runningQueue, waitingQueue,
-                performanceClient);
+        orderService = new OrderServiceImpl(orderRepository, runningQueue, waitingQueue, performanceClient, redisTemplate);
 
         // Clear the queues in Redis before each test
         waitingQueue.clear();
@@ -75,7 +72,7 @@ class OrderServiceImplTest {
                 orderId,
                 "1",
                 performanceId,
-                List.of(new SeatDetail(seatId, 12, 3)),
+                List.of(new SeatDetail(seatId, 12, 3, "VIP")),  // seatType 추가
                 30000,
                 "PENDING_PAYMENT",
                 "CREDIT_CARD",
@@ -91,7 +88,7 @@ class OrderServiceImplTest {
         Mockito.when(runningQueue.check(User.of("1"))).thenReturn(true);
 
         // when
-        CreateOrderResponseDto actual = orderService.createOrder(createOrderRequestDto, "1");
+        CreateOrderResponseDto actual = orderService.createOrder(createOrderRequestDto, "1", "ROLE_USER", "user@example.com");
 
         // then
         assertEquals(expected, actual);
@@ -113,31 +110,32 @@ class OrderServiceImplTest {
 
         // when
         Executable executable = () -> {
-            orderService.createOrder(createOrderRequestDto, "2");
+            orderService.createOrder(createOrderRequestDto, "2", "ROLE_USER", "user@example.com");
         };
 
         // then
         assertThrows(OrderException.class, executable);
     }
 
+
+
     @Test
     void contextLoads() throws InterruptedException {
-
         int threadCount = 20;
+        int runningQueueLimit = 10; // RunningQueue 크기 제한 설정
         ExecutorService executorService = Executors.newFixedThreadPool(10);
         CountDownLatch latch = new CountDownLatch(threadCount);
-
-        CreateOrderRequestDto requestDto = new CreateOrderRequestDto(
-                UUID.fromString("655ee2b4-edb9-4bdb-aad2-594134f65702"),
-                List.of(UUID.fromString("f3f0e1a6-0a19-4a3a-9d3d-53e223c1b9b7")),
-                "CREDIT_CARD"
-        );
 
         for (int i = 0; i < threadCount; i++) {
             int finalI = i;
             executorService.submit(() -> {
                 try {
-                    orderService.createOrder(requestDto, String.valueOf(finalI));
+                    CreateOrderRequestDto requestDto = new CreateOrderRequestDto(
+                            UUID.fromString("655ee2b4-edb9-4bdb-aad2-594134f65702"),
+                            List.of(UUID.randomUUID()), // 매번 고유한 좌석 ID 생성
+                            "CREDIT_CARD"
+                    );
+                    orderService.createOrder(requestDto, String.valueOf(finalI), "ROLE_USER", "user" + finalI + "@example.com");
                     log.info("test-i : {}", finalI);
                 } finally {
                     latch.countDown();
@@ -145,17 +143,19 @@ class OrderServiceImplTest {
             });
         }
 
-        latch.await();
+        latch.await(30, TimeUnit.SECONDS);
+        executorService.shutdown();
+        executorService.awaitTermination(10, TimeUnit.SECONDS);
 
-        Thread.sleep(5000);  // 5초 대기
+//        // transferWaitingToRunning을 직접 호출하여 대기열에서 실행 큐로 이동
+//        ((OrderServiceImpl) orderService).transferWaitingToRunning();
 
         Awaitility.await()
-                .atMost(10, TimeUnit.SECONDS)
+                .atMost(20, TimeUnit.SECONDS)
                 .pollInterval(1, TimeUnit.SECONDS)
                 .untilAsserted(() -> {
-                    long size = waitingQueue.size();
-                    System.out.println("Current waiting queue size: " + size);
-                    assertEquals(10, size);
+                    assertEquals(runningQueueLimit, runningQueue.size(), "RunningQueue should contain 10 users.");
+                    assertEquals(threadCount - runningQueueLimit, waitingQueue.size(), "WaitingQueue should contain remaining 10 users.");
                 });
     }
 }
