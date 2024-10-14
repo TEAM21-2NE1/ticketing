@@ -11,6 +11,8 @@ import com.ticketing.review.infrastructure.utils.SecurityUtils;
 import java.util.Optional;
 import java.util.UUID;
 import lombok.RequiredArgsConstructor;
+import org.springframework.cache.annotation.CacheEvict;
+import org.springframework.cache.annotation.Caching;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -22,6 +24,11 @@ public class ReviewLikeService {
   private final ReviewRepository reviewRepository;
 
   @Transactional(readOnly = false)
+  @Caching(evict = {
+      @CacheEvict(cacheNames = "reviewCache", key = "#reviewId", cacheManager = "reviewCacheManager"),
+      @CacheEvict(cacheNames = {
+          "reviewSearchCache"}, allEntries = true, cacheManager = "reviewCacheManager")
+  })
   public ReviewLikeResponseDto toggleReviewLike(UUID reviewId) {
     Optional<ReviewLike> reviewLike = reviewLikeRepository.findByUserIdAndReviewId(
         SecurityUtils.getUserId(),
