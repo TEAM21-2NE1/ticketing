@@ -19,4 +19,18 @@ eureka:
     register-with-eureka: true
     fetch-registry: true
     service-url:
-      defaultZone: http://${EUREKA_HOST}:19090/eureka/
+       defaultZone: http://${EUREKA_HOST}:19090/eureka/
+
+
+management:
+  endpoints:
+    web:
+      exposure:
+        include: '*'
+      base-path: "/api/v1/performances/actuator"
+  endpoint:
+    health:
+      show-details: always
+
+    prometheus:
+      enabled: true
