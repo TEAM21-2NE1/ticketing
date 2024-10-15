@@ -44,7 +44,9 @@ public class JwtAuthenticationFilter implements ServerSecurityContextRepository 
         String path = exchange.getRequest().getURI().getPath();
 
         // 로그인, 회원가입
-        if (path.equals("/api/v1/auth/sign-in") || path.equals("/api/v1/auth/sign-up")) {
+        if (path.equals("/api/v1/auth/sign-in")
+                || path.equals("/api/v1/auth/sign-up")
+                || path.equals("/api/v1/payments/view")) {
             return Mono.empty();
         }
 
