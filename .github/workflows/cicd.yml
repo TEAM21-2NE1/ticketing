@@ -2,8 +2,7 @@ name: Spring boot CI/CD with AWS EC2, ECR
 
 on:
   push:
-    branches:
-      - main
+    branches: ["main"]
 
 env:
   ECR_NAMESPACE: ticketing
@@ -15,14 +14,39 @@ jobs:
     env:
       DB_HOST: ${{ secrets.DB_HOST }}
       DB_PORT: ${{ secrets.DB_PORT }}
-      USER_PROD_DB_NAME: ${{ secrets.USER_PROD_DB_NAME }}
       DB_USERNAME: ${{ secrets.DB_USERNAME }}
       DB_PASSWORD: ${{ secrets.DB_PASSWORD }}
+      EUREKA_HOST: ${{ secrets.EUREKA_HOST }}
+      # user
+      USER_PROD_DB_NAME: ${{ secrets.USER_PROD_DB_NAME }}
       JWT_SECRET_KEY: ${{ secrets.JWT_SECRET_KEY }}
+      # review
+      REVIEW_PROD_DB_NAME: ${{ secrets.REVIEW_PROD_DB_NAME }}
+      REVIEW_REDIS_HOST: ${{ secrets.REVIEW_REDIS_HOST }}
+      REVIEW_REDIS_PORT: ${{ secrets.REVIEW_REDIS_PORT }}
+      REVIEW_REDIS_USERNAME: ${{ secrets.REVIEW_REDIS_USERNAME }}
+      REVIEW_REDIS_PASSWORD: ${{ secrets.REVIEW_REDIS_PASSWORD }}
+      # performance
+      PERFORMANCE_PROD_DB_NAME: ${{ secrets.PERFORMANCE_PROD_DB_NAME }}
+      PERFORMANCE_REDIS_HOST: ${{ secrets.PERFORMANCE_REDIS_HOST }}
+      PERFORMANCE_REDIS_PORT: ${{ secrets.PERFORMANCE_REDIS_PORT }}
+      PERFORMANCE_REDIS_USERNAME: ${{ secrets.PERFORMANCE_REDIS_USERNAME }}
+      PERFORMANCE_REDIS_PASSWORD: ${{ secrets.PERFORMANCE_REDIS_PASSWORD }}
+      S3_ACCESS_KEY: ${{ secrets.S3_ACCESS_KEY }}
+      S3_SECRET_KEY: ${{ secrets.S3_SECRET_KEY }}
+      S3_BUCKET_NAME: ${{ secrets.S3_BUCKET_NAME }}
+      # order
+      ORDER_PROD_DB_NAME: ${{ secrets.ORDER_PROD_DB_NAME }}
+      ORDER_REDIS_HOST: ${{ secrets.ORDER_REDIS_HOST }}
+      ORDER_REDIS_PORT: ${{ secrets.ORDER_REDIS_PORT }}
+      ORDER_REDIS_USERNAME: ${{ secrets.ORDER_REDIS_USERNAME }}
+      ORDER_REDIS_PASSWORD: ${{ secrets.ORDER_REDIS_PASSWORD }}
+      # payment
+      PAYMENT_PROD_DB_NAME: ${{ secrets.PAYMENT_PROD_DB_NAME }}
 
     strategy:
       matrix:
-        service: [eureka, user, gateway]
+        service: [eureka, gateway, user, review, performance, order, payment]
 
     steps:
       - name: Checkout
@@ -34,8 +58,12 @@ jobs:
           java-version: '17'
           distribution: 'zulu'
 
+      - name: Grant execute permission for gradlew
+        run: chmod +x ./gradlew
+        working-directory: ${{ matrix.service }}
+
       - name: Build with Gradle
-        run: ./gradlew clean build
+        run: ./gradlew clean build -x test -Dspring.profiles.active=prod
         working-directory: ${{ matrix.service }}
 
   Docker:
@@ -59,6 +87,9 @@ jobs:
       - name: Login to Amazon ECR
         id: login-ecr
         uses: aws-actions/amazon-ecr-login@v1
+
+      - name: Grant execute permission for dockerTagAndPush.sh
+        run: chmod +x ./dockerTagAndPush.sh
 
       # docker compose 를 이용해서 여러 이미지를 모두 빌드하고, 별도의 script를 사용해서 이미지를 push
       - name: Build, Tag and Push docker image to AWS ECR

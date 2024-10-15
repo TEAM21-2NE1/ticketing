@@ -5,6 +5,8 @@ services:
       args:
         - FILE_DIRECTORY=./eureka
     image: ${ECR_REGISTRY}/${ECR_NAMESPACE}/eureka
+    env_file:
+      - .env
 
   gateway:
     build:
@@ -12,8 +14,12 @@ services:
       args:
         - FILE_DIRECTORY=./gateway
     image: ${ECR_REGISTRY}/${ECR_NAMESPACE}/gateway
+    env_file:
+      - .env
     ports:
       - "8080:8080"
+    depends_on:
+      - eureka
 
   user:
     build:
@@ -21,3 +27,85 @@ services:
       args:
         - FILE_DIRECTORY=./user
     image: ${ECR_REGISTRY}/${ECR_NAMESPACE}/user
+    env_file:
+      - .env
+
+  review:
+    build:
+      dockerfile: Dockerfile
+      args:
+        - FILE_DIRECTORY=./review
+    image: ${ECR_REGISTRY}/${ECR_NAMESPACE}/review
+    env_file:
+      - .env
+
+  review-redis:
+    image: "redis/redis-stack"
+    container_name: review-redis
+    restart: always
+    ports:
+      - "${REVIEW_REDIS_PORT}:6379"
+    environment:
+      - REDIS_ARGS=--requirepass ${REVIEW_REDIS_PASSWORD}
+    volumes:
+      - review-redis-prod-data:/data
+      - review-redis-config-file:/usr/local/etc/redis/redis.conf
+
+  performance:
+    build:
+      dockerfile: Dockerfile
+      args:
+        - FILE_DIRECTORY=./performance
+    image: ${ECR_REGISTRY}/${ECR_NAMESPACE}/performance
+    env_file:
+      - .env
+
+  performance-redis:
+    image: "redis/redis-stack"
+    container_name: performance-redis
+    restart: always
+    ports:
+      -  "6380:6379"
+    environment:
+      - REDIS_ARGS=--requirepass ${PERFORMANCE_REDIS_PASSWORD}
+    volumes:
+      - performance-redis-prod-data:/data
+      - performance-redis-config-file:/usr/local/etc/redis/redis.conf
+
+  order:
+    build:
+      dockerfile: Dockerfile
+      args:
+        - FILE_DIRECTORY=./order
+    image: ${ECR_REGISTRY}/${ECR_NAMESPACE}/order
+    env_file:
+      - .env
+
+  order-redis:
+    image: "redis/redis-stack"
+    container_name: order-redis
+    restart: always
+    ports:
+      - "6381:6379"
+    environment:
+      - REDIS_ARGS=--requirepass ${ORDER_REDIS_PASSWORD}
+    volumes:
+      - order-redis-prod-data:/data
+      - order-redis-config-file:/usr/local/etc/redis/redis.conf
+
+  payment:
+    build:
+      dockerfile: Dockerfile
+      args:
+        - FILE_DIRECTORY=./payment
+    image: ${ECR_REGISTRY}/${ECR_NAMESPACE}/payment
+    env_file:
+      - .env
+
+volumes:
+  review-redis-prod-data:
+  review-redis-config-file:
+  performance-redis-prod-data:
+  performance-redis-config-file:
+  order-redis-prod-data:
+  order-redis-config-file:
