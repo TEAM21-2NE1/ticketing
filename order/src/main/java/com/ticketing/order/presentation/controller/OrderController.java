@@ -64,10 +64,11 @@ public class OrderController {
 
     // a. 좌석 선택
     @PutMapping("/hold")
-    public ResponseEntity<SuccessResponse<Void>> holdSeat(
+    public ResponseEntity<SuccessResponse<?>> holdSeat(
             @RequestBody HoldSeatRequestDto requestDto) {
         seatOrderService.holdSeat(requestDto.getPerformanceId(), requestDto.getSeatId());
-        return ResponseEntity.status(HttpStatus.ACCEPTED).build();
+        return ResponseEntity.status(HttpStatus.OK)
+                .body(success("좌석 선택 성공"));
     }
 
 
@@ -75,7 +76,7 @@ public class OrderController {
     public ResponseEntity<SuccessResponse<List<SeatInfoResponseDto>>> getOrderSeats(
             @PathVariable UUID performanceId) {
         List<SeatInfoResponseDto> seats = seatOrderService.getSeatsFromRedis(performanceId);
-        return ResponseEntity.ok(success(200, "성공", seats));
+        return ResponseEntity.ok(success(200, "좌석 조회 성공", seats));
     }
 
 }
