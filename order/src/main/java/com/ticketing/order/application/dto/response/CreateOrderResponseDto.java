@@ -32,6 +32,7 @@ public record CreateOrderResponseDto(
     // 주문 성공
     public static CreateOrderResponseDto from(Order order,
             List<CreateOrderResponseDto.SeatDetail> seats) {
+
         return CreateOrderResponseDto.builder()
                 .orderId(order.getId())
                 .userId(order.getUserId())

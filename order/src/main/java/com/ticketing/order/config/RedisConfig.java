@@ -20,7 +20,16 @@ public class RedisConfig {
         redisTemplate.setHashKeySerializer(StringRedisSerializer.UTF_8);
         redisTemplate.setHashValueSerializer(new GenericJackson2JsonRedisSerializer());
         redisTemplate.setConnectionFactory(redisConnectionFactory);
-        redisTemplate.setEnableTransactionSupport(true); // 트랜잭션 지원 활성화
+        redisTemplate.setEnableTransactionSupport(false); // 트랜잭션 지원 활성화
         return redisTemplate;
+    }
+
+    @Bean
+    public RedisTemplate<String, Object> redisTemplateSeat(RedisConnectionFactory connectionFactory) {
+        RedisTemplate<String, Object> template = new RedisTemplate<>();
+        template.setConnectionFactory(connectionFactory);
+        template.setKeySerializer(new StringRedisSerializer());
+        template.setValueSerializer(new GenericJackson2JsonRedisSerializer());
+        return template;
     }
 }

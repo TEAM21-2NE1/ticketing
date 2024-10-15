@@ -42,5 +42,6 @@ public class PrfInfoResponseDto {
         private Integer seatNum;
         private Integer seatRow;
         private String seatType;
+
     }
 }

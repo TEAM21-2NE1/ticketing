@@ -6,6 +6,10 @@ import org.springframework.data.domain.Pageable;
 
 public interface CustomPerformanceRepository {
 
+    Page<Performance> findAllByKeywordByUser(String keyword, Pageable pageable);
+
+    Page<Performance> findAllByKeywordByManagerId(String keyword, Pageable pageable, Long managerId);
 
     Page<Performance> findAllByKeyword(String keyword, Pageable pageable);
+
 }

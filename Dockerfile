@@ -13,4 +13,4 @@ FROM openjdk:17-jdk-slim
 
 COPY --from=build /app/build/libs/*SNAPSHOT.jar /app.jar
 
-CMD ["java", "-jar", "app.jar"]
+CMD ["java", "-Dspring.profiles.active=prod", "-jar", "app.jar"]

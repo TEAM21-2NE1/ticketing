@@ -3,7 +3,7 @@ package com.ticketing.order.common.exception;
 import com.ticketing.order.common.response.ExceptionMessage;
 import org.springframework.http.HttpStatus;
 
-public class OrderException extends RuntimeException {
+public class OrderException extends RuntimeException{
 
     private final ExceptionMessage exceptionMessage;
 
@@ -19,6 +19,5 @@ public class OrderException extends RuntimeException {
     public String getMessage() {
         return exceptionMessage.getMessage();
     }
-
 
 }

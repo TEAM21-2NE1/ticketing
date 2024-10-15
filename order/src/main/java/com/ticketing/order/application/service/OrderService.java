@@ -5,7 +5,9 @@ import com.ticketing.order.application.dto.response.CreateOrderResponseDto;
 
 public interface OrderService {
 
-    CreateOrderResponseDto createOrder(CreateOrderRequestDto requestDto, String userId, String userRole, String userEmail);
+    CreateOrderResponseDto createOrder(CreateOrderRequestDto requestDto, String userId,
+            String userRole, String userEmail);
 
     void transferWaitingToRunning();
+
 }
