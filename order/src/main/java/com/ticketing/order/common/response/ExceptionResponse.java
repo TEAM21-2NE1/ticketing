@@ -1,7 +1,9 @@
 package com.ticketing.order.common.response;
 
+import static com.fasterxml.jackson.annotation.JsonInclude.Include.NON_NULL;
 import static lombok.AccessLevel.PRIVATE;
 
+import com.fasterxml.jackson.annotation.JsonInclude;
 import com.ticketing.order.application.dto.client.SeatInfoResponseDto;
 import java.util.List;
 import lombok.Builder;
@@ -12,7 +14,7 @@ public record ExceptionResponse(
         int resultCode,
         @NonNull
         String message,
-        @NonNull
+        @JsonInclude(value = NON_NULL)
         List<SeatInfoResponseDto> seatList
 
 ) implements CommonResponse {
