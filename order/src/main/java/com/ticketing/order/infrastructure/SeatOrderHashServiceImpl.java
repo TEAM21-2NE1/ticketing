@@ -3,6 +3,7 @@ package com.ticketing.order.infrastructure;
 
 import com.ticketing.order.application.dto.PrfRedisInfoDto;
 import com.ticketing.order.application.dto.client.SeatInfoResponseDto;
+import com.ticketing.order.application.dto.client.SeatStatus;
 import com.ticketing.order.application.service.SeatOrderService;
 import com.ticketing.order.common.exception.OrderException;
 import com.ticketing.order.common.exception.SeatException;
@@ -151,7 +152,9 @@ public class SeatOrderHashServiceImpl implements SeatOrderService {
     private long getSelectedSeatsCount(UUID performanceId) {
         return getSeatsFromRedis(performanceId)
                 .stream()
-                .filter(seat -> SecurityUtil.getId().equals(seat.getUserId()))
+                .filter(seat -> SecurityUtil.getId().equals(seat.getUserId())
+                    && seat.getSeatStatus().equals(SeatStatus.HOLD)
+                )
                 .count();
     }
 
