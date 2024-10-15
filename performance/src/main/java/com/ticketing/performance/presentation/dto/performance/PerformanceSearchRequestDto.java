@@ -22,8 +22,11 @@ public class PerformanceSearchRequestDto {
     @Pattern(regexp = "10|30|50", message = "Size는 10, 30, 50 중 하나여야 합니다.")
     private String size = "10";
 
-
+    @Pattern(regexp = "createdAt|performanceTime|ticketOpenTime",
+            message = "정렬 기준은 createdAt, performanceTime, ticketOpenTime 중 하나여야 합니다.")
     private String sort = "createdAt";
+
+
     private Sort.Direction direction = Sort.Direction.DESC;
     private String keyword;
 
