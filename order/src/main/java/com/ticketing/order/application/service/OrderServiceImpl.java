@@ -3,28 +3,27 @@ package com.ticketing.order.application.service;
 import com.ticketing.order.application.dto.client.CancelSeatRequestDto;
 import com.ticketing.order.application.dto.client.ConfirmSeatRequestDto;
 import com.ticketing.order.application.dto.client.SeatInfoResponseDto;
+import com.ticketing.order.application.dto.client.SeatStatus;
 import com.ticketing.order.application.dto.request.CreateOrderRequestDto;
 import com.ticketing.order.application.dto.response.CreateOrderResponseDto;
 import com.ticketing.order.application.dto.response.CreateOrderResponseDto.SeatDetail;
 import com.ticketing.order.common.exception.OrderException;
+import com.ticketing.order.common.exception.SeatException;
 import com.ticketing.order.common.response.ExceptionMessage;
-import com.ticketing.order.domain.model.Order;
-import com.ticketing.order.domain.model.OrderStatus;
-import com.ticketing.order.domain.model.RunningQueue;
-import com.ticketing.order.domain.model.User;
-import com.ticketing.order.domain.model.WaitingQueue;
+import com.ticketing.order.domain.model.*;
 import com.ticketing.order.domain.repository.OrderRepository;
 import com.ticketing.order.infrastructure.PerformanceClient;
 import jakarta.transaction.Transactional;
-import java.util.List;
-import java.util.UUID;
-import java.util.concurrent.TimeUnit;
-import java.util.concurrent.locks.ReentrantLock;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
+
+import java.util.List;
+import java.util.UUID;
+import java.util.concurrent.TimeUnit;
+import java.util.concurrent.locks.ReentrantLock;
 
 @Service
 @RequiredArgsConstructor
@@ -109,8 +108,12 @@ public class OrderServiceImpl implements OrderService {
     private Integer getTotalAmount(UUID performanceId, List<UUID> seatIds) {
         return seatIds.stream().map(
                         seatId -> {
-                            SeatInfoResponseDto seatInfo = seatOrderService.getSeatFromRedis(performanceId,
-                                    seatId);
+                            SeatInfoResponseDto seatInfo = seatOrderService.getSeatFromRedis(performanceId, seatId);
+
+                            if (seatInfo.getSeatStatus().equals(SeatStatus.BOOKED)) {
+                                throw new SeatException(ExceptionMessage.SEAT_ALREADY_BOOKED);
+                            }
+
                             return seatInfo.getPrice();
 
                         })
