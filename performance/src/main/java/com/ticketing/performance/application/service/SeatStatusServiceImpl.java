@@ -21,13 +21,11 @@ import java.util.UUID;
 public class SeatStatusServiceImpl implements SeatStatusService{
 
     private final SeatRepository seatRepository;
-    private final SeatOrderService seatOrderService;
 
     @Override
     public ConfirmSeatResponseDto confirmSeat(ConfirmSeatRequestDto requestDto) {
 
         List<UUID> seatIds = requestDto.getSeatIds();
-        seatOrderService.confirm(seatIds, requestDto.getPerformanceId());
 
         List<Seat> seats = seatRepository.findAllByIds(requestDto.getSeatIds());
         seats.forEach(seat -> seat.confirm(requestDto.getOrderId()));
@@ -40,7 +38,6 @@ public class SeatStatusServiceImpl implements SeatStatusService{
     public CancelSeatResponseDto cancelSeat(CancelSeatRequestDto requestDto) {
 
         List<UUID> seatIds = requestDto.getSeatIds();
-        seatOrderService.cancel(seatIds, requestDto.getPerformanceId());
 
         List<Seat> seats = seatRepository.findAllByIds(requestDto.getSeatIds());
         seats.forEach(Seat::cancel);

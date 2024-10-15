@@ -55,11 +55,7 @@ dependencies {
     testImplementation 'org.springframework.boot:spring-boot-starter-test'
     testRuntimeOnly 'org.junit.platform:junit-platform-launcher'
 
-    // webflux
-//    implementation 'org.springframework.boot:spring-boot-starter-webflux'
-
     // redis
-//    implementation 'org.springframework.boot:spring-boot-starter-data-redis-reactive'
     implementation 'org.springframework.boot:spring-boot-starter-data-redis'
 
 
@@ -67,8 +63,11 @@ dependencies {
     testImplementation 'io.projectreactor:reactor-test'
 
     // security
-//	implementation 'org.springframework.boot:spring-boot-starter-security'
-//	testImplementation 'org.springframework.security:spring-security-test'
+	implementation 'org.springframework.boot:spring-boot-starter-security'
+	testImplementation 'org.springframework.security:spring-security-test'
+
+    implementation 'org.springframework.cloud:spring-cloud-starter-openfeign'
+
 
 }
 

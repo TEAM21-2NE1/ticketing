@@ -43,6 +43,8 @@ jobs:
       ORDER_REDIS_PASSWORD: ${{ secrets.ORDER_REDIS_PASSWORD }}
       # payment
       PAYMENT_PROD_DB_NAME: ${{ secrets.PAYMENT_PROD_DB_NAME }}
+      PORTONE_REST_API_KEY=: ${{ secrets.PORTONE_REST_API_KEY }}
+      PORTONE_REST_API_SECRET: ${{ secrets.PORTONE_REST_API_SECRET }}
 
     strategy:
       matrix:
@@ -135,4 +137,5 @@ jobs:
             aws ecr get-login-password --region ${{ secrets.AWS_REGION }} | docker login --username AWS --password-stdin ${{ secrets.ECR_REGISTRY }}
             docker compose down
             docker compose pull
+            docker image prune -af
             docker compose up -d

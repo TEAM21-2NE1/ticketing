@@ -146,6 +146,11 @@ public class ReviewService {
         () -> new ReviewException(ErrorCode.REVIEW_NOT_FOUND)
     );
 
+    if (SecurityUtils.getUserRole().equals("ROLE_USER")
+        && SecurityUtils.getUserId() != findReview.getUserId()) {
+      throw new ReviewException(ErrorCode.REVIEW_FORBIDDEN);
+    }
+
     findReview.deleteReview(SecurityUtils.getUserId());
 
     eventPublisher.publishEvent(
@@ -187,6 +192,10 @@ public class ReviewService {
   )
   public ReviewListResponseDto getReviews(UUID performanceId, int page, int size, boolean isAsc,
       String sortBy, String title, String content) {
+
+    if (performanceId == null) {
+      throw new ReviewException(ErrorCode.REQUIRED_PERFORMANCE);
+    }
 
     Sort.Direction direction = isAsc ? Sort.Direction.ASC : Sort.Direction.DESC;
     Pageable pageable = PageRequest.of(page, size, Sort.by(direction, sortBy));

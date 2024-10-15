@@ -1,5 +1,6 @@
 package com.ticketing.performance.presentation.controller;
 
+import com.ticketing.performance.application.dto.PageResponse;
 import com.ticketing.performance.application.dto.hall.CreateHallResponseDto;
 import com.ticketing.performance.application.dto.hall.HallInfoResponseDto;
 import com.ticketing.performance.application.dto.hall.HallListResponseDto;
@@ -7,7 +8,9 @@ import com.ticketing.performance.application.dto.hall.UpdateHallResponseDto;
 import com.ticketing.performance.application.service.HallService;
 import com.ticketing.performance.common.response.CommonResponse;
 import com.ticketing.performance.presentation.dto.hall.CreateHallRequestDto;
+import com.ticketing.performance.presentation.dto.hall.HallSearchRequestDto;
 import com.ticketing.performance.presentation.dto.hall.UpdateHallRequestDto;
+import com.ticketing.performance.presentation.dto.performance.PerformanceSearchRequestDto;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -35,11 +38,10 @@ public class HallController {
     }
 
     @GetMapping
-    public ResponseEntity<CommonResponse<Page<HallListResponseDto>>> getHalls(
-            @PageableDefault(page = 0, size = 10, sort = "createdAt", direction = Sort.Direction.DESC) Pageable pageable) {
-        //todo: page custome
-        Page<HallListResponseDto> hallList = hallService.getHalls(pageable);
-        return ResponseEntity.ok(CommonResponse.success("get success!", hallList));
+    public ResponseEntity<CommonResponse<PageResponse<HallListResponseDto>>> getHalls(
+            @Validated @ModelAttribute HallSearchRequestDto requestDto) {
+        Page<HallListResponseDto> hallList = hallService.getHalls(requestDto.toPageable());
+        return ResponseEntity.ok(CommonResponse.success("get success!", PageResponse.of(hallList)));
     }
 
     @GetMapping("/{hallId}")

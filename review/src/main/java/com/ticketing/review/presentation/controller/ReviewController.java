@@ -124,7 +124,7 @@ public class ReviewController {
    */
   @GetMapping()
   public ResponseEntity<CommonResponse<ReviewListResponseDto>> getReviews(
-      @RequestParam(name = "performanceId", required = true) UUID performanceId,
+      @RequestParam(name = "performanceId", required = false) UUID performanceId,
       @RequestParam(name = "page", defaultValue = "1") int page,
       @RequestParam(name = "size", defaultValue = "10") int size,
       @RequestParam(name = "isAsc", defaultValue = "true") boolean isAsc,

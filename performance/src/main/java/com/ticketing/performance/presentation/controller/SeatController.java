@@ -4,6 +4,7 @@ import com.ticketing.performance.application.dto.seat.SeatInfoResponseDto;
 import com.ticketing.performance.application.service.SeatService;
 import com.ticketing.performance.common.response.CommonResponse;
 import com.ticketing.performance.presentation.dto.seat.CreateSeatRequestDto;
+import com.ticketing.performance.presentation.dto.seat.OrderSeatRequestDto;
 import com.ticketing.performance.presentation.dto.seat.UpdateSeatPriceRequestDto;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
@@ -35,11 +36,19 @@ public class SeatController {
         return ResponseEntity.ok(CommonResponse.success("update success"));
     }
 
+    @PreAuthorize("hasAnyRole('MANAGER','P_MANAGER')")
     @GetMapping("/performances/{performanceId}")
-    public ResponseEntity<CommonResponse<List<SeatInfoResponseDto>>> getOrderSeats(@PathVariable UUID performanceId) {
-        List<SeatInfoResponseDto> seats = seatService.getOrderSeats(performanceId);
+    public ResponseEntity<CommonResponse<List<SeatInfoResponseDto>>> getSeatsByManager(@PathVariable UUID performanceId) {
+        List<SeatInfoResponseDto> seats = seatService.getSeatsByManager(performanceId);
         return ResponseEntity.ok(CommonResponse.success("get success!", seats));
     }
+
+    @PostMapping("/order")
+    public ResponseEntity<CommonResponse<List<SeatInfoResponseDto>>> getOrderSeats(@RequestBody OrderSeatRequestDto requestDto) {
+        List<SeatInfoResponseDto> seats = seatService.getOrderSeats(requestDto);
+        return ResponseEntity.ok(CommonResponse.success("get success!", seats));
+    }
+
 
 
 }
