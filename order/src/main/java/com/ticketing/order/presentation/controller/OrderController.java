@@ -68,7 +68,7 @@ public class OrderController {
             @RequestBody HoldSeatRequestDto requestDto) {
         seatOrderService.holdSeat(requestDto.getPerformanceId(), requestDto.getSeatId());
         return ResponseEntity.status(HttpStatus.OK)
-                .body(success("좌석 선택 성공"));
+                .body(success("좌석 상태 변경 성공"));
     }
 
 
