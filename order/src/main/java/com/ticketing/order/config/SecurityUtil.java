@@ -1,7 +1,5 @@
-package com.ticketing.performance.common.util;
+package com.ticketing.order.config;
 
-import com.ticketing.performance.common.exception.ForbiddenAccessException;
-import com.ticketing.performance.common.response.ErrorCode;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.context.SecurityContextHolder;
 
@@ -19,10 +17,10 @@ public class SecurityUtil {
                 .stream()
                 .map(GrantedAuthority::getAuthority)
                 .findFirst()
-                .orElseThrow(()-> new ForbiddenAccessException(ErrorCode.FORBIDDEN_ACCESS));
+                .orElseThrow(()-> new RuntimeException("FORBIDDEN_ACCESS"));
     }
 
     public static String getEmail() {
-        return(String) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+        return (String) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
     }
 }

@@ -7,9 +7,9 @@ import java.util.UUID;
 
 public interface OrderService {
 
-    CommonResponse<GetOrderResponseDto> getOrder(UUID orderId);
+    CommonResponse<GetOrderResponseDto> getOrder(String userId, String role, String email, UUID orderId);
 
-    void deleteOrder(UUID orderId);
+    void deleteOrder(String userId, String role, String email, UUID orderId);
 
-    void changeOrderBySuccess(UUID orderId);
+    void changeOrderBySuccess(String userId, String role, String email, UUID orderId);
 }

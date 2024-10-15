@@ -49,9 +49,10 @@ public class Order extends BaseEntity {
     @Column(name = "seat_id")
     private List<UUID> selectedSeatIds = new ArrayList<>();
 
-    public static Order of(CreateOrderRequestDto requestDto, String userId) {
+    public static Order of(CreateOrderRequestDto requestDto, String userId, Integer totalAmount) {
         return Order.builder()
                 .paymentMethod(PaymentMethod.valueOf(requestDto.paymentMethod()))
+                .totalAmount(totalAmount)
                 .performanceId(requestDto.performanceId())
                 .orderStatus(OrderStatus.PENDING_PAYMENT)
                 .userId(userId)
@@ -76,24 +77,8 @@ public class Order extends BaseEntity {
         this.orderStatus = status;
     }
 
-//    public void completeOrder() {
-//        if (this.orderStatus != OrderStatus.PENDING_PAYMENT) {
-//            throw new IllegalStateException("Cannot complete an order that is not pending payment");
-//        }
-//        this.orderStatus = OrderStatus.COMPLETED;
-//    }
-//
-//    public void cancelOrder() {
-//        if (this.orderStatus != OrderStatus.PENDING_PAYMENT && this.orderStatus != OrderStatus.COMPLETED) {
-//            throw new IllegalStateException("Cannot cancel an order that is not pending or reserved");
-//        }
-//        this.orderStatus = OrderStatus.CANCELED;
-//    }
-//
-//    public void refundOrder() {
-//        if (this.orderStatus != OrderStatus.COMPLETED) {
-//            throw new IllegalStateException("Cannot refund an order that is not reserved");
-//        }
-//        this.orderStatus = OrderStatus.REFUNDED;
-//    }
+    public void delete(Long id) {
+        super.setDeleted(id);
+    }
+
 }

@@ -16,14 +16,13 @@ import com.ticketing.performance.domain.repository.PerformanceRepository;
 import com.ticketing.performance.presentation.dto.performance.CreatePrfRequestDto;
 import com.ticketing.performance.presentation.dto.performance.PerformanceSearchRequestDto;
 import com.ticketing.performance.presentation.dto.performance.UpdatePrfRequestDto;
+import java.time.LocalDate;
+import java.util.List;
+import java.util.UUID;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-
-import java.time.LocalDate;
-import java.util.List;
-import java.util.UUID;
 
 @Service
 @RequiredArgsConstructor
@@ -49,6 +48,19 @@ public class PerformanceService {
 
 
     public Page<PrfListResponseDto> getPerformances(PerformanceSearchRequestDto requestDto) {
+        String role = SecurityUtil.getRole();
+
+        if (role.equals("USER")) {
+            return performanceRepository
+                    .findAllByKeywordByUser(requestDto.getKeyword(), requestDto.toPageable())
+                    .map(PrfListResponseDto::of);
+        }
+        if (role.equals("P_MANAGER")) {
+            return performanceRepository
+                    .findAllByKeywordByManagerId(requestDto.getKeyword(), requestDto.toPageable(), SecurityUtil.getId())
+                    .map(PrfListResponseDto::of);
+        }
+
         return performanceRepository
                 .findAllByKeyword(requestDto.getKeyword(), requestDto.toPageable())
                 .map(PrfListResponseDto::of);
