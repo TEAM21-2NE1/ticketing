@@ -3,20 +3,20 @@ package com.ticketing.performance.application.scheduler;
 import com.ticketing.performance.application.dto.performance.PrfRedisInfoDto;
 import com.ticketing.performance.application.dto.seat.SeatInfoResponseDto;
 import com.ticketing.performance.application.service.OrderService;
-import com.ticketing.performance.application.service.SeatOrderService;
 import com.ticketing.performance.common.util.SecurityUtil;
 import com.ticketing.performance.domain.model.Performance;
 import com.ticketing.performance.domain.repository.PerformanceRepository;
 import com.ticketing.performance.domain.repository.SeatRepository;
 import com.ticketing.performance.infrastructure.client.OrderSeatInfoDto;
-import java.time.LocalDate;
-import java.time.LocalDateTime;
-import java.time.LocalTime;
-import java.util.List;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
+
+import java.time.LocalDate;
+import java.time.LocalDateTime;
+import java.time.LocalTime;
+import java.util.List;
 
 @Component
 @RequiredArgsConstructor
@@ -25,10 +25,9 @@ public class SeatScheduler {
 
     private final SeatRepository seatRepository;
     private final PerformanceRepository performanceRepository;
-    private final SeatOrderService seatOrderService;
     private final OrderService orderService;
 
-    @Scheduled(cron = "0 40 20 * * *", zone = "Asia/Seoul")
+    @Scheduled(cron = "0 0 6 * * *", zone = "Asia/Seoul")
     public void run() {
         LocalDate today = LocalDate.now();
         LocalDateTime startOfDay = today.atStartOfDay();
@@ -53,7 +52,6 @@ public class SeatScheduler {
             orderService.insertSeats(SecurityUtil.getId().toString(), SecurityUtil.getRole(), SecurityUtil.getEmail(),
                     new OrderSeatInfoDto(PrfRedisInfoDto.of(performance), seatsForPerformance));
 
-//            seatOrderService.saveSeatsToRedis(PrfRedisInfoDto.of(performance), seatsForPerformance);
         });
     }
 }
