@@ -92,9 +92,12 @@ public class SeatOrderHashServiceImpl implements SeatOrderService {
         String key = generateKey(performanceId);
         String openTimeStr = (String) redisTemplateSeat.opsForHash().get(key, TICKET_OPEN_TIME);
 
-        if (openTimeStr != null && LocalDateTime.now().isBefore(LocalDateTime.parse(openTimeStr))) {
+
+
+        if (openTimeStr == null || LocalDateTime.now().isBefore(LocalDateTime.parse(openTimeStr))) {
             throw new SeatException(ExceptionMessage.TICKET_NOT_OPEN);
         }
+
         Map<Object, Object> seatMap = redisTemplateSeat.opsForHash().entries(key);
         seatMap.remove(TICKET_LIMIT);
         seatMap.remove(TICKET_OPEN_TIME);
