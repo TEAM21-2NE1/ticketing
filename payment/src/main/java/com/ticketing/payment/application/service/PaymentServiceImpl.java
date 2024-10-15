@@ -10,6 +10,7 @@ import com.ticketing.payment.application.dto.PaymentResponseDto;
 import com.ticketing.payment.common.exception.IamportException;
 import com.ticketing.payment.common.exception.PaymentException;
 import com.ticketing.payment.common.response.ErrorCode;
+import com.ticketing.payment.common.util.SecurityUtil;
 import com.ticketing.payment.domain.model.Payment;
 import com.ticketing.payment.domain.repository.PaymentRepository;
 import com.ticketing.payment.presentation.dto.CreatePaymentRequestDto;
@@ -52,14 +53,21 @@ public class PaymentServiceImpl implements PaymentService{
         impUid = iamportResponse.getResponse().getImpUid();
 
         iamportPrice = iamportResponse.getResponse().getAmount().longValue();
-        Long price = orderService.getOrder(requestDto.getOrderUid()).data().getPrice();
+        Long price = orderService.getOrder(SecurityUtil.getId().toString(),
+                SecurityUtil.getRole(),
+                SecurityUtil.getEmail(),
+                requestDto.getOrderUid()).data().getTotalAmount().longValue();
         if (!"paid".equals(iamportResponse.getResponse().getStatus())) {
-            orderService.deleteOrder(requestDto.getOrderUid());
+            orderService.deleteOrder(SecurityUtil.getId().toString(),
+                    SecurityUtil.getRole(),
+                    SecurityUtil.getEmail(),requestDto.getOrderUid());
             throw new PaymentException(ErrorCode.PAYMENT_FAILED);
         }
 
         if (price != iamportPrice) {
-            orderService.deleteOrder(requestDto.getOrderUid());
+            orderService.deleteOrder(SecurityUtil.getId().toString(),
+                    SecurityUtil.getRole(),
+                    SecurityUtil.getEmail(),requestDto.getOrderUid());
             iamportClient.cancelPaymentByImpUid(new CancelData(impUid, true, BigDecimal.valueOf(iamportPrice)));
             throw new PaymentException(ErrorCode.PAYMENT_AMOUNT_TAMPERED);
         }
@@ -72,7 +80,9 @@ public class PaymentServiceImpl implements PaymentService{
         paymentRepository.save(payment);
 
         // order 상태값 변경
-        orderService.changeOrderBySuccess(requestDto.getOrderUid());
+        orderService.changeOrderBySuccess(SecurityUtil.getId().toString(),
+                SecurityUtil.getRole(),
+                SecurityUtil.getEmail(),requestDto.getOrderUid());
 
         return PaymentResponseDto.of(payment);
     }

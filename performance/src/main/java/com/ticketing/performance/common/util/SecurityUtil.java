@@ -21,4 +21,8 @@ public class SecurityUtil {
                 .findFirst()
                 .orElseThrow(()-> new ForbiddenAccessException(ErrorCode.FORBIDDEN_ACCESS));
     }
+
+    public static String getEmail() {
+        return(String) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+    }
 }

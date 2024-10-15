@@ -12,13 +12,25 @@ import java.util.UUID;
 public interface OrderClient extends OrderService {
 
     @GetMapping("/api/v1/orders/{orderId}")
-    CommonResponse<GetOrderResponseDto> getOrder(@PathVariable("orderId") UUID orderId);
+    CommonResponse<GetOrderResponseDto> getOrder(
+            @RequestHeader("X-User-Id") String userId,
+            @RequestHeader("X-User-Role") String userRole,
+            @RequestHeader("X-User-Email") String email,
+            @PathVariable("orderId") UUID orderId);
 
     @Override
     @DeleteMapping("/api/v1/orders/{orderId}")
-    void deleteOrder(@PathVariable("orderId") UUID orderId);
+    void deleteOrder(
+            @RequestHeader("X-User-Id") String userId,
+            @RequestHeader("X-User-Role") String userRole,
+            @RequestHeader("X-User-Email") String email,
+            @PathVariable("orderId") UUID orderId);
 
     @Override
     @PutMapping("/api/v1/orders/{orderId}")
-    void changeOrderBySuccess(@PathVariable("orderId") UUID orderId);
+    void changeOrderBySuccess(
+            @RequestHeader("X-User-Id") String userId,
+            @RequestHeader("X-User-Role") String userRole,
+            @RequestHeader("X-User-Email") String email,
+            @PathVariable("orderId") UUID orderId);
 }

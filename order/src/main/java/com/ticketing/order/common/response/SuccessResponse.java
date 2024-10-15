@@ -9,7 +9,6 @@ import lombok.NonNull;
 
 @Builder(access = PRIVATE)
 public record SuccessResponse<T>(
-        int resultCode, // resultCode 추가
         @NonNull
         String message,
         @JsonInclude(value = NON_NULL) T data
@@ -17,15 +16,13 @@ public record SuccessResponse<T>(
 
     public static <T> SuccessResponse<T> success(int resultCode, String message, T data) {
         return SuccessResponse.<T>builder()
-                .resultCode(resultCode) // resultCode 설정
                 .message(message)
                 .data(data)
                 .build();
     }
 
-    public static SuccessResponse<?> success(int resultCode, String message) {
+    public static SuccessResponse<?> success(String message) {
         return SuccessResponse.builder()
-                .resultCode(resultCode) // resultCode 설정
                 .message(message)
                 .build();
     }

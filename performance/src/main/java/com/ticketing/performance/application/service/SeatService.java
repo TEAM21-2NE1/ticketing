@@ -2,7 +2,6 @@ package com.ticketing.performance.application.service;
 
 import com.ticketing.performance.application.dto.hall.HallInfoResponseDto;
 import com.ticketing.performance.application.dto.hall.HallSeatInfoResponseDto;
-import com.ticketing.performance.application.dto.performance.PrfRedisInfoDto;
 import com.ticketing.performance.application.dto.seat.SeatInfoResponseDto;
 import com.ticketing.performance.common.exception.ForbiddenAccessException;
 import com.ticketing.performance.common.exception.PerformanceException;
@@ -14,15 +13,14 @@ import com.ticketing.performance.domain.model.Seat;
 import com.ticketing.performance.domain.repository.PerformanceRepository;
 import com.ticketing.performance.domain.repository.SeatRepository;
 import com.ticketing.performance.presentation.dto.seat.CreateSeatRequestDto;
+import com.ticketing.performance.presentation.dto.seat.OrderSeatRequestDto;
 import com.ticketing.performance.presentation.dto.seat.UpdateSeatPriceRequestDto;
-import lombok.RequiredArgsConstructor;
-import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
-
-import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
+import lombok.RequiredArgsConstructor;
+import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 @Service
 @RequiredArgsConstructor
@@ -32,7 +30,6 @@ public class SeatService {
     private final SeatRepository seatRepository;
     private final HallService hallService;
     private final PerformanceRepository performanceRepository;
-    private final SeatOrderService seatOrderService;
 
     public List<SeatInfoResponseDto> getSeats(UUID performanceId) {
         return seatRepository.findAllByPerformanceId(performanceId)
@@ -41,27 +38,16 @@ public class SeatService {
                 .toList();
     }
 
-    public List<SeatInfoResponseDto> getOrderSeats(UUID performanceId) {
-        List<SeatInfoResponseDto> seatsFromRedis = seatOrderService.getSeatsFromRedis(performanceId);
-        if (!seatsFromRedis.isEmpty()) {
-            return seatsFromRedis;
-        }
-        PrfRedisInfoDto prfRedisInfoDto = performanceRepository.findById(performanceId).map(PrfRedisInfoDto::of)
+    public List<SeatInfoResponseDto> getSeatsByManager(UUID performanceId) {
+        Performance performance = performanceRepository.findById(performanceId)
                 .orElseThrow(() -> new PerformanceException(ErrorCode.PERFORMANCE_NOT_FOUND));
 
-        if (prfRedisInfoDto.getTicketOpenTime().isAfter(LocalDateTime.now())
-                || (prfRedisInfoDto.getPerformanceTime().plusDays(1)).isBefore(LocalDateTime.now())) {
-            throw new SeatException(ErrorCode.SEAT_QUERY_PERIOD_INVALID);
-        }
+        checkRole(performance.getManagerId());
 
-        List<Seat> seats = seatRepository.findAllByPerformanceId(performanceId);
-        List<SeatInfoResponseDto> seatList = seats.stream()
+        return seatRepository.findAllByPerformanceId(performanceId)
+                .stream()
                 .map(SeatInfoResponseDto::of)
                 .toList();
-
-        seatOrderService.saveSeatsToRedis(prfRedisInfoDto, seatList);
-
-        return seatList;
     }
 
 
@@ -128,4 +114,10 @@ public class SeatService {
         }
     }
 
+    public List<SeatInfoResponseDto> getOrderSeats(OrderSeatRequestDto requestDto) {
+        return seatRepository.findAllByIds(requestDto.getSeatId())
+                .stream()
+                .map(SeatInfoResponseDto::of)
+                .toList();
+    }
 }

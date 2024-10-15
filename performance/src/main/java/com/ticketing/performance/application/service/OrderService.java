@@ -1,12 +1,12 @@
 package com.ticketing.performance.application.service;
 
-import com.ticketing.performance.application.dto.seat.SeatInfoResponseDto;
-import org.springframework.web.bind.annotation.RequestBody;
-
-import java.util.List;
+import com.ticketing.performance.infrastructure.client.OrderSeatInfoDto;
 
 public interface OrderService  {
 
-    void seatUpdate(@RequestBody List<SeatInfoResponseDto> seatList);
+    void insertSeats(String userId,
+            String userRole,
+            String email,
+            OrderSeatInfoDto orderSeatInfoDto);
 
 }

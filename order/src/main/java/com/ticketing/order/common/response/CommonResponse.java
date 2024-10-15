@@ -7,6 +7,4 @@ public interface CommonResponse {
     @NonNull
     String message();
 
-    int resultCode();
-
 }

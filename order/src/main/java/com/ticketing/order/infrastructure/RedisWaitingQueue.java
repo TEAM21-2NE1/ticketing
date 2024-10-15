@@ -56,4 +56,11 @@ public class RedisWaitingQueue implements WaitingQueue {
         Long rank = redisTemplate.opsForZSet().rank(WAITING_QUEUE, user);
         return WaitingTicket.of(rank);
     }
+
+    // 대기열 초기화 메서드
+    @Override
+    public void clear() {
+        redisTemplate.delete(WAITING_QUEUE);
+    }
+
 }
