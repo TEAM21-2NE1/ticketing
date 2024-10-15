@@ -1,6 +1,6 @@
-package com.ticketing.review.common.configuration;
+package com.ticketing.payment.common.configuration;
 
-import com.ticketing.review.common.filter.JwtAuthorizationFilter;
+import com.ticketing.payment.common.filter.JwtAuthorizationFilter;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -35,8 +35,8 @@ public class SecurityConfig {
         .sessionManagement(session -> session.sessionCreationPolicy(
             SessionCreationPolicy.STATELESS))  // 세션 사용하지 않음
         .authorizeHttpRequests(authorize -> authorize
-            .requestMatchers("/api/v1/orders/test-user").hasRole("USER")
-            .requestMatchers("/api/v1/reviews/actuator/**").permitAll()
+            .requestMatchers("/api/v1/payments/actuator/**").permitAll()
+            .requestMatchers("/api/v1/payments/view").permitAll()
             .anyRequest().authenticated()  // 그 외 모든 요청은 인증 필요
         )
         .addFilterBefore(jwtAuthenticationFilter,

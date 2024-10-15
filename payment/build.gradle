@@ -19,8 +19,10 @@ configurations {
 	}
 }
 
+
 repositories {
 	mavenCentral()
+	maven { url 'https://jitpack.io'}
 }
 
 ext {
@@ -28,8 +30,19 @@ ext {
 }
 
 dependencies {
+
+	// 포트원
+	implementation 'com.github.iamport:iamport-rest-client-java:0.2.23'
+	//thymeleaf
+	implementation 'org.springframework.boot:spring-boot-starter-thymeleaf'
+
+	//security
+	implementation 'org.springframework.boot:spring-boot-starter-security'
+	testImplementation 'org.springframework.security:spring-security-test'
+
+
 	// jpa
-//	implementation 'org.springframework.boot:spring-boot-starter-data-jpa'
+	implementation 'org.springframework.boot:spring-boot-starter-data-jpa'
 
 	// valid
 	implementation 'org.springframework.boot:spring-boot-starter-validation'
@@ -46,6 +59,18 @@ dependencies {
 
 	testImplementation 'org.springframework.boot:spring-boot-starter-test'
 	testRuntimeOnly 'org.junit.platform:junit-platform-launcher'
+
+	// prometheus
+	implementation 'org.springframework.boot:spring-boot-starter-actuator'
+	runtimeOnly 'io.micrometer:micrometer-registry-prometheus'
+
+	// open feign
+	implementation 'org.springframework.cloud:spring-cloud-starter-openfeign'
+
+	// postgres
+	runtimeOnly 'org.postgresql:postgresql'
+
+
 }
 
 dependencyManagement {

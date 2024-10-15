@@ -27,7 +27,7 @@ management:
     web:
       exposure:
         include: '*'
-      base-path: "/api/v1/performances/actuator"
+      base-path: "/api/v1/reviews/actuator"
   endpoint:
     health:
       show-details: always
