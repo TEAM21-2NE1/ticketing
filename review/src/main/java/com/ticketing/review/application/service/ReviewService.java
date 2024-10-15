@@ -146,6 +146,11 @@ public class ReviewService {
         () -> new ReviewException(ErrorCode.REVIEW_NOT_FOUND)
     );
 
+    if (SecurityUtils.getUserRole().equals("ROLE_USER")
+        && SecurityUtils.getUserId() != findReview.getUserId()) {
+      throw new ReviewException(ErrorCode.REVIEW_FORBIDDEN);
+    }
+
     findReview.deleteReview(SecurityUtils.getUserId());
 
     eventPublisher.publishEvent(
