@@ -18,7 +18,7 @@ import org.hibernate.annotations.SQLRestriction;
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
-@SQLRestriction("is_delete = false")
+@SQLRestriction("is_deleted = false")
 public class Order extends BaseEntity {
 
     @Id
