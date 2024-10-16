@@ -56,12 +56,12 @@ public class CreatePrfRequestDto {
 
 
     @AssertTrue(message = "openDate는 티켓 오픈 시간 이전 이어야 합니다.")
-    public boolean openDate() {
+    public boolean isOpenDate() {
         return openDate.isBefore(ticketOpenTime.toLocalDate());
     }
 
     @AssertTrue(message = "티켓 오픈 시간 은 공연 시작 시간 이전 이어야 합니다.")
-    public boolean ticketOpenTime() {
+    public boolean isTicketOpenTime() {
         return ticketOpenTime.isBefore(performanceTime);
     }
 }
