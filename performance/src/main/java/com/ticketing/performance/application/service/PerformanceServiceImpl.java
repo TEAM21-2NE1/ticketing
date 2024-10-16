@@ -42,6 +42,8 @@ public class PerformanceServiceImpl implements PerformanceService {
         Long userId = SecurityUtil.getId();
         Performance performance = Performance.create(requestDto, userId, posterUrl);
 
+        hallService.getHall(requestDto.getHallId());
+
         performanceRepository.save(performance);
 
         return CreatePrfResponseDto.of(performance);
