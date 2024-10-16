@@ -8,7 +8,7 @@ import org.springframework.http.HttpStatus;
 @RequiredArgsConstructor
 public enum ErrorCode {
 
-    FORBIDDEN_ACCESS(HttpStatus.BAD_REQUEST, "해당 요청애 대한 권한이 없습니다."),
+    FORBIDDEN_ACCESS(HttpStatus.BAD_REQUEST, "해당 요청에 대한 권한이 없습니다."),
 
     // s3
     ALREADY_EXISTS(HttpStatus.BAD_REQUEST, "이미 존재 하는 값 입니다."),
