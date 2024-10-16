@@ -4,9 +4,6 @@ import com.ticketing.performance.infrastructure.client.OrderSeatInfoDto;
 
 public interface OrderService  {
 
-    void insertSeats(String userId,
-            String userRole,
-            String email,
-            OrderSeatInfoDto orderSeatInfoDto);
+    void insertSeats(OrderSeatInfoDto orderSeatInfoDto);
 
 }

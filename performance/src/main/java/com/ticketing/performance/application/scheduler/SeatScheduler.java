@@ -49,8 +49,7 @@ public class SeatScheduler {
                     .filter(seat -> seat.getPerformanceId().equals(performance.getId()))
                     .toList();
 
-            orderService.insertSeats(SecurityUtil.getId().toString(), SecurityUtil.getRole(), SecurityUtil.getEmail(),
-                    new OrderSeatInfoDto(PrfRedisInfoDto.of(performance), seatsForPerformance));
+            orderService.insertSeats(new OrderSeatInfoDto(PrfRedisInfoDto.of(performance), seatsForPerformance));
 
         });
     }
