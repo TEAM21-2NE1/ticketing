@@ -15,7 +15,7 @@ import java.util.UUID;
 public class CreatePaymentRequestDto {
 
     private String paymentUid;
-    private UUID orderUid;
+    private String orderUid;
     private Long price;
 
 }

@@ -14,6 +14,8 @@ import com.ticketing.payment.common.util.SecurityUtil;
 import com.ticketing.payment.domain.model.Payment;
 import com.ticketing.payment.domain.repository.PaymentRepository;
 import com.ticketing.payment.presentation.dto.CreatePaymentRequestDto;
+import feign.FeignException;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -24,7 +26,8 @@ import java.util.UUID;
 
 @Service
 @Transactional(readOnly = true)
-public class PaymentServiceImpl implements PaymentService{
+@Slf4j
+public class PaymentServiceImpl implements PaymentService {
 
     private final PaymentRepository paymentRepository;
     private final IamportClient iamportClient;
@@ -32,47 +35,48 @@ public class PaymentServiceImpl implements PaymentService{
 
 
     public PaymentServiceImpl(PaymentRepository paymentRepository,
-                              @Value("${rest.api.key}")String restApiKey,
-                              @Value("${rest.api.secret}")String restApiSecret,
-                              OrderService orderService)
-    {
+                              @Value("${rest.api.key}") String restApiKey,
+                              @Value("${rest.api.secret}") String restApiSecret,
+                              OrderService orderService) {
         this.paymentRepository = paymentRepository;
         this.orderService = orderService;
         this.iamportClient = new IamportClient(restApiKey, restApiSecret);
     }
 
     @Transactional
-    public PaymentResponseDto createPayment(CreatePaymentRequestDto requestDto){
+    public PaymentResponseDto createPayment(CreatePaymentRequestDto requestDto) {
 
-        long iamportPrice;
-        String impUid;
+        UUID orderUid = null;
+        long iamportPrice = 0L;
+        String impUid = "";
 
         try {
-        IamportResponse<com.siot.IamportRestClient.response.Payment> iamportResponse =
-                iamportClient.paymentByImpUid(requestDto.getPaymentUid());
-        impUid = iamportResponse.getResponse().getImpUid();
+            IamportResponse<com.siot.IamportRestClient.response.Payment> iamportResponse =
+                    iamportClient.paymentByImpUid(requestDto.getPaymentUid());
+            impUid = iamportResponse.getResponse().getImpUid();
+            iamportPrice = iamportResponse.getResponse().getAmount().longValue();
+            orderUid = UUID.fromString(requestDto.getOrderUid());
 
-        iamportPrice = iamportResponse.getResponse().getAmount().longValue();
-        Long price = orderService.getOrder(SecurityUtil.getId().toString(),
-                SecurityUtil.getRole(),
-                SecurityUtil.getEmail(),
-                requestDto.getOrderUid()).data().getTotalAmount().longValue();
-        if (!"paid".equals(iamportResponse.getResponse().getStatus())) {
-            orderService.deleteOrder(SecurityUtil.getId().toString(),
+            Long price = orderService.getOrder(SecurityUtil.getId().toString(),
                     SecurityUtil.getRole(),
-                    SecurityUtil.getEmail(),requestDto.getOrderUid());
-            throw new PaymentException(ErrorCode.PAYMENT_FAILED);
-        }
+                    SecurityUtil.getEmail(),
+                    orderUid).data().getTotalAmount().longValue();
 
-        if (price != iamportPrice) {
-            orderService.deleteOrder(SecurityUtil.getId().toString(),
-                    SecurityUtil.getRole(),
-                    SecurityUtil.getEmail(),requestDto.getOrderUid());
-            iamportClient.cancelPaymentByImpUid(new CancelData(impUid, true, BigDecimal.valueOf(iamportPrice)));
-            throw new PaymentException(ErrorCode.PAYMENT_AMOUNT_TAMPERED);
-        }
-        } catch (IamportResponseException | IOException e) {
+            if (!"paid".equals(iamportResponse.getResponse().getStatus())) {
+                throw new PaymentException(ErrorCode.PAYMENT_FAILED);
+            }
+
+            if (price != iamportPrice) {
+                throw new PaymentException(ErrorCode.PAYMENT_AMOUNT_TAMPERED);
+            }
+        }catch (IamportResponseException | IOException e) {
             throw new IamportException(ErrorCode.IAMPORT_ERROR);
+        } catch (FeignException | PaymentException e) {
+            cancelAndDeleteOrder(orderUid, impUid, iamportPrice);
+            throw e;
+        } catch (IllegalArgumentException e) {
+            cancelAndDeleteOrder(null, impUid, iamportPrice);
+            throw new PaymentException(ErrorCode.INVALID_UUID);
         }
 
         Payment payment = Payment.create(iamportPrice, impUid);
@@ -82,9 +86,33 @@ public class PaymentServiceImpl implements PaymentService{
         // order 상태값 변경
         orderService.changeOrderBySuccess(SecurityUtil.getId().toString(),
                 SecurityUtil.getRole(),
-                SecurityUtil.getEmail(),requestDto.getOrderUid());
+                SecurityUtil.getEmail(), orderUid);
 
         return PaymentResponseDto.of(payment);
+    }
+
+    private void cancelAndDeleteOrder(UUID orderUid, String impUid, long iamportPrice) {
+        if (impUid != null) {
+            try {
+                log.info("취소로직 실행");
+                log.info("{}, {}", impUid, iamportPrice);
+                iamportClient.cancelPaymentByImpUid(new CancelData(impUid, true, BigDecimal.valueOf(iamportPrice)));
+            } catch (IamportResponseException | IOException ex) {
+                log.error("결제 취소 중 오류 발생: {}", ex.getMessage(), ex);
+            }
+        }
+        if (orderUid != null) {
+            try {
+                orderService.deleteOrder(
+                        SecurityUtil.getId().toString(),
+                        SecurityUtil.getRole(),
+                        SecurityUtil.getEmail(),
+                        orderUid
+                );
+            } catch (FeignException ex) {
+                log.error("주문 삭제 중 오류 발생: {}", ex.getMessage(), ex);
+            }
+        }
     }
 
     @Override
@@ -105,13 +133,17 @@ public class PaymentServiceImpl implements PaymentService{
         Long price = payment.getPrice();
         String paymentUid = payment.getPaymentUid();
 
-        try {
-            iamportClient.cancelPaymentByImpUid(new CancelData(paymentUid, true, BigDecimal.valueOf(price)));
-        } catch (IamportResponseException  | IOException e) {
-            throw new PaymentException(ErrorCode.PAYMENT_FAILED);
-        }
+        cancelImpPayment(paymentUid, price);
 
         payment.cancel();
+    }
+
+    private void cancelImpPayment(String paymentUid, Long price) {
+        try {
+            iamportClient.cancelPaymentByImpUid(new CancelData(paymentUid, true, BigDecimal.valueOf(price)));
+        } catch (IamportResponseException | IOException ex) {
+            log.error("결제 취소 중 오류 발생: {}", ex.getMessage(), ex);
+        }
     }
 
     @Transactional
