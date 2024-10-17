@@ -35,7 +35,7 @@ public class PerformanceServiceImpl implements PerformanceService {
     private final SeatService seatService;
     private final HallService hallService;
     private final ImageUploadService imageUploadService;
-    private final EventApplicationService eventApplicationService;
+    private final PerformanceEventService performanceEventService;
 
 
     @Transactional
@@ -114,7 +114,7 @@ public class PerformanceServiceImpl implements PerformanceService {
 
         seatService.deleteSeatsByPerformanceId(performanceId);
 
-        eventApplicationService.publishPerformanceDeletedEvent(
+        performanceEventService.publishPerformanceDeletedEvent(
                 PrfDeletedEvent.create(performanceId, SecurityUtil.getId())
         );
 

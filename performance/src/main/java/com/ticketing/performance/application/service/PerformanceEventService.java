@@ -9,7 +9,7 @@ import org.springframework.stereotype.Service;
 
 @Service
 @RequiredArgsConstructor
-public class EventApplicationService {
+public class PerformanceEventService {
 
     private final KafkaTemplate<String, Object> kafkaTemplate;
 
