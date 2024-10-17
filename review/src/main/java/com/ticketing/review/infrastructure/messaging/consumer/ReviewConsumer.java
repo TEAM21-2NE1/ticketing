@@ -13,7 +13,7 @@ public class ReviewConsumer {
 
   private final ReviewService reviewService;
 
-  @KafkaListener(topics = "performance-canceled", groupId = "review-group")
+  @KafkaListener(topics = "performance-deleted", groupId = "review-group")
   public void handlePerformanceCanceled(String message) {
     PerformanceCanceledEvent event = EventSerializer.deserialize(message,
         PerformanceCanceledEvent.class);
