@@ -1,5 +1,6 @@
 package com.ticketing.review.application.client;
 
+import com.ticketing.review.application.client.dto.OrderStatusDto;
 import com.ticketing.review.application.client.dto.PerformanceInfoDto;
 import com.ticketing.review.application.client.dto.UserNicknameInfoDto;
 import java.util.List;
@@ -12,7 +13,6 @@ public interface ReviewClient {
   PerformanceInfoDto getPerformanceInfo(UUID performanceId);
 
   List<UserNicknameInfoDto> getUserNicknameList(List<Long> userIds);
-
-  // TODO Order 개발 후 구현 예정
-
+  
+  OrderStatusDto getOrderStatus(Long userId, UUID performanceId);
 }

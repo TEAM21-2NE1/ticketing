@@ -2,19 +2,15 @@ package com.ticketing.order.domain.model;
 
 import com.ticketing.order.application.dto.request.CreateOrderRequestDto;
 import com.ticketing.order.common.auditor.BaseEntity;
-import jakarta.persistence.Column;
-import jakarta.persistence.Entity;
-import jakarta.persistence.EnumType;
-import jakarta.persistence.Enumerated;
-import jakarta.persistence.GeneratedValue;
-import jakarta.persistence.GenerationType;
-import jakarta.persistence.Id;
-import jakarta.persistence.Table;
+import jakarta.persistence.*;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.UUID;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+import org.hibernate.annotations.SQLRestriction;
 
 @Entity
 @Table(name = "p_order")
@@ -22,6 +18,7 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
+@SQLRestriction("is_deleted = false")
 public class Order extends BaseEntity {
 
     @Id
@@ -49,17 +46,24 @@ public class Order extends BaseEntity {
     @Column(name = "order_status", nullable = false)
     private OrderStatus orderStatus;
 
-    public static Order of(CreateOrderRequestDto requestDto, String userId) {
+    @ElementCollection
+    @CollectionTable(name = "order_selected_seats", joinColumns = @JoinColumn(name = "order_id"))
+    @Column(name = "seat_id")
+    private List<UUID> selectedSeatIds = new ArrayList<>();
+
+    public static Order of(CreateOrderRequestDto requestDto, String userId, Integer totalAmount) {
         return Order.builder()
                 .paymentMethod(PaymentMethod.valueOf(requestDto.paymentMethod()))
+                .totalAmount(totalAmount)
                 .performanceId(requestDto.performanceId())
                 .orderStatus(OrderStatus.PENDING_PAYMENT)
                 .userId(userId)
+                .selectedSeatIds(requestDto.selectedSeatIds())
                 .build();
     }
 
     public static Order createOrder(UUID paymentId, UUID performanceId, Integer totalAmount,
-            PaymentMethod paymentMethod, String userId) {
+            PaymentMethod paymentMethod, String userId, List<UUID> selectedSeatIds) {
         return Order.builder()
                 .paymentId(paymentId)
                 .performanceId(performanceId)
@@ -67,6 +71,16 @@ public class Order extends BaseEntity {
                 .paymentMethod(paymentMethod)
                 .orderStatus(OrderStatus.PENDING_PAYMENT)
                 .userId(userId)
+                .selectedSeatIds(selectedSeatIds)
                 .build();
     }
+
+    public void setStatus(OrderStatus status) {
+        this.orderStatus = status;
+    }
+
+    public void delete(Long id) {
+        super.setDeleted(id);
+    }
+
 }

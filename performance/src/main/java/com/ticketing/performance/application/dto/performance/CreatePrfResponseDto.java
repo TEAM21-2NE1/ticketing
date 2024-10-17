@@ -15,11 +15,13 @@ import java.util.UUID;
 public class CreatePrfResponseDto {
 
     private UUID performanceId;
+    private UUID hallId;
     private String title;
 
     public static CreatePrfResponseDto of(Performance performance) {
         return CreatePrfResponseDto.builder()
                 .performanceId(performance.getId())
+                .hallId(performance.getHallId())
                 .title(performance.getTitle())
                 .build();
     }

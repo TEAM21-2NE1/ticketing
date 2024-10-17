@@ -11,4 +11,6 @@ public interface RunningQueue {
     boolean check(User user);
 
     Long size();
+
+    void clear();
 }

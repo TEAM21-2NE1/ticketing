@@ -12,7 +12,7 @@ import org.springframework.stereotype.Component;
 @RequiredArgsConstructor
 public class RedisRunningQueue implements RunningQueue {
 
-    public static final int MAX_CAPACITY = 2;
+    public static final int MAX_CAPACITY = 10;
     public static final String RUNNING_QUEUE = "running:queue";
     private final RedisTemplate<String, User> redisTemplate;
 
@@ -54,5 +54,10 @@ public class RedisRunningQueue implements RunningQueue {
         } else {
             return false;
         }
+    }
+
+    @Override
+    public void clear() {
+        redisTemplate.delete(RUNNING_QUEUE);
     }
 }

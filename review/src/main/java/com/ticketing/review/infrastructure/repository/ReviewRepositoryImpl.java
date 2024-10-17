@@ -32,7 +32,7 @@ public class ReviewRepositoryImpl implements ReviewRepositoryCustom {
 
     JPAQuery<Review> query = queryFactory
         .selectFrom(review)
-        .where(titleContain(title), contentContain(content))
+        .where(review.performanceId.eq(performanceId), titleContain(title), contentContain(content))
         .offset(pageable.getOffset())
         .limit(pageable.getPageSize());
 

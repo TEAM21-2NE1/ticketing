@@ -43,6 +43,7 @@ public class SecurityConfig {
                         .requestMatchers("/api/v1/auth/sign-in").permitAll()  // 로그인 요청 허용
                         .requestMatchers("/api/v1/users/**").permitAll()
                         .requestMatchers("/user-service/**").permitAll()
+                        .requestMatchers("/api/v1/users/actuator/**").permitAll()
                         .anyRequest().authenticated()  // 그 외 모든 요청은 인증 필요
                 )
                 .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))  // 세션 사용하지 않음

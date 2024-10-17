@@ -1,6 +1,35 @@
+spring:
+  datasource:
+    url: jdbc:postgresql://${DB_HOST}:${DB_PORT}/${PAYMENT_PROD_DB_NAME}
+    username: ${DB_USERNAME}
+    password: ${DB_PASSWORD}
+  jpa:
+    hibernate:
+      ddl-auto: update
+    show-sql: true
+
 eureka:
   client:
     register-with-eureka: true
     fetch-registry: true
     service-url:
-      defaultZone: http://server:19090/eureka/
+      defaultZone: http://${EUREKA_HOST}:19090/eureka/
+
+rest:
+  api:
+    key: ${PORTONE_REST_API_KEY}
+    secret: ${PORTONE_REST_API_SECRET}
+
+
+management:
+  endpoints:
+    web:
+      exposure:
+        include: '*'
+      base-path: "/api/v1/payments/actuator"
+  endpoint:
+    health:
+      show-details: always
+
+    prometheus:
+      enabled: true

@@ -60,7 +60,15 @@ public class ReviewService {
       throw new ReviewException(ErrorCode.ALREADY_EXISTS);
     }
 
-    // TODO order 서버에서 사용자가 해당 공연을 실제로 예매했던 게 맞는지 확인
+    try {
+      if (!reviewClient.getOrderStatus(SecurityUtils.getUserId(), requestDto.performanceId())
+          .orderStatus()
+          .equals("COMPLETED")) {
+        throw new ReviewException(ErrorCode.ORDER_NOT_COMPLETED);
+      }
+    } catch (FeignException.Forbidden e) {
+      throw new ReviewException(ErrorCode.ORDER_NOT_FOUND);
+    }
 
     try {
       PerformanceInfoDto prfInfo = reviewClient.getPerformanceInfo(requestDto.performanceId());
@@ -70,8 +78,6 @@ public class ReviewService {
     } catch (FeignException.NotFound e) {
       throw new ReviewException(ErrorCode.PERFORMANCE_NOT_FOUND);
     }
-
-    // TODO 리뷰 제목 및 내용에 부적절한 언행이 포함되었는지 AI에게 문의
 
     List<Long> userIds = new ArrayList<>();
 
@@ -112,7 +118,6 @@ public class ReviewService {
       throw new ReviewException(ErrorCode.REVIEW_FORBIDDEN);
     }
 
-    // TODO 리뷰 제목 및 내용에 부적절한 언행이 포함되었는지 AI에게 문의
     List<Long> userIds = new ArrayList<>();
     userIds.add(findReview.getUserId());
     String nickname = reviewClient.getUserNicknameList(userIds).get(0).nickname();
@@ -145,6 +150,11 @@ public class ReviewService {
     Review findReview = reviewRepository.findById(reviewId).orElseThrow(
         () -> new ReviewException(ErrorCode.REVIEW_NOT_FOUND)
     );
+
+    if (SecurityUtils.getUserRole().equals("ROLE_USER")
+        && SecurityUtils.getUserId() != findReview.getUserId()) {
+      throw new ReviewException(ErrorCode.REVIEW_FORBIDDEN);
+    }
 
     findReview.deleteReview(SecurityUtils.getUserId());
 
@@ -187,6 +197,10 @@ public class ReviewService {
   )
   public ReviewListResponseDto getReviews(UUID performanceId, int page, int size, boolean isAsc,
       String sortBy, String title, String content) {
+
+    if (performanceId == null) {
+      throw new ReviewException(ErrorCode.REQUIRED_PERFORMANCE);
+    }
 
     Sort.Direction direction = isAsc ? Sort.Direction.ASC : Sort.Direction.DESC;
     Pageable pageable = PageRequest.of(page, size, Sort.by(direction, sortBy));

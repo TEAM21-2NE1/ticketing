@@ -6,20 +6,6 @@ spring:
     active: local
   application:
     name: order-service
-    
-  jpa:
-    hibernate:
-      ddl-auto: create-drop
-    show-sql: true
-  datasource:
-    url: jdbc:postgresql://localhost:5432/order
-    username: postgres
-    password: ${password}
-
-  data:
-    redis:
-      host: ${redis-url}
-      port: ${redis-port}
 
 scheduler:
   enabled: true

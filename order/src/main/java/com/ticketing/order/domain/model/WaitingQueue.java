@@ -9,5 +9,9 @@ public interface WaitingQueue {
 
     User pop();
 
+    // 대기 번호 조회
     WaitingTicket getTicket(User user);
+
+    void clear();
+
 }

@@ -1,127 +1,25 @@
 package com.ticketing.performance.application.service;
 
-import com.ticketing.performance.application.dto.hall.HallInfoResponseDto;
 import com.ticketing.performance.application.dto.performance.CreatePrfResponseDto;
 import com.ticketing.performance.application.dto.performance.PrfInfoResponseDto;
 import com.ticketing.performance.application.dto.performance.PrfListResponseDto;
 import com.ticketing.performance.application.dto.performance.UpdatePrfResponseDto;
-import com.ticketing.performance.application.dto.seat.SeatInfoResponseDto;
-import com.ticketing.performance.common.exception.ForbiddenAccessException;
-import com.ticketing.performance.common.exception.PerformanceException;
-import com.ticketing.performance.common.response.ErrorCode;
-import com.ticketing.performance.common.util.SecurityUtil;
-import com.ticketing.performance.domain.model.Performance;
-import com.ticketing.performance.domain.model.SeatStatus;
-import com.ticketing.performance.domain.repository.PerformanceRepository;
 import com.ticketing.performance.presentation.dto.performance.CreatePrfRequestDto;
 import com.ticketing.performance.presentation.dto.performance.PerformanceSearchRequestDto;
 import com.ticketing.performance.presentation.dto.performance.UpdatePrfRequestDto;
-import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
-import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
 
-import java.time.LocalDate;
-import java.util.List;
 import java.util.UUID;
 
-@Service
-@RequiredArgsConstructor
-@Transactional(readOnly = true)
-public class PerformanceService {
+public interface PerformanceService {
 
-    private final PerformanceRepository performanceRepository;
-    private final SeatService seatService;
-    private final HallService hallService;
-    private final ImageUploadService imageUploadService;
+    CreatePrfResponseDto createPerformance(CreatePrfRequestDto requestDto);
 
-    @Transactional
-    public CreatePrfResponseDto createPerformance(CreatePrfRequestDto requestDto) {
+    Page<PrfListResponseDto> getPerformances(PerformanceSearchRequestDto requestDto);
 
-        String posterUrl = imageUploadService.upload(requestDto.getImage());
-        Long userId = SecurityUtil.getId();
-        Performance performance = Performance.create(requestDto, userId, posterUrl);
+    PrfInfoResponseDto getPerformance(UUID performanceId);
 
-        performanceRepository.save(performance);
+    UpdatePrfResponseDto updatePerformance(UUID performanceId, UpdatePrfRequestDto requestDto);
 
-        return CreatePrfResponseDto.of(performance);
-    }
-
-
-    public Page<PrfListResponseDto> getPerformances(PerformanceSearchRequestDto requestDto) {
-        return performanceRepository
-                .findAllByKeyword(requestDto.getKeyword(), requestDto.toPageable())
-                .map(PrfListResponseDto::of);
-    }
-
-    public PrfInfoResponseDto getPerformance(UUID performanceId) {
-        Performance performance = performanceRepository.findById(performanceId)
-                .orElseThrow(() -> new PerformanceException(ErrorCode.PERFORMANCE_NOT_FOUND));
-
-        checkRoleGetPerformance(performance);
-
-        HallInfoResponseDto hall = hallService.getHall(performance.getHallId());
-
-
-        List<SeatInfoResponseDto> seatList = seatService.getSeats(performanceId);
-        int totalSeat = seatList.size();
-        int availableSeat = seatList.stream()
-                .filter(seat -> seat.getSeatStatus() == SeatStatus.AVAILABLE)
-                .toList()
-                .size();
-
-        return PrfInfoResponseDto.of(performance, hall.getHallName(), totalSeat, availableSeat);
-    }
-
-    @Transactional
-    public UpdatePrfResponseDto updatePerformance(UUID performanceId, UpdatePrfRequestDto requestDto) {
-
-        Performance performance = performanceRepository.findById(performanceId)
-                .orElseThrow(() -> new PerformanceException(ErrorCode.PERFORMANCE_NOT_FOUND));
-
-        checkRole(performance.getManagerId());
-
-        performance.update(requestDto);
-
-        return UpdatePrfResponseDto.of(performance);
-
-    }
-
-    @Transactional
-    public void deletePerformance(UUID performanceId) {
-        Performance performance = performanceRepository.findById(performanceId)
-                .orElseThrow(() -> new PerformanceException(ErrorCode.PERFORMANCE_NOT_FOUND));
-
-        checkRole(performance.getManagerId());
-
-        seatService.deleteSeatsByPerformanceId(performanceId);
-
-        performance.delete();
-    }
-
-
-    private void checkRoleGetPerformance(Performance performance) {
-        if (SecurityUtil.getRole().equals("ROLE_USER")) {
-            if (performance.getOpenDate().isAfter(LocalDate.now())) {
-                throw new PerformanceException(ErrorCode.PERFORMANCE_NOT_FOUND);
-            }
-        }
-
-        if (SecurityUtil.getRole().equals("ROLE_P_MANAGER")) {
-            if (!performance.getManagerId().equals(SecurityUtil.getId())) {
-                throw new PerformanceException(ErrorCode.UNAUTHORIZED_PERFORMANCE_ACCESS);
-            }
-        }
-    }
-
-    private void checkRole(Long managerId) {
-        Long userId = SecurityUtil.getId();
-        String role = SecurityUtil.getRole();
-
-        if (role.equals("ROLE_P_MANAGER")) {
-            if (!userId.equals(managerId)) {
-                throw new ForbiddenAccessException(ErrorCode.FORBIDDEN_ACCESS);
-            }
-        }
-    }
+    void deletePerformance(UUID performanceId);
 }
