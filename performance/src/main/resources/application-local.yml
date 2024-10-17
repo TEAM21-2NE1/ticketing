@@ -18,13 +18,25 @@ spring:
           batch_size: 1000
     generate-ddl: true
     database: postgresql
+  kafka:
+    bootstrap-servers: localhost:9092
+    consumer:
+      group-id: ${spring.application.name}-group
+      auto-offset-reset: earliest
+      key-deserializer: org.apache.kafka.common.serialization.StringDeserializer
+      value-deserializer: org.springframework.kafka.support.serializer.JsonDeserializer
+      properties:
+        spring.json.trusted.packages: '*'
+    producer:
+      key-serializer: org.apache.kafka.common.serialization.StringSerializer
+      value-serializer: org.springframework.kafka.support.serializer.JsonSerializer
 
   data:
     redis:
       host: ${redis-url}
       port: ${redis-port}
-#      username: ${redis-username}
-#      password: ${redis-password}
+      username: ${redis-username}
+      password: ${redis-password}
 
 s3:
   credentials:
