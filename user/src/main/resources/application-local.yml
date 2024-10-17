@@ -1,4 +1,6 @@
 spring:
+  config:
+    import: optional:classpath:.env[.properties]
   datasource:
     url: jdbc:postgresql://${DB_HOST}:${DB_PORT}/${USER_DB_NAME}
     username: ${DB_USERNAME}
