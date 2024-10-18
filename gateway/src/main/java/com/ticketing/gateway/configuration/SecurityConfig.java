@@ -21,6 +21,7 @@ public class SecurityConfig {
                         .pathMatchers("/api/v1/auth/**").permitAll()
                         .pathMatchers("/api/v1/orders/view/**").permitAll()
                         .pathMatchers("/api/v1/orders/**").authenticated()
+                        .pathMatchers("/error").permitAll()
                         .anyExchange().authenticated()
                 )
                 .securityContextRepository(jwtAuthenticationFilter);
