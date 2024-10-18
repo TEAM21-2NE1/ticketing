@@ -4,6 +4,7 @@ import com.ticketing.user.domain.model.User;
 import com.ticketing.user.domain.model.UserRole;
 import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotNull;
+import jakarta.validation.constraints.PastOrPresent;
 import jakarta.validation.constraints.Size;
 import java.time.LocalDate;
 import org.springframework.format.annotation.DateTimeFormat;
@@ -26,6 +27,7 @@ public record CreateUserRequestDto(
 
         @NotNull(message = "생년월일은 필수 입력 값입니다.")
         @DateTimeFormat(pattern = "yyyy-MM-dd")
+        @PastOrPresent(message = "생년월일은 미래일 수 없습니다.")
         LocalDate birthdate,
 
         @NotNull(message = "닉네임은 필수 입력 값입니다.")

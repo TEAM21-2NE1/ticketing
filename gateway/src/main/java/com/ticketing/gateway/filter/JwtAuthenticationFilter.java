@@ -2,6 +2,7 @@ package com.ticketing.gateway.filter;
 
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.ExpiredJwtException;
+import io.jsonwebtoken.JwtException;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.MalformedJwtException;
 import io.jsonwebtoken.security.Keys;
@@ -43,30 +44,37 @@ public class JwtAuthenticationFilter implements ServerSecurityContextRepository 
 
         String path = exchange.getRequest().getURI().getPath();
 
-        // 로그인, 회원가입
+        // 로그인, 회원가입 경로는 필터 제외
         if (path.equals("/api/v1/auth/sign-in")
                 || path.equals("/api/v1/auth/sign-up")
                 || path.equals("/api/v1/payments/view")) {
             return Mono.empty();
         }
 
+        // JWT 토큰 추출
         String token = resolveToken(exchange);
-        Claims claims = validateToken(token);
-
-        if (token == null || claims == null) {
+        if (token == null) {
+            log.info("No JWT token found for path: {}", path);
             exchange.getResponse().setStatusCode(HttpStatus.UNAUTHORIZED);
-            log.info(exchange.getRequest().getURI().getPath());
+            return Mono.empty();
+        }
 
+        // 토큰 검증
+        Claims claims = validateToken(token);
+        if (claims == null) {
+            log.info("JWT token validation failed for path: {}", path);
+            exchange.getResponse().setStatusCode(HttpStatus.UNAUTHORIZED);
             return Mono.empty();
         }
 
         String id = String.valueOf(claims.get("userId"));
-        String email = (String)claims.get("userEmail");
-        String role = (String)claims.get("role");
+        String email = (String) claims.get("userEmail");
+        String role = (String) claims.get("role");
 
         //username, null, role
         Collection<GrantedAuthority> roleCollection = List.of(() -> role);
-        UsernamePasswordAuthenticationToken authentication = new UsernamePasswordAuthenticationToken(email, null, roleCollection);
+        UsernamePasswordAuthenticationToken authentication = new UsernamePasswordAuthenticationToken(
+                email, null, roleCollection);
 
         exchange.mutate()
                 .request(r -> r.headers(headers -> {
@@ -79,6 +87,7 @@ public class JwtAuthenticationFilter implements ServerSecurityContextRepository 
         return Mono.just(new SecurityContextImpl(authentication));  // SecurityContext 생성
     }
 
+    // JWT 토큰을 추출하는 메서드
     private String resolveToken(ServerWebExchange exchange) {
         ServerHttpRequest request = exchange.getRequest();
 
@@ -89,6 +98,7 @@ public class JwtAuthenticationFilter implements ServerSecurityContextRepository 
         return null;
     }
 
+    // JWT 토큰을 검증하고 Claims 객체를 반환하는 메서드
     private Claims validateToken(String token) {
         SecretKey key = generateSigningKey(secretKey);
         try {
@@ -97,10 +107,16 @@ public class JwtAuthenticationFilter implements ServerSecurityContextRepository 
                     .build()
                     .parseSignedClaims(token)
                     .getPayload();
-        } catch (ExpiredJwtException | MalformedJwtException | IllegalArgumentException e) {
-            log.error("JWT validation failed: {}", e.getMessage());
-            return null;
+        } catch (ExpiredJwtException e) {
+            log.error("Expired JWT token: {}", e.getMessage());
+        } catch (MalformedJwtException e) {
+            log.error("Malformed JWT token: {}", e.getMessage());
+        } catch (JwtException e) {
+            log.error("Invalid JWT token: {}", e.getMessage());
+        } catch (IllegalArgumentException e) {
+            log.error("Illegal argument during JWT parsing: {}", e.getMessage());
         }
+        return null;  // 토큰 검증 실패 시 null 반환
     }
 
     public SecretKey generateSigningKey(String base64SecretKey) {
