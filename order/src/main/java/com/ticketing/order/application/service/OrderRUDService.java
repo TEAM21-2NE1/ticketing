@@ -1,23 +1,24 @@
 package com.ticketing.order.application.service;
 
-import com.ticketing.order.application.dto.client.SeatInfoResponseDto;
 import com.ticketing.order.application.dto.request.OrderSeatRequestDto;
 import com.ticketing.order.application.dto.response.GetOrderPerformancesResponseDto;
 import com.ticketing.order.application.dto.response.GetOrderResponseDto;
 import com.ticketing.order.application.dto.response.GetOrderResponseDto.SeatDetail;
 import com.ticketing.order.application.dto.response.GetOrderStatusResponse;
+import com.ticketing.order.application.dto.response.ViewOrderDto;
 import com.ticketing.order.common.exception.OrderException;
 import com.ticketing.order.common.response.ExceptionMessage;
 import com.ticketing.order.config.SecurityUtil;
 import com.ticketing.order.domain.model.Order;
 import com.ticketing.order.domain.repository.OrderRepository;
 import com.ticketing.order.infrastructure.PerformanceClient;
-import java.util.List;
-import java.util.Objects;
-import java.util.UUID;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+
+import java.util.List;
+import java.util.Objects;
+import java.util.UUID;
 
 @Service
 @RequiredArgsConstructor
@@ -32,7 +33,7 @@ public class OrderRUDService {
     public void deleteOrder(UUID orderId) {
         Order order = orderRepository.findById(orderId)
                 .orElseThrow(() -> new OrderException(ExceptionMessage.ORDER_NOT_FOUND));
-
+        seatOrderService.cancel(order.getSelectedSeatIds(), order.getPerformanceId());
         order.delete(SecurityUtil.getId());
     }
 
@@ -54,19 +55,27 @@ public class OrderRUDService {
                         seat.getSeatRow(),
                         seat.getSeatType()))
                 .toList();
-//        List<SeatDetail> seats = orderSelectedSeats.stream()
-//                .map(seatId -> seatOrderService.getSeatFromRedis(order.getPerformanceId(),
-//                        seatId)) // Redis에서 좌석 정보 조회
-//                .filter(Objects::nonNull) // 조회된 좌석 정보가 null이 아닌 경우에만 처리
-//                .map(seatInfo -> new SeatDetail(
-//                        seatInfo.getSeatId(),
-//                        seatInfo.getSeatNum(),
-//                        seatInfo.getSeatRow(),
-//                        seatInfo.getSeatType()
-//                )) // SeatDetail 객체로 변환
-//                .toList();
-
         return GetOrderResponseDto.from(order, seats);
+    }
+
+    public ViewOrderDto getOrderRedis(UUID orderId) {
+
+        Order order = orderRepository.findById(orderId)
+                .orElseThrow(() -> new OrderException(ExceptionMessage.ORDER_NOT_FOUND));
+        List<UUID> orderSelectedSeats = order.getSelectedSeatIds();
+
+        List<SeatDetail> seats = orderSelectedSeats.stream()
+                .map(seatId -> seatOrderService.getSeatFromRedis(order.getPerformanceId(),
+                        seatId))
+                .filter(Objects::nonNull)
+                .map(seatInfo -> new SeatDetail(
+                        seatInfo.getSeatId(),
+                        seatInfo.getSeatNum(),
+                        seatInfo.getSeatRow(),
+                        seatInfo.getSeatType()
+                ))
+                .toList();
+        return ViewOrderDto.of(order.getId(), seats, order.getTotalAmount());
     }
 
     public GetOrderStatusResponse orderStatusResponse(String userId, UUID performanceId) {

@@ -37,6 +37,7 @@ public class SecurityConfig {
                         .requestMatchers("/api/v1/orders/test-user").hasRole("USER")
                         .requestMatchers("/api/v1/orders/seats").permitAll()
                         .requestMatchers("/api/v1/orders/actuator/**").permitAll()
+                        .requestMatchers("/api/v1/orders/view/**").permitAll()
                         .anyRequest().authenticated()  // 그 외 모든 요청은 인증 필요
                 )
                 .addFilterBefore(jwtAuthenticationFilter,
