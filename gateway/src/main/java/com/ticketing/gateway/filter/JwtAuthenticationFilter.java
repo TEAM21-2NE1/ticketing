@@ -47,7 +47,7 @@ public class JwtAuthenticationFilter implements ServerSecurityContextRepository 
         // 로그인, 회원가입 경로는 필터 제외
         if (path.equals("/api/v1/auth/sign-in")
                 || path.equals("/api/v1/auth/sign-up")
-                || path.equals("/api/v1/payments/view")) {
+                || path.startsWith("/api/v1/orders/view")) {
             return Mono.empty();
         }
 
