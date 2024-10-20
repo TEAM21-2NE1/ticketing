@@ -1,7 +1,7 @@
 package com.ticketing.review.infrastructure.messaging.consumer;
 
 import com.ticketing.review.application.service.ReviewService;
-import com.ticketing.review.domain.event.PerformanceCanceledEvent;
+import com.ticketing.review.domain.messaging.PerformanceCanceledEvent;
 import com.ticketing.review.infrastructure.messaging.EventSerializer;
 import lombok.RequiredArgsConstructor;
 import org.springframework.kafka.annotation.KafkaListener;

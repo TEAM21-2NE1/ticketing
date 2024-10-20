@@ -1,4 +1,4 @@
-package com.ticketing.review.domain.event;
+package com.ticketing.review.domain.messaging;
 
 public enum ReviewTopic {
   DELETE_ERROR("review-delete-error");
