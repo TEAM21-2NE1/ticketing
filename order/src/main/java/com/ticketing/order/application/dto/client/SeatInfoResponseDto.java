@@ -28,6 +28,11 @@ public class SeatInfoResponseDto implements Serializable {
 
     }
 
+    public void hold(Long userId) {
+        this.userId = userId;
+        this.seatStatus = SeatStatus.HOLD;
+    }
+
     public void hold() {
         this.userId = SecurityUtil.getId();
         this.seatStatus = SeatStatus.HOLD;
