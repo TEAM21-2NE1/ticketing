@@ -1,4 +1,4 @@
-package com.ticketing.review.domain.event;
+package com.ticketing.review.domain.messaging;
 
 
 import java.util.UUID;
