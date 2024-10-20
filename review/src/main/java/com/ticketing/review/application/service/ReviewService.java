@@ -10,8 +10,6 @@ import com.ticketing.review.application.dto.response.DeleteReviewResponseDto;
 import com.ticketing.review.application.dto.response.ReviewListResponseDto;
 import com.ticketing.review.application.dto.response.ReviewResponseDto;
 import com.ticketing.review.application.dto.response.UpdateReviewResponseDto;
-import com.ticketing.review.application.event.AvgRatingEvent;
-import com.ticketing.review.application.event.RatingOperation;
 import com.ticketing.review.common.exception.ReviewException;
 import com.ticketing.review.common.response.ErrorCode;
 import com.ticketing.review.domain.model.Review;
@@ -89,9 +87,9 @@ public class ReviewService {
     Review savedReview = reviewRepository.save(
         CreateReviewRequestDto.toEntity(requestDto, SecurityUtils.getUserId()));
 
-    eventPublisher.publishEvent(
+/*    eventPublisher.publishEvent(
         AvgRatingEvent.toAvgRatingEvent(requestDto.performanceId(), (short) 0, requestDto.rating(),
-            RatingOperation.CREATE));
+            RatingOperation.CREATE));*/
 
     return CreateReviewResponseDto.fromEntity(savedReview, nickname);
   }
@@ -124,11 +122,11 @@ public class ReviewService {
     userIds.add(findReview.getUserId());
     String nickname = reviewClient.getUserNicknameList(userIds).get(0).nickname();
 
-    if (requestDto.rating() != null) {
+/*    if (requestDto.rating() != null) {
       eventPublisher.publishEvent(
           AvgRatingEvent.toAvgRatingEvent(findReview.getPerformanceId(), findReview.getRating(),
               requestDto.rating(), RatingOperation.UPDATE));
-    }
+    }*/
 
     findReview.updateReview(requestDto.rating(), requestDto.title(), requestDto.content());
     return UpdateReviewResponseDto.fromEntity(findReview, nickname);
@@ -160,10 +158,10 @@ public class ReviewService {
 
     findReview.deleteReview(SecurityUtils.getUserId());
 
-    eventPublisher.publishEvent(
+/*    eventPublisher.publishEvent(
         AvgRatingEvent.toAvgRatingEvent(findReview.getPerformanceId(), findReview.getRating(),
             (short) 0,
-            RatingOperation.DELETE));
+            RatingOperation.DELETE));*/
 
     return DeleteReviewResponseDto.fromEntity(findReview);
   }
@@ -242,8 +240,11 @@ public class ReviewService {
   public void deleteReviewByPerformance(UUID performanceId, Long userId) {
     try {
       reviewRepository.deleteByPerformanceId(performanceId, userId);
+
     } catch (Exception e) {
       eventService.publishReviewDeleteErrorEvent(performanceId, userId);
     }
   }
+
+
 }
