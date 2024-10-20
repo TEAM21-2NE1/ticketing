@@ -1,6 +1,7 @@
 package com.ticketing.review.application.service;
 
 import com.ticketing.review.application.dto.event.ReviewDeleteErrorEvent;
+import com.ticketing.review.infrastructure.messaging.EventSerializer;
 import com.ticketing.review.infrastructure.messaging.ReviewTopic;
 import java.util.UUID;
 import lombok.RequiredArgsConstructor;
@@ -15,7 +16,7 @@ public class EventService {
 
   public void publishReviewDeleteErrorEvent(UUID performanceId, Long userId) {
     kafkaTemplate.send(ReviewTopic.DELETE_ERROR.getTopic(),
-        new ReviewDeleteErrorEvent(performanceId, userId));
+        EventSerializer.serialize(new ReviewDeleteErrorEvent(performanceId, userId)));
   }
 
 }
