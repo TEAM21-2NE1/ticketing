@@ -19,4 +19,7 @@ public interface SeatOrderService {
     void confirm(List<UUID> seatIds, UUID performanceId);
 
     void cancel(List<UUID> seaIds, UUID performanceId);
+
+    void releaseExpiredSeats(UUID performanceId, UUID seatId, SeatInfoResponseDto seat, Long userId);
+
 }
