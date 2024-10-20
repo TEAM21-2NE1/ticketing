@@ -26,7 +26,6 @@ import org.springframework.cache.annotation.CacheEvict;
 import org.springframework.cache.annotation.CachePut;
 import org.springframework.cache.annotation.Cacheable;
 import org.springframework.cache.annotation.Caching;
-import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
@@ -39,7 +38,6 @@ import org.springframework.transaction.annotation.Transactional;
 public class ReviewService {
 
   private final ReviewRepository reviewRepository;
-  private final ApplicationEventPublisher eventPublisher;
   private final RedisRatingRepository redisRatingRepository;
   private final ReviewClient reviewClient;
   private final EventService eventService;
@@ -87,10 +85,6 @@ public class ReviewService {
     Review savedReview = reviewRepository.save(
         CreateReviewRequestDto.toEntity(requestDto, SecurityUtils.getUserId()));
 
-/*    eventPublisher.publishEvent(
-        AvgRatingEvent.toAvgRatingEvent(requestDto.performanceId(), (short) 0, requestDto.rating(),
-            RatingOperation.CREATE));*/
-
     return CreateReviewResponseDto.fromEntity(savedReview, nickname);
   }
 
@@ -122,12 +116,6 @@ public class ReviewService {
     userIds.add(findReview.getUserId());
     String nickname = reviewClient.getUserNicknameList(userIds).get(0).nickname();
 
-/*    if (requestDto.rating() != null) {
-      eventPublisher.publishEvent(
-          AvgRatingEvent.toAvgRatingEvent(findReview.getPerformanceId(), findReview.getRating(),
-              requestDto.rating(), RatingOperation.UPDATE));
-    }*/
-
     findReview.updateReview(requestDto.rating(), requestDto.title(), requestDto.content());
     return UpdateReviewResponseDto.fromEntity(findReview, nickname);
   }
@@ -157,11 +145,6 @@ public class ReviewService {
     }
 
     findReview.deleteReview(SecurityUtils.getUserId());
-
-/*    eventPublisher.publishEvent(
-        AvgRatingEvent.toAvgRatingEvent(findReview.getPerformanceId(), findReview.getRating(),
-            (short) 0,
-            RatingOperation.DELETE));*/
 
     return DeleteReviewResponseDto.fromEntity(findReview);
   }
