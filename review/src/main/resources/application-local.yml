@@ -20,7 +20,18 @@ spring:
       port: ${REVIEW.LOCAL.REDIS.PORT}
       username: ${REVIEW.LOCAL.REDIS.USERNAME}
       password: ${REVIEW.LOCAL.REDIS.PASSWORD}
-
+  kafka:
+    bootstrap-servers: localhost:9092
+    consumer:
+      group-id: ${SPRING.APPLICATION.NAME}-group
+      auto-offset-reset: earliest
+      key-deserializer: org.apache.kafka.common.serialization.StringDeserializer
+      value-deserializer: org.springframework.kafka.support.serializer.JsonDeserializer
+      properties:
+        spring.json.trusted.packages: '*'
+    producer:
+      key-serializer: org.apache.kafka.common.serialization.StringSerializer
+      value-serializer: org.springframework.kafka.support.serializer.JsonSerializer
 eureka:
   instance:
     prefer-ip-address: true
@@ -29,3 +40,4 @@ eureka:
     fetch-registry: true
     service-url:
       defaultZone: http://localhost:19090/eureka/
+

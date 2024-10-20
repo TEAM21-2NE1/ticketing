@@ -225,4 +225,20 @@ public class ReviewService {
   }
 
 
+  /**
+   * 공연 취소 시 리뷰 삭제
+   *
+   * @param performanceId
+   * @param userId
+   */
+  @Transactional(readOnly = false)
+  @Caching(evict = {
+      @CacheEvict(cacheNames = "reviewCache", allEntries = true, cacheManager = "reviewCacheManager"),
+      @CacheEvict(cacheNames = {
+          "reviewSearchCache"}, allEntries = true, cacheManager = "reviewCacheManager")
+  })
+  public void deleteReviewByPerformance(UUID performanceId, Long userId) {
+    reviewRepository.deleteByPerformanceId(performanceId, userId);
+  }
+
 }

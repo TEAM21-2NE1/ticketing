@@ -1,0 +1,84 @@
+<!DOCTYPE html>
+<html lang="ko" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>ticket 결제</title>
+    <meta name="viewport"
+          content="width=device-width, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0, user-scale=1.0, user-scalable=no, viewport-fit=cover, shrink-to-fit=no">
+    <script src="https://cdn.iamport.kr/v1/iamport.js"></script>
+    <script type="text/javascript" src="https://code.jquery.com/jquery-1.12.4.min.js"></script>
+
+    <script>
+        var IMP = window.IMP;
+        IMP.init("imp68783837"); // 아임포트 초기화
+
+        function generateMerchantUid() {
+            var today = new Date();
+            var hours = today.getHours();
+            var minutes = today.getMinutes();
+            var seconds = today.getSeconds();
+            var milliseconds = today.getMilliseconds();
+
+            return `${hours}${minutes}${seconds}${milliseconds}`;
+        }
+
+        function requestPay() {
+            const jwtToken = document.getElementById('jwtToken').value;
+            const orderUid = document.getElementById('orderUid').value;
+            const itemName = document.getElementById('itemName').value;
+            const itemPrice = document.getElementById('itemPrice').value;
+
+            IMP.request_pay({
+                    pg: 'kakaopay.TC0ONETIME',
+                    pay_method: 'card',
+                    merchant_uid: orderUid, // 주문번호
+                    name: itemName, // 상품 이름
+                    amount: itemPrice, // 상품 가격
+                },
+                function (rsp) {
+                    if (rsp.success) {
+                        alert('결제 성공: ' + JSON.stringify(rsp));
+
+                        // 결제 성공 시 서버에 요청 전송
+                        jQuery.ajax({
+                            url: "/api/v1/payments",
+                            method: "POST",
+                            headers: {
+                                "Content-Type": "application/json",
+                                "Authorization": "Bearer " + jwtToken
+                            },
+                            data: JSON.stringify({
+                                "payment_uid": rsp.imp_uid,      // 결제 고유번호
+                                "order_uid": rsp.merchant_uid,
+                                "price": rsp.paid_amount
+                            })
+                        }).done(function (response) {
+                            console.log(response);
+                            alert('결제가 완료되었습니다!');
+                        }).fail(function (error) {
+                            alert('결제 처리 중 문제가 발생했습니다.');
+                            console.error(error);
+                        });
+                    } else {
+                        alert('결제 실패: ' + JSON.stringify(rsp));
+                    }
+                });
+        }
+    </script>
+</head>
+<body>
+<h1>결제 페이지</h1>
+<form id="paymentForm">
+    <label for="jwtToken">JWT 토큰:</label>
+    <input type="text" id="jwtToken" name="jwtToken" placeholder="JWT 토큰 입력" required><br><br>
+
+    <button type="button" onclick="requestPay()">결제하기</button>
+    <input type="hidden" id="orderUid" name="orderUid" placeholder="주문번호 입력" th:value="${orderDto.getOrderId}"><br><br>
+
+    <input type="hidden" id="itemName" name="itemName" placeholder="상품 이름 입력" th:value="${orderDto.getItemName}"><br><br>
+
+    <input type="hidden" id="itemPrice" name="itemPrice" placeholder="상품 가격 입력" th:value="${orderDto.getTotalAmount}"><br><br>
+
+</form>
+</body>
+</html>
