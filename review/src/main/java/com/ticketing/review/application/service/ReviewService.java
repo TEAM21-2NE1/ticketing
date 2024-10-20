@@ -44,6 +44,8 @@ public class ReviewService {
   private final ApplicationEventPublisher eventPublisher;
   private final RedisRatingRepository redisRatingRepository;
   private final ReviewClient reviewClient;
+  private final EventService eventService;
+
 
   /**
    * 리뷰 생성
@@ -238,7 +240,10 @@ public class ReviewService {
           "reviewSearchCache"}, allEntries = true, cacheManager = "reviewCacheManager")
   })
   public void deleteReviewByPerformance(UUID performanceId, Long userId) {
-    reviewRepository.deleteByPerformanceId(performanceId, userId);
+    try {
+      reviewRepository.deleteByPerformanceId(performanceId, userId);
+    } catch (Exception e) {
+      eventService.publishReviewDeleteErrorEvent(performanceId, userId);
+    }
   }
-
 }
