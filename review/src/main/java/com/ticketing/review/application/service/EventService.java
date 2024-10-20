@@ -1,8 +1,8 @@
 package com.ticketing.review.application.service;
 
-import com.ticketing.review.application.dto.event.ReviewDeleteErrorEvent;
+import com.ticketing.review.domain.event.ReviewDeleteErrorEvent;
+import com.ticketing.review.domain.event.ReviewTopic;
 import com.ticketing.review.infrastructure.messaging.EventSerializer;
-import com.ticketing.review.infrastructure.messaging.ReviewTopic;
 import java.util.UUID;
 import lombok.RequiredArgsConstructor;
 import org.springframework.kafka.core.KafkaTemplate;
