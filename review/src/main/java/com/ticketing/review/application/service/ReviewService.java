@@ -55,10 +55,10 @@ public class ReviewService {
   @Transactional(readOnly = false)
   public CreateReviewResponseDto createReview(CreateReviewRequestDto requestDto) {
     // 같은 공연에 대해 리뷰를 등록함
-    //if (reviewRepository.existsByUserIdAndPerformanceId(SecurityUtils.getUserId(),
-    //    requestDto.performanceId())) {
-    //  throw new ReviewException(ErrorCode.ALREADY_EXISTS);
-    //}
+    if (reviewRepository.existsByUserIdAndPerformanceId(SecurityUtils.getUserId(),
+        requestDto.performanceId())) {
+      throw new ReviewException(ErrorCode.ALREADY_EXISTS);
+    }
 
     try {
       if (!reviewClient.getOrderStatus(SecurityUtils.getUserId(), requestDto.performanceId())
