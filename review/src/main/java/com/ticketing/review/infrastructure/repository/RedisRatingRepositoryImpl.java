@@ -4,6 +4,7 @@ import com.ticketing.review.domain.repository.RedisRatingRepository;
 import com.ticketing.review.domain.repository.ReviewRepository;
 import java.math.BigDecimal;
 import java.util.Collections;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.UUID;
@@ -55,19 +56,21 @@ public class RedisRatingRepositoryImpl implements RedisRatingRepository {
 
     for (int i = 0; i < totalRecords; i += batchSize) {
       int start = i;
+      int end = Math.min(start + batchSize, totalRecords);
       redisTemplate.executePipelined((RedisCallback<Object>) connection -> {
-        int endSize = Math.min(start + batchSize, totalRecords);
-
-        for (int j = start; j < endSize; j++) {
+        for (int j = start; j < end; j++) {
           Map<String, Object> data = result.get(j);
           UUID performanceId = (UUID) data.get("performanceId");
           double avgRating = convertObjectToDouble(data.get("avgRating"));
           long reviewCount = convertObjectToLong(data.get("reviewCount"));
 
           String avgRatingKey = "avgRating:" + performanceId.toString();
-          
-          redisTemplate.opsForHash().put(avgRatingKey, "avgRating", Double.toString(avgRating));
-          redisTemplate.opsForHash().put(avgRatingKey, "reviewCount", Long.toString(reviewCount));
+
+          Map<String, Object> ratingInfo = new HashMap<>();
+          ratingInfo.put("avgRating", Double.toString(avgRating));
+          ratingInfo.put("reviewCount", Long.toString(reviewCount));
+
+          redisTemplate.opsForHash().putAll(avgRatingKey, ratingInfo);
         }
 
         return null;
