@@ -16,6 +16,8 @@ public interface SeatService {
 
     void deleteSeatsByPerformanceId(UUID performanceId);
 
+    void rollbackSeatsByPerformanceId(UUID performanceId);
+
     void createSeat(CreateSeatRequestDto requestDto);
 
     void updateSeatPrice(UpdateSeatPriceRequestDto requestDto);
