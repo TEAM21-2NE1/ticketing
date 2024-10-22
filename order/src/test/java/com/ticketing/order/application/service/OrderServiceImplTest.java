@@ -53,10 +53,9 @@ class OrderServiceImplTest {
         performanceClient = Mockito.mock(PerformanceClient.class);
         waitingQueue = new RedisWaitingQueue(redisTemplate);
 
-        orderService = new OrderServiceImpl(orderRepository, runningQueue, waitingQueue,
-                performanceClient, redisTemplate, seatOrderService);
+        orderService = new OrderServiceImpl(orderRepository, performanceClient,
+                seatOrderService);
 
-        // Clear the queues in Redis before each test
         waitingQueue.clear();
         runningQueue.clear();
 

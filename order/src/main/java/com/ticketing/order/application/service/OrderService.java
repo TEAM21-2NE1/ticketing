@@ -8,6 +8,4 @@ public interface OrderService {
     CreateOrderResponseDto createOrder(CreateOrderRequestDto requestDto, String userId,
             String userRole, String userEmail);
 
-    void transferWaitingToRunning();
-
 }
