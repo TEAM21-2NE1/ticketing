@@ -1,6 +1,8 @@
 package com.ticketing.review.domain.repository;
 
 import com.ticketing.review.domain.model.Review;
+import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 import java.util.UUID;
 import org.springframework.data.jpa.repository.EntityGraph;
@@ -30,5 +32,16 @@ public interface ReviewRepository extends JpaRepository<Review, UUID>, ReviewRep
   void deleteByPerformanceId(@Param("performanceId") UUID performanceId,
       @Param("userId") Long userId);
 
+  @Query(value = "SELECT AVG(r.rating) AS avgRating, COUNT(r.id) AS reviewCount FROM p_review r "
+      + "WHERE r.performance_id = :performanceId AND r.is_deleted = false", nativeQuery = true)
+  Map<String, Object> calculateAvgRatingAndCount(UUID performanceId);
 
+
+  @Query(value =
+      "SELECT r.performance_id AS performanceId, AVG(r.rating) AS avgRating, COUNT(r.id) AS reviewCount "
+          +
+          "FROM p_review r " +
+          "WHERE r.is_deleted = false " +
+          "GROUP BY r.performance_id", nativeQuery = true)
+  List<Map<String, Object>> calculateAvgRatingAndCountBulk();
 }
