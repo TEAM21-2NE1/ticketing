@@ -76,6 +76,9 @@ public class Performance extends BaseEntity {
 
     public void delete() {
         super.delete();
+    }
 
+    public void rollbackDelete() {
+        super.rollbackDelete();
     }
 }

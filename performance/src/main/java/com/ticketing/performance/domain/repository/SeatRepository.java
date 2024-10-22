@@ -14,12 +14,23 @@ public interface SeatRepository extends JpaRepository<Seat, UUID>, SeatJdbcRepos
     List<Seat> findAllByPerformanceId(UUID performanceId);
 
     @Modifying
-    @Query("UPDATE Seat s SET s.isDeleted = true, s.deletedBy = :userId, s.deletedAt = CURRENT_TIMESTAMP  WHERE s.performanceId = :performanceId")
+    @Query("UPDATE Seat s SET s.isDeleted = true," +
+            " s.deletedBy = :userId," +
+            " s.deletedAt = CURRENT_TIMESTAMP," +
+            "  s.updatedAt = CURRENT_TIMESTAMP ," +
+            " s.updatedBy = :userId  " +
+            "WHERE s.performanceId = :performanceId")
     void softDeleteSeatsByPerformanceId(@Param("performanceId") UUID performanceId, @Param("userId")Long userId);
 
     @Modifying
-    @Query("UPDATE Seat s SET s.price = :price, s.updatedAt = CURRENT_TIMESTAMP , s.updatedBy = :userId WHERE s.performanceId = :performanceId and s.seatType = :seatType")
-    void updateSeatPriceBySeatType(@Param("seatType")String seatType, @Param("price") Integer price, @Param("performanceId") UUID performanceId, @Param("userId")Long userId);
+    @Query("UPDATE Seat s SET s.price = :price," +
+            " s.updatedAt = CURRENT_TIMESTAMP ," +
+            " s.updatedBy = :userId " +
+            "WHERE s.performanceId = :performanceId and s.seatType = :seatType")
+    void updateSeatPriceBySeatType(@Param("seatType")String seatType,
+                                   @Param("price") Integer price,
+                                   @Param("performanceId") UUID performanceId,
+                                   @Param("userId")Long userId);
 
     @Query("Select s from Seat s where s.id in :seatIds")
     List<Seat> findAllByIds(@Param("seatIds") List<UUID> seatIds);
@@ -27,4 +38,14 @@ public interface SeatRepository extends JpaRepository<Seat, UUID>, SeatJdbcRepos
     List<Seat> findAllByPerformanceIdIn(List<UUID> performanceIds);
 
     boolean existsByPerformanceId(UUID performanceId);
+
+    @Modifying
+    @Query("UPDATE Seat s SET " +
+            "s.isDeleted = false, " +
+            "s.deletedBy = null, " +
+            "s.deletedAt = null, " +
+            "s.updatedAt = CURRENT_TIMESTAMP , " +
+            "s.updatedBy = :userId " +
+            "WHERE s.performanceId = :performanceId")
+    void rollbackDeleteSeatsByPerformanceId(@Param("performanceId") UUID performanceId, @Param("userId")Long userId);
 }

@@ -48,4 +48,10 @@ public class BaseEntity{
         this.deletedBy = SecurityUtil.getId();
         this.isDeleted = true;
     }
+
+    protected void rollbackDelete() {
+        this.deletedAt = null;
+        this.deletedBy = null;
+        this.isDeleted = false;
+    }
 }

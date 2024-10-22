@@ -117,8 +117,18 @@ public class PerformanceServiceImpl implements PerformanceService {
         performanceEventService.publishPerformanceDeletedEvent(
                 PrfDeletedEvent.create(performanceId, SecurityUtil.getId())
         );
-
         performance.delete();
+    }
+
+
+    @Override
+    @Transactional
+    public void rollbackDeletePerformance(UUID performanceId) {
+        Performance performance = performanceRepository.findById(performanceId)
+                .orElseThrow(() -> new PerformanceException(ErrorCode.PERFORMANCE_NOT_FOUND));
+
+        seatService.rollbackSeatsByPerformanceId(performanceId);
+        performance.rollbackDelete();
     }
 
 
