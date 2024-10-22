@@ -2,7 +2,7 @@ name: Spring boot CI/CD with AWS EC2, ECR
 
 on:
   push:
-    branches: ["chore/#140cicd-kafka"]
+    branches: ["main"]
 
 env:
   ECR_NAMESPACE: ticketing
