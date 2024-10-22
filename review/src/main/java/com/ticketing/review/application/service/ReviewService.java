@@ -2,7 +2,6 @@ package com.ticketing.review.application.service;
 
 import com.ticketing.review.application.client.ReviewClient;
 import com.ticketing.review.application.client.dto.PerformanceInfoDto;
-import com.ticketing.review.application.client.dto.UserNicknameInfoDto;
 import com.ticketing.review.application.dto.request.CreateReviewRequestDto;
 import com.ticketing.review.application.dto.request.UpdateReviewRequestDto;
 import com.ticketing.review.application.dto.response.CreateReviewResponseDto;
@@ -20,8 +19,10 @@ import feign.FeignException;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 import java.util.UUID;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.cache.annotation.CacheEvict;
 import org.springframework.cache.annotation.CachePut;
 import org.springframework.cache.annotation.Cacheable;
@@ -35,6 +36,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 @Service
 @RequiredArgsConstructor
+@Slf4j
 public class ReviewService {
 
   private final ReviewRepository reviewRepository;
@@ -80,8 +82,7 @@ public class ReviewService {
     List<Long> userIds = new ArrayList<>();
 
     userIds.add(SecurityUtils.getUserId());
-    String nickname = reviewClient.getUserNicknameList(userIds).get(0).nickname();
-
+    String nickname = reviewClient.getUserNicknameList(userIds).get(SecurityUtils.getUserId());
     Review savedReview = reviewRepository.save(
         CreateReviewRequestDto.toEntity(requestDto, SecurityUtils.getUserId()));
 
@@ -114,7 +115,7 @@ public class ReviewService {
 
     List<Long> userIds = new ArrayList<>();
     userIds.add(findReview.getUserId());
-    String nickname = reviewClient.getUserNicknameList(userIds).get(0).nickname();
+    String nickname = reviewClient.getUserNicknameList(userIds).get(findReview.getUserId());
 
     findReview.updateReview(requestDto.rating(), requestDto.title(), requestDto.content());
     return UpdateReviewResponseDto.fromEntity(findReview, nickname);
@@ -165,7 +166,7 @@ public class ReviewService {
 
     List<Long> userIds = new ArrayList<>();
     userIds.add(findReview.getUserId());
-    String nickname = reviewClient.getUserNicknameList(userIds).get(0).nickname();
+    String nickname = reviewClient.getUserNicknameList(userIds).get(findReview.getUserId());
 
     return ReviewResponseDto.fromEntity(findReview, nickname);
   }
@@ -193,14 +194,10 @@ public class ReviewService {
 
     List<Long> userIds = reviews.getContent().stream().map(Review::getUserId).toList();
 
-    List<UserNicknameInfoDto> nicknames = reviewClient.getUserNicknameList(userIds);
+    Map<Long, String> nicknames = reviewClient.getUserNicknameList(userIds);
 
     Page<ReviewResponseDto> reviewDtos = reviews.map(review -> {
-      String nickname = nicknames.stream()
-          .filter(nicknameInfo -> review.getUserId() == nicknameInfo.userId())
-          .findFirst()
-          .map(UserNicknameInfoDto::nickname)
-          .orElse(null);
+      String nickname = nicknames.get(review.getUserId());
       return ReviewResponseDto.fromEntity(review, nickname);
     });
 
