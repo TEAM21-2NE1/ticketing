@@ -5,6 +5,7 @@ services:
       args:
         - FILE_DIRECTORY=./eureka
     image: ${ECR_REGISTRY}/${ECR_NAMESPACE}/eureka
+    container_name: eureka
     environment:
       - TZ=Asia/Seoul
     env_file:
@@ -16,6 +17,7 @@ services:
       args:
         - FILE_DIRECTORY=./gateway
     image: ${ECR_REGISTRY}/${ECR_NAMESPACE}/gateway
+    container_name: gateway
     environment:
       - TZ=Asia/Seoul
     env_file:
@@ -31,6 +33,7 @@ services:
       args:
         - FILE_DIRECTORY=./user
     image: ${ECR_REGISTRY}/${ECR_NAMESPACE}/user
+    container_name: user
     environment:
       - TZ=Asia/Seoul
     env_file:
@@ -42,6 +45,7 @@ services:
       args:
         - FILE_DIRECTORY=./review
     image: ${ECR_REGISTRY}/${ECR_NAMESPACE}/review
+    container_name: review
     environment:
       - TZ=Asia/Seoul
     env_file:
@@ -65,6 +69,7 @@ services:
       args:
         - FILE_DIRECTORY=./performance
     image: ${ECR_REGISTRY}/${ECR_NAMESPACE}/performance
+    container_name: performance
     environment:
       - TZ=Asia/Seoul
     env_file:
@@ -88,6 +93,7 @@ services:
       args:
         - FILE_DIRECTORY=./order
     image: ${ECR_REGISTRY}/${ECR_NAMESPACE}/order
+    container_name: order
     environment:
       - TZ=Asia/Seoul
     env_file:
@@ -111,6 +117,7 @@ services:
       args:
         - FILE_DIRECTORY=./payment
     image: ${ECR_REGISTRY}/${ECR_NAMESPACE}/payment
+    container_name: payment
     environment:
       - TZ=Asia/Seoul
     env_file:
