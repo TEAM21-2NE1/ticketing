@@ -26,7 +26,7 @@ public record GetSeatsResponseDto(
     public static GetSeatsResponseDto waiting(WaitingTicket waitingTicket) {
         return GetSeatsResponseDto.builder()
                 .status("WAITING")
-                .waitingNumber(waitingTicket.getOrder() + 1)
+                .waitingNumber(waitingTicket.getOrder())
                 .build();
     }
 }

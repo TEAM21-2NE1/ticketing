@@ -70,7 +70,7 @@ public class OrderController {
         if ("WAITING".equals(responseDto.status())) {
             return ResponseEntity.status(HttpStatus.ACCEPTED)
                     .body(success(HttpStatus.ACCEPTED.value(),
-                            "현재 대기열에 등록되었습니다.",
+                            "대기 번호",
                             responseDto));
         } else {
             return ResponseEntity.ok(success(HttpStatus.OK.value(),
@@ -78,4 +78,13 @@ public class OrderController {
                     responseDto));
         }
     }
+
+    @GetMapping("/rank")
+    public ResponseEntity<SuccessResponse<?>> rank(@RequestHeader("X-User-Id") String userId) {
+        return ResponseEntity.ok(SuccessResponse.success(HttpStatus.OK.value(),
+                "대기 번호 조회 성공",
+                orderService.getTicket(userId)));
+    }
+
+
 }

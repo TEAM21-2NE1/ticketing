@@ -8,6 +8,9 @@ import com.ticketing.order.application.dto.response.CreateOrderResponseDto.SeatD
 import com.ticketing.order.common.exception.SeatException;
 import com.ticketing.order.common.response.ExceptionMessage;
 import com.ticketing.order.domain.model.Order;
+import com.ticketing.order.domain.model.User;
+import com.ticketing.order.domain.model.WaitingQueue;
+import com.ticketing.order.domain.model.WaitingTicket;
 import com.ticketing.order.domain.repository.OrderRepository;
 import com.ticketing.order.infrastructure.PerformanceClient;
 import jakarta.transaction.Transactional;
@@ -25,6 +28,7 @@ public class OrderServiceImpl implements OrderService {
     private final OrderRepository orderRepository;
     private final PerformanceClient performanceClient;
     private final SeatOrderService seatOrderService;
+    private final WaitingQueue waitingQueue;
 
     // 주문 생성
     @Transactional
@@ -53,6 +57,10 @@ public class OrderServiceImpl implements OrderService {
                 requestDto.selectedSeatIds());
         return CreateOrderResponseDto.from(newOrder, seatDetails);
 
+    }
+
+    public WaitingTicket getTicket(String userId) {
+        return waitingQueue.getTicket(User.of(userId));
     }
 
     // 기존 주문이 있는 경우 처리
