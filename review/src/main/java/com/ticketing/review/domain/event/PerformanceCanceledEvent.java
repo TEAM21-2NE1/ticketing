@@ -1,4 +1,4 @@
-package com.ticketing.review.infrastructure.messaging.event;
+package com.ticketing.review.domain.event;
 
 import java.util.UUID;
 import lombok.AllArgsConstructor;
