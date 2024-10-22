@@ -22,4 +22,6 @@ public interface PerformanceService {
     UpdatePrfResponseDto updatePerformance(UUID performanceId, UpdatePrfRequestDto requestDto);
 
     void deletePerformance(UUID performanceId);
+
+    void rollbackDeletePerformance(UUID performanceId);
 }
