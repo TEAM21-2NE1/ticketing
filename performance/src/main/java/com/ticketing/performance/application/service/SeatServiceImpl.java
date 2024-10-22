@@ -58,6 +58,13 @@ public class SeatServiceImpl implements SeatService{
         seatRepository.softDeleteSeatsByPerformanceId(performanceId, SecurityUtil.getId());
     }
 
+    @Override
+    @Transactional
+    public void rollbackSeatsByPerformanceId(UUID performanceId) {
+        seatRepository.rollbackDeleteSeatsByPerformanceId(performanceId, SecurityUtil.getId());
+
+    }
+
     @Transactional
     public void createSeat(CreateSeatRequestDto requestDto) {
 

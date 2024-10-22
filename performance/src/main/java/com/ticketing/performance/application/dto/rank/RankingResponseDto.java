@@ -17,7 +17,7 @@ public class RankingResponseDto implements Serializable {
     private UUID performanceId;
     private String title;
     private String posterUrl;
-    private LocalDateTime performanceTime;
+    private String performanceTime;
     private Double reservationRate;
     @Setter
     private Integer ranking;
@@ -27,7 +27,7 @@ public class RankingResponseDto implements Serializable {
         this.performanceId = performanceId;
         this.title = title;
         this.posterUrl = posterUrl;
-        this.performanceTime = performanceTime;
+        this.performanceTime = performanceTime.toString();
         this.reservationRate = reservationRate;
     }
 
