@@ -10,20 +10,22 @@ import com.ticketing.order.application.dto.response.CreateOrderResponseDto.SeatD
 import com.ticketing.order.common.exception.OrderException;
 import com.ticketing.order.common.exception.SeatException;
 import com.ticketing.order.common.response.ExceptionMessage;
-import com.ticketing.order.domain.model.*;
+import com.ticketing.order.domain.model.Order;
+import com.ticketing.order.domain.model.OrderStatus;
+import com.ticketing.order.domain.model.RunningQueue;
+import com.ticketing.order.domain.model.User;
+import com.ticketing.order.domain.model.WaitingQueue;
 import com.ticketing.order.domain.repository.OrderRepository;
 import com.ticketing.order.infrastructure.PerformanceClient;
 import jakarta.transaction.Transactional;
+import java.util.List;
+import java.util.UUID;
+import java.util.concurrent.locks.ReentrantLock;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
-
-import java.util.List;
-import java.util.UUID;
-import java.util.concurrent.TimeUnit;
-import java.util.concurrent.locks.ReentrantLock;
 
 @Service
 @RequiredArgsConstructor
@@ -46,42 +48,88 @@ public class OrderServiceImpl implements OrderService {
         lock.lock();
         try {
             User user = User.of(userId);
-            log.info("Creating order for user: {}", userId);
 
             // 공연 정보
             performanceClient.getPerformance(userId, userRole, userEmail,
                     requestDto.performanceId());
+            Order order = orderRepository.findBySelectedSeatIds(requestDto.selectedSeatIds());
 
-            // 좌석 선택 가능 여부는 이전 좌석 선택 단계에서 진행 예정이라 주석 처리함
-            // 좌석 선택 가능 여부 확인 및 임시 점유
-//            List<UUID> selectedSeatIds = requestDto.selectedSeatIds();
-//            boolean seatsAvailable = checkAndHoldSeats(requestDto.performanceId(), selectedSeatIds,
-//                    userId);
-//            if (!seatsAvailable) {
-//                throw new OrderException(ExceptionMessage.SEAT_UNAVAILABLE);
-//            }
-
-            // 1. 사용자 상태에 따른 처리
-            if (runningQueue.check(user)) {
-                // 사용자는 running queue에 있음 -> 주문 생성 진행
-                log.info("User {} is in running queue, processing immediate order", userId);
-                return processImmediateOrder(requestDto, userId, userRole, userEmail);
-
-            } else if (runningQueue.available()) {
-
-                // 사용자는 running:queue에 없지만, 현재 running queue에 자리 있어서 주문 생성 진행
-                log.info("Running queue is available, processing queued order for user {}", userId);
-                return processQueuedOrder(requestDto, userId, user, userRole, userEmail);
-
-            } else {
-                // running queue가 차서, waiting queue로 들어가는 프로세스 진행
-                log.info("Running queue is full, processing waiting order for user {}", userId);
-                return processWaitingOrder(user);
-
+            if (order != null) {
+                return handleExistingOrder(requestDto, userId, user, order);
             }
+
+            validateSeats(requestDto.performanceId(), requestDto.selectedSeatIds(), userId);
+
+            return processOrderByUserStatus(requestDto, userId, user, userRole, userEmail);
 
         } finally {
             lock.unlock();
+        }
+    }
+
+    // 기존 주문이 있는 경우 처리
+    private CreateOrderResponseDto handleExistingOrder(CreateOrderRequestDto requestDto,
+            String userId, User user, Order existingOrder) {
+        if (!existingOrder.getUserId().equals(userId)) {
+            throw new SeatException(ExceptionMessage.SEAT_NOT_SELECTED_BY_USER);
+        }
+
+        if (runningQueue.check(user)) {
+            return returnExistingOrderDetails(requestDto, existingOrder);
+        } else if (runningQueue.available()) {
+            return returnExistingOrderDetails(requestDto, existingOrder);
+        } else {
+            return processWaitingOrder(user);
+        }
+    }
+
+    // 기존 주문의 상세 정보 반환
+    private CreateOrderResponseDto returnExistingOrderDetails(CreateOrderRequestDto requestDto,
+            Order order) {
+        List<SeatDetail> seatDetails = createSeatDetails(requestDto.performanceId(),
+                requestDto.selectedSeatIds());
+        return CreateOrderResponseDto.from(order, seatDetails);
+    }
+
+    // 좌석 상태 검증
+    private void validateSeats(UUID performanceId, List<UUID> seatIds, String userId) {
+        for (UUID seatId : seatIds) {
+            SeatInfoResponseDto seatInfo = seatOrderService.getSeatFromRedis(performanceId, seatId);
+
+            if (seatInfo == null) {
+                throw new SeatException(ExceptionMessage.SEAT_NOT_FOUND);
+            }
+
+            if (seatInfo.getSeatStatus() == SeatStatus.BOOKED) {
+                throw new SeatException(ExceptionMessage.SEAT_ALREADY_BOOKED);
+            }
+
+            validateSeatHoldStatus(seatInfo, userId);
+        }
+    }
+
+    // HOLD 상태와 사용자 일치 여부 검증
+    private void validateSeatHoldStatus(SeatInfoResponseDto seatInfo, String userId) {
+        boolean isStatusMatch = seatInfo.getSeatStatus() == SeatStatus.HOLD;
+        boolean isUserMatch = Long.parseLong(userId) == seatInfo.getUserId();
+
+        if (!isStatusMatch || !isUserMatch) {
+            throw new SeatException(ExceptionMessage.SEAT_NOT_SELECTED_BY_USER);
+        }
+    }
+
+    // 사용자 상태에 따른 주문 처리
+    private CreateOrderResponseDto processOrderByUserStatus(CreateOrderRequestDto requestDto,
+            String userId, User user, String userRole, String userEmail) {
+        if (runningQueue.check(user)) {
+            log.info("User {} is in running queue, processing immediate order", userId);
+            return processImmediateOrder(requestDto, userId, userRole, userEmail);
+        } else if (runningQueue.available()) {
+            log.info("Running queue is available, processing queued order for user {}", userId);
+            return processQueuedOrder(requestDto, userId, user, userRole, userEmail);
+        } else {
+            log.info("Running queue is full, processing waiting order for user {}", userId);
+            return processWaitingOrder(user);
         }
     }
 
@@ -90,15 +138,13 @@ public class OrderServiceImpl implements OrderService {
             String userId, String userRole, String userEmail) {
 
         // 주문 생성
-
         Integer totalAmount = getTotalAmount(requestDto.performanceId(),
                 requestDto.selectedSeatIds());
         Order order = Order.of(requestDto, userId, totalAmount);
 
         orderRepository.save(order);
 
-        // 결제 요청은 아직 진행하지 않음
-//        finishOrder(order.getId(), userId, userRole, userEmail);
+        finishOrder(order.getId(), userId, userRole, userEmail);
 
         List<SeatDetail> seatDetails = createSeatDetails(requestDto.performanceId(),
                 requestDto.selectedSeatIds());
@@ -108,7 +154,8 @@ public class OrderServiceImpl implements OrderService {
     private Integer getTotalAmount(UUID performanceId, List<UUID> seatIds) {
         return seatIds.stream().map(
                         seatId -> {
-                            SeatInfoResponseDto seatInfo = seatOrderService.getSeatFromRedis(performanceId, seatId);
+                            SeatInfoResponseDto seatInfo = seatOrderService.getSeatFromRedis(performanceId,
+                                    seatId);
 
                             if (seatInfo.getSeatStatus().equals(SeatStatus.BOOKED)) {
                                 throw new SeatException(ExceptionMessage.SEAT_ALREADY_BOOKED);
@@ -129,6 +176,8 @@ public class OrderServiceImpl implements OrderService {
         Integer totalAmount = getTotalAmount(requestDto.performanceId(),
                 requestDto.selectedSeatIds());
         Order order = Order.of(requestDto, userId, totalAmount);
+
+        order = orderRepository.save(order);
 
         finishOrder(order.getId(), userId, userRole, userEmail);
 
@@ -158,32 +207,6 @@ public class OrderServiceImpl implements OrderService {
                             seatInfo.getSeatType()
                     );
                 }).toList();
-    }
-
-    // 좌석 임시 점유 확인 및 설정
-    private boolean checkAndHoldSeats(UUID performanceId, List<UUID> seatIds, String userId) {
-        String keyPrefix = "performance:" + performanceId + ":seats";
-
-        return seatIds.stream().allMatch(seatId -> {
-            String seatKey = keyPrefix + ":" + seatId;
-            String seatStatus = String.valueOf(redisTemplate.opsForValue().get(seatKey));
-
-            if (seatStatus == null) {
-                throw new IllegalStateException("해당 좌석에 대한 정보가 없습니다: " + seatId);
-            }
-
-            switch (seatStatus) {
-                case "BOOKED":
-                case "HOLD":
-                    return false;
-                case "AVAILABLE":
-                    // AVAILABLE 상태일 경우 해당 좌석을 임시로 점유하고 5분 타임아웃 설정
-                    redisTemplate.opsForValue().set(seatKey, User.of(userId), 5, TimeUnit.MINUTES);
-                    return true;
-                default:
-                    throw new IllegalStateException("알 수 없는 좌석 상태: " + seatStatus);
-            }
-        });
     }
 
     // 주문 완료 처리 - 결제 처리 및 좌석 상태 변경
@@ -222,8 +245,8 @@ public class OrderServiceImpl implements OrderService {
         }
     }
 
-    // TODO
     private boolean callPaymentService() {
         return true;
     }
+
 }
