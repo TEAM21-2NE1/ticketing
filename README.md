@@ -64,8 +64,8 @@ Java, Spring Boot 기반 백엔드 팀 프로젝트 입니다.<br>MSA 구조의 
     - 사용자가 대기열에 진입한 후 새로고침 했을 때, 기존 대기번호를 유지하지 않고 대기열의 끝으로 이동하여 새로운 대기번호를 부여한다.
       <details>
         <summary>예매 flow</summary>
-  
-        ![21조_아키텍처-예매 플로우 drawio](https://github.com/user-attachments/assets/75c28311-efcc-4571-be07-0099c5e8fd37)
+
+      ![21조_아키텍처-예매 플로우 drawio](https://github.com/user-attachments/assets/efd2aa36-1dd1-4ce2-b376-a6eb85324de3)
   
       </details>
         
@@ -84,7 +84,7 @@ Java, Spring Boot 기반 백엔드 팀 프로젝트 입니다.<br>MSA 구조의 
 
 - **리뷰 조회**
     - **Redis Cache**를 적용해 리뷰를 빠르게 조회할 수 있다.
-    - 리뷰 목록 조회 시**, Lua Script**, **scheduler, Redis Pipeline**을 통해 저장한 평점 평균 데이터를 확인할 수 있다.
+    - 리뷰 목록 조회 시, **Lua Script, scheduler, Redis Pipeline** 을 통해 저장한 평점 평균 데이터를 확인할 수 있다.
 - **리뷰 등록**
     - 공연을 예매한 사용자는 공연 시작 후에 리뷰를 등록할 수 있다.
 - **리뷰 삭제**
@@ -126,19 +126,20 @@ Java, Spring Boot 기반 백엔드 팀 프로젝트 입니다.<br>MSA 구조의 
 <br>
 
 ## 💡 6. 기술적 의사결정
-- [[리뷰] review 목록 조회 과정에서 user 서버로부터 nickname 목록 조회](https://github.com/TEAM21-2NE1/ticketing.wiki.git)
-- [[리뷰] 평균 평점 구할 때 적용한 기술적 의사 결정](https://github.com/TEAM21-2NE1/ticketing.wiki.git)
-- [[예매] Redis를 이용한 예매 대기열 구현](https://github.com/TEAM21-2NE1/ticketing.wiki.git)
-- [[예매] Redis keyspace notification을 이용한 좌석 선택 제한시간 구현](https://github.com/TEAM21-2NE1/ticketing.wiki.git)
+- [[리뷰] review 목록 조회 과정에서 user 서버로부터 nickname 목록 조회](https://github.com/TEAM21-2NE1/ticketing/wiki/%5B%EB%A6%AC%EB%B7%B0%5D-review-%EB%AA%A9%EB%A1%9D-%EC%A1%B0%ED%9A%8C-%EA%B3%BC%EC%A0%95%EC%97%90%EC%84%9C-user-%EC%84%9C%EB%B2%84%EB%A1%9C%EB%B6%80%ED%84%B0-nickname-%EB%AA%A9%EB%A1%9D-%EC%A1%B0%ED%9A%8C)
+- [[리뷰] 평균 평점 구할 때 적용한 기술적 의사 결정](https://github.com/TEAM21-2NE1/ticketing/wiki/%5B%EB%A6%AC%EB%B7%B0%5D-%ED%8F%89%EA%B7%A0-%ED%8F%89%EC%A0%90-%EA%B5%AC%ED%95%A0-%EB%95%8C-%EC%A0%81%EC%9A%A9%ED%95%9C-%EA%B8%B0%EC%88%A0%EC%A0%81-%EC%9D%98%EC%82%AC-%EA%B2%B0%EC%A0%95)
+- [[예매] Redis를 이용한 예매 대기열 구현](https://github.com/TEAM21-2NE1/ticketing/wiki/%5B%EC%98%88%EB%A7%A4%5D-Redis%EB%A5%BC-%EC%9D%B4%EC%9A%A9%ED%95%9C-%EC%98%88%EB%A7%A4-%EB%8C%80%EA%B8%B0%EC%97%B4-%EA%B5%AC%ED%98%84)
+- [[예매] Redis keyspace notification을 이용한 좌석 선택 제한시간 구현](https://github.com/TEAM21-2NE1/ticketing/wiki/%5B%EC%98%88%EB%A7%A4%5D-Redis-keyspace-notification%EC%9D%84-%EC%9D%B4%EC%9A%A9%ED%95%9C-%EC%A2%8C%EC%84%9D-%EC%84%A0%ED%83%9D-%EC%A0%9C%ED%95%9C%EC%8B%9C%EA%B0%84-%EA%B5%AC%ED%98%84)
 
 <br>
 
 ## 📌 7. 트러블슈팅
-- [[TS] [리뷰] 리뷰 목록 조회 시 TPS 200 이하](https://github.com/TEAM21-2NE1/ticketing.wiki.git)
-- [[TS] [공연] 좌석 데이터 개별 Insert query db 과도한 부하](https://github.com/TEAM21-2NE1/ticketing.wiki.git)
-- [[TS] [security] 예외가 발생했을 때, 403 Forbidden 리턴](https://github.com/TEAM21-2NE1/ticketing.wiki.git)
-- [[TS] [예매] 대기열 처리 중 사용자 수 불일치](https://github.com/TEAM21-2NE1/ticketing.wiki.git)
-- [[TS] [예매] 대기열 동시성](https://github.com/TEAM21-2NE1/ticketing.wiki.git)
+- [[TS] [리뷰] 리뷰 목록 조회 시 List 탐색으로 TPS 200 이하로 떨어지는 현상 발생](https://github.com/TEAM21-2NE1/ticketing/wiki/%5BTS%5D-%5B%EB%A6%AC%EB%B7%B0%5D-%EB%A6%AC%EB%B7%B0-%EB%AA%A9%EB%A1%9D-%EC%A1%B0%ED%9A%8C-%EC%8B%9C-List-%ED%83%90%EC%83%89%EC%9C%BC%EB%A1%9C-TPS-200-%EC%9D%B4%ED%95%98%EB%A1%9C-%EB%96%A8%EC%96%B4%EC%A7%80%EB%8A%94-%ED%98%84%EC%83%81-%EB%B0%9C%EC%83%9D)
+- [[TS] [공연] 좌석 데이터 개별 Insert query db 과도한 부하](https://github.com/TEAM21-2NE1/ticketing/wiki/%5BTS%5D-%5B%EA%B3%B5%EC%97%B0%5D-%EC%A2%8C%EC%84%9D-%EB%8D%B0%EC%9D%B4%ED%84%B0-%EA%B0%9C%EB%B3%84-Insert-query-db-%EA%B3%BC%EB%8F%84%ED%95%9C-%EB%B6%80%ED%95%98)
+- [[TS] [security] 예외가 발생했을 때, 403 Forbidden 리턴](https://github.com/TEAM21-2NE1/ticketing/wiki/%5BTS%5D-%5Bsecurity%5D-%EC%98%88%EC%99%B8%EA%B0%80-%EB%B0%9C%EC%83%9D%ED%96%88%EC%9D%84-%EB%95%8C,-403-Forbidden-%EB%A6%AC%ED%84%B4)
+- [[TS] [예매] 대기열 처리 중 사용자 수 불일치](https://github.com/TEAM21-2NE1/ticketing/wiki/%5BTS%5D-%5B%EC%98%88%EB%A7%A4%5D-%EB%8C%80%EA%B8%B0%EC%97%B4-%EC%B2%98%EB%A6%AC-%EC%A4%91-%EC%82%AC%EC%9A%A9%EC%9E%90-%EC%88%98-%EB%B6%88%EC%9D%BC%EC%B9%98)
+- [[TS] [예매] 대기열 동시성](https://github.com/TEAM21-2NE1/ticketing/wiki/%5BTS%5D-%5B%EC%98%88%EB%A7%A4%5D-%EB%8C%80%EA%B8%B0%EC%97%B4-%EB%8F%99%EC%8B%9C%EC%84%B1)
+- [[TS] [예매] 대기열 부하 테스트](https://github.com/TEAM21-2NE1/ticketing/wiki/%5BTS%5D-%5B%EC%98%88%EB%A7%A4%5D-%EB%8C%80%EA%B8%B0%EC%97%B4-%EB%B6%80%ED%95%98-%ED%85%8C%EC%8A%A4%ED%8A%B8)
 
 <br>
 
