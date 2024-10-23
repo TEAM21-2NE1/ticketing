@@ -6,6 +6,7 @@ import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
+import java.io.Serializable;
 import java.util.List;
 import java.util.UUID;
 
@@ -13,7 +14,7 @@ import java.util.UUID;
 @NoArgsConstructor
 @Getter
 @Builder
-public class HallInfoResponseDto {
+public class HallInfoResponseDto implements Serializable {
 
     private UUID hallId;
     private String hallName;

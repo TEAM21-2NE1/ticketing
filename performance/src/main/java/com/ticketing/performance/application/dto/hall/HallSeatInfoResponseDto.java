@@ -6,13 +6,14 @@ import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
+import java.io.Serializable;
 import java.util.UUID;
 
 @AllArgsConstructor
 @NoArgsConstructor
 @Getter
 @Builder
-public class HallSeatInfoResponseDto {
+public class HallSeatInfoResponseDto implements Serializable {
 
     private UUID hallSeatId;
     private String seatType;

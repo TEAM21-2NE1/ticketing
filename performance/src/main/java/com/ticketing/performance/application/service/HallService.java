@@ -12,6 +12,8 @@ import com.ticketing.performance.domain.repository.HallRepository;
 import com.ticketing.performance.presentation.dto.hall.CreateHallRequestDto;
 import com.ticketing.performance.presentation.dto.hall.UpdateHallRequestDto;
 import lombok.RequiredArgsConstructor;
+import org.springframework.cache.annotation.CacheEvict;
+import org.springframework.cache.annotation.Cacheable;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
@@ -48,7 +50,7 @@ public class HallService {
         return hallRepository.findAll(pageable).map(HallListResponseDto::of);
     }
 
-
+    @Cacheable(value = "hallCache", key = "#hallId", cacheManager = "getCacheManager")
     public HallInfoResponseDto getHall(UUID hallId) {
 
         return hallRepository.findById(hallId).map(HallInfoResponseDto::of)
@@ -56,6 +58,7 @@ public class HallService {
     }
 
     @Transactional
+    @CacheEvict(value = "hallCache", key = "#hallId", cacheManager = "getCacheManager")
     public UpdateHallResponseDto updateHall(UUID hallId, UpdateHallRequestDto updateHallRequestDto) {
         Hall hall = hallRepository.findById(hallId)
                 .orElseThrow(() -> new HallException(ErrorCode.HALL_NOT_FOUND));
@@ -64,6 +67,7 @@ public class HallService {
     }
 
     @Transactional
+    @CacheEvict(value = "hallCache", key = "#hallId", cacheManager = "getCacheManager")
     public void deleteHall(UUID hallId) {
         Hall hall = hallRepository.findById(hallId)
                 .orElseThrow(() -> new HallException(ErrorCode.HALL_NOT_FOUND));

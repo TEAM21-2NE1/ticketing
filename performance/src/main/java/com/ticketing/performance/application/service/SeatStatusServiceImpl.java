@@ -8,6 +8,7 @@ import com.ticketing.performance.presentation.dto.seat.CancelSeatRequestDto;
 import com.ticketing.performance.presentation.dto.seat.ConfirmSeatRequestDto;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.cache.annotation.CacheEvict;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -23,6 +24,7 @@ public class SeatStatusServiceImpl implements SeatStatusService{
     private final SeatRepository seatRepository;
 
     @Override
+    @CacheEvict(value = "getSeats", key = "#requestDto.performanceId", cacheManager = "getCacheManager")
     public ConfirmSeatResponseDto confirmSeat(ConfirmSeatRequestDto requestDto) {
 
         List<UUID> seatIds = requestDto.getSeatIds();
@@ -35,6 +37,7 @@ public class SeatStatusServiceImpl implements SeatStatusService{
     }
 
     @Override
+    @CacheEvict(value = "getSeats", key = "#requestDto.performanceId", cacheManager = "getCacheManager")
     public CancelSeatResponseDto cancelSeat(CancelSeatRequestDto requestDto) {
 
         List<UUID> seatIds = requestDto.getSeatIds();
