@@ -50,4 +50,10 @@ public class GlobalExceptionHandler {
                 .status(e.getStatusCode())
                 .body(CommonResponse.errors(FieldError.of(e.getBindingResult())));
     }
+
+    @ExceptionHandler(Exception.class)
+    public ResponseEntity<CommonResponse<Void>> handleException(Exception e) {
+        return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+                .body(CommonResponse.error(e.getLocalizedMessage()));
+    }
 }
