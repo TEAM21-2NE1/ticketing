@@ -20,15 +20,12 @@ public class RedisWaitingQueue implements WaitingQueue {
     // 대기열 등록
     @Override
     public WaitingTicket register(User user) {
-        var existRank = redisTemplate.opsForZSet().rank(WAITING_QUEUE, user);
-        if (existRank != null) {
-            return WaitingTicket.of(existRank);
-        }
 
         redisTemplate.opsForZSet()
-                .addIfAbsent(WAITING_QUEUE, user, System.currentTimeMillis());
+                .add(WAITING_QUEUE, user, System.currentTimeMillis());
 
         var rank = redisTemplate.opsForZSet().rank(WAITING_QUEUE, user);
+
         WaitingTicket waitingTicket = WaitingTicket.of(rank);
 
         return waitingTicket;
@@ -54,7 +51,7 @@ public class RedisWaitingQueue implements WaitingQueue {
     @Override
     public WaitingTicket getTicket(User user) {
         Long rank = redisTemplate.opsForZSet().rank(WAITING_QUEUE, user);
-        return WaitingTicket.of(rank);
+        return WaitingTicket.of(((rank != null) ? rank : -1L) + 1);
     }
 
     // 대기열 초기화 메서드
