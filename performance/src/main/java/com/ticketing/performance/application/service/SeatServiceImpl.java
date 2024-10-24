@@ -2,6 +2,8 @@ package com.ticketing.performance.application.service;
 
 import com.ticketing.performance.application.dto.hall.HallInfoResponseDto;
 import com.ticketing.performance.application.dto.hall.HallSeatInfoResponseDto;
+import com.ticketing.performance.application.dto.seat.GetSeatInfoDto;
+import com.ticketing.performance.application.dto.seat.GetSeatInfoList;
 import com.ticketing.performance.application.dto.seat.SeatInfoResponseDto;
 import com.ticketing.performance.common.exception.ForbiddenAccessException;
 import com.ticketing.performance.common.exception.HallException;
@@ -18,6 +20,7 @@ import com.ticketing.performance.presentation.dto.seat.OrderSeatRequestDto;
 import com.ticketing.performance.presentation.dto.seat.SeatTypePriceRequestDto;
 import com.ticketing.performance.presentation.dto.seat.UpdateSeatPriceRequestDto;
 import lombok.RequiredArgsConstructor;
+import org.springframework.cache.annotation.Cacheable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -34,11 +37,13 @@ public class SeatServiceImpl implements SeatService{
     private final HallService hallService;
     private final PerformanceRepository performanceRepository;
 
-    public List<SeatInfoResponseDto> getSeats(UUID performanceId) {
-        return seatRepository.findAllByPerformanceId(performanceId)
+    @Cacheable(value = "getSeats", key = "#performanceId", cacheManager = "getCacheManager", unless = "#result.getList().isEmpty()")
+    public GetSeatInfoList getSeats(UUID performanceId) {
+        List<GetSeatInfoDto> list = seatRepository.findAllByPerformanceId(performanceId)
                 .stream()
-                .map(SeatInfoResponseDto::of)
+                .map(GetSeatInfoDto::of)
                 .toList();
+        return GetSeatInfoList.of(list);
     }
 
     public List<SeatInfoResponseDto> getSeatsByManager(UUID performanceId) {

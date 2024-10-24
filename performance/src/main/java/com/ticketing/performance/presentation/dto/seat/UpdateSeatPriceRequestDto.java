@@ -18,6 +18,6 @@ public class UpdateSeatPriceRequestDto {
     private UUID performanceId;
     @NotBlank
     private String seatType;
-    @NotBlank
+    @NotNull
     private Integer price;
 }

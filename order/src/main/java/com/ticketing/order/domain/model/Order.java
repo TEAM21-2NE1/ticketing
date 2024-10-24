@@ -83,4 +83,7 @@ public class Order extends BaseEntity {
         super.setDeleted(id);
     }
 
+    public void cancel() {
+        this.orderStatus = OrderStatus.CANCELED;
+    }
 }

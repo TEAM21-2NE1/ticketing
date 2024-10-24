@@ -5,7 +5,8 @@ import com.ticketing.performance.application.dto.performance.CreatePrfResponseDt
 import com.ticketing.performance.application.dto.performance.PrfInfoResponseDto;
 import com.ticketing.performance.application.dto.performance.PrfListResponseDto;
 import com.ticketing.performance.application.dto.performance.UpdatePrfResponseDto;
-import com.ticketing.performance.application.dto.seat.SeatInfoResponseDto;
+import com.ticketing.performance.application.dto.seat.GetSeatInfoDto;
+import com.ticketing.performance.application.dto.seat.GetSeatInfoList;
 import com.ticketing.performance.application.event.PrfDeletedEvent;
 import com.ticketing.performance.common.exception.ForbiddenAccessException;
 import com.ticketing.performance.common.exception.PerformanceException;
@@ -23,7 +24,6 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDate;
-import java.util.List;
 import java.util.UUID;
 
 @Service
@@ -81,9 +81,9 @@ public class PerformanceServiceImpl implements PerformanceService {
         HallInfoResponseDto hall = hallService.getHall(performance.getHallId());
 
 
-        List<SeatInfoResponseDto> seatList = seatService.getSeats(performanceId);
-        int totalSeat = seatList.size();
-        int availableSeat = seatList.stream()
+        GetSeatInfoList seatList = seatService.getSeats(performanceId);
+        int totalSeat = seatList.getList().size();
+        int availableSeat = seatList.getList().stream()
                 .filter(seat -> seat.getSeatStatus() == SeatStatus.AVAILABLE)
                 .toList()
                 .size();
@@ -96,6 +96,8 @@ public class PerformanceServiceImpl implements PerformanceService {
 
         Performance performance = performanceRepository.findById(performanceId)
                 .orElseThrow(() -> new PerformanceException(ErrorCode.PERFORMANCE_NOT_FOUND));
+
+        hallService.getHall(requestDto.getHallId());
 
         checkRole(performance.getManagerId());
 

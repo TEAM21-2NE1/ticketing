@@ -1,16 +1,14 @@
 package com.ticketing.order.application.service;
 
 import com.ticketing.order.application.dto.request.OrderSeatRequestDto;
-import com.ticketing.order.application.dto.response.GetOrderPerformancesResponseDto;
-import com.ticketing.order.application.dto.response.GetOrderResponseDto;
+import com.ticketing.order.application.dto.response.*;
 import com.ticketing.order.application.dto.response.GetOrderResponseDto.SeatDetail;
-import com.ticketing.order.application.dto.response.GetOrderStatusResponse;
-import com.ticketing.order.application.dto.response.ViewOrderDto;
 import com.ticketing.order.common.exception.OrderException;
 import com.ticketing.order.common.response.ExceptionMessage;
 import com.ticketing.order.config.SecurityUtil;
 import com.ticketing.order.domain.model.Order;
 import com.ticketing.order.domain.repository.OrderRepository;
+import com.ticketing.order.infrastructure.PaymentClient;
 import com.ticketing.order.infrastructure.PerformanceClient;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -28,13 +26,26 @@ public class OrderRUDService {
     private final OrderRepository orderRepository;
     private final SeatOrderService seatOrderService;
     private final PerformanceClient performanceClient;
+    private final PaymentClient paymentClient;
 
     @Transactional
     public void deleteOrder(UUID orderId) {
         Order order = orderRepository.findById(orderId)
                 .orElseThrow(() -> new OrderException(ExceptionMessage.ORDER_NOT_FOUND));
-        seatOrderService.cancel(order.getSelectedSeatIds(), order.getPerformanceId());
         order.delete(SecurityUtil.getId());
+    }
+
+    @Transactional
+    public void cancelOrder(UUID orderId) {
+        Order order = orderRepository.findById(orderId)
+                .orElseThrow(() -> new OrderException(ExceptionMessage.ORDER_NOT_FOUND));
+
+        seatOrderService.cancel(order.getSelectedSeatIds(), order.getPerformanceId());
+        paymentClient.cancelPayment(SecurityUtil.getId().toString(),
+                SecurityUtil.getRole(),
+                SecurityUtil.getEmail(),
+                order.getPaymentId());
+        order.cancel();
     }
 
 
@@ -94,5 +105,12 @@ public class OrderRUDService {
         return GetOrderPerformancesResponseDto.builder()
                 .performanceIds(orderPerformanceIds)
                 .build();
+    }
+
+    public List<GetOrderListResponseDto> getOrders() {
+        return orderRepository.findAllByUserId(SecurityUtil.getId().toString())
+                .stream()
+                .map(GetOrderListResponseDto::from)
+                .toList();
     }
 }
