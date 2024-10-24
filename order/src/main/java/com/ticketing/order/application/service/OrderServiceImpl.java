@@ -66,7 +66,7 @@ public class OrderServiceImpl implements OrderService {
     // 기존 주문이 있는 경우 처리
     private CreateOrderResponseDto handleExistingOrder(CreateOrderRequestDto requestDto,
             String userId, Order existingOrder) {
-        if (!existingOrder.getUserId().equals(userId)) {
+        if (!userId.equals(existingOrder.getUserId())) {
             throw new SeatException(ExceptionMessage.SEAT_NOT_SELECTED_BY_USER);
         }
 
@@ -101,10 +101,9 @@ public class OrderServiceImpl implements OrderService {
 
     // HOLD 상태와 사용자 일치 여부 검증
     private void validateSeatHoldStatus(SeatInfoResponseDto seatInfo, String userId) {
-        boolean isStatusMatch = seatInfo.getSeatStatus() == SeatStatus.HOLD;
-        boolean isUserMatch = Long.parseLong(userId) == seatInfo.getUserId();
 
-        if (!isStatusMatch || !isUserMatch) {
+        if ((seatInfo.getSeatStatus() != SeatStatus.HOLD) ||
+                (seatInfo.getUserId() == null || Long.parseLong(userId) != seatInfo.getUserId())) {
             throw new SeatException(ExceptionMessage.SEAT_NOT_SELECTED_BY_USER);
         }
     }
