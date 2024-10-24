@@ -2,7 +2,6 @@ package com.ticketing.review.application.service;
 
 import com.ticketing.review.application.client.ReviewClient;
 import com.ticketing.review.application.client.dto.PerformanceInfoDto;
-import com.ticketing.review.application.client.dto.UserNicknameInfoDto;
 import com.ticketing.review.application.dto.request.CreateReviewRequestDto;
 import com.ticketing.review.application.dto.request.UpdateReviewRequestDto;
 import com.ticketing.review.application.dto.response.CreateReviewResponseDto;
@@ -10,8 +9,6 @@ import com.ticketing.review.application.dto.response.DeleteReviewResponseDto;
 import com.ticketing.review.application.dto.response.ReviewListResponseDto;
 import com.ticketing.review.application.dto.response.ReviewResponseDto;
 import com.ticketing.review.application.dto.response.UpdateReviewResponseDto;
-import com.ticketing.review.application.event.AvgRatingEvent;
-import com.ticketing.review.application.event.RatingOperation;
 import com.ticketing.review.common.exception.ReviewException;
 import com.ticketing.review.common.response.ErrorCode;
 import com.ticketing.review.domain.model.Review;
@@ -22,13 +19,14 @@ import feign.FeignException;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 import java.util.UUID;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.cache.annotation.CacheEvict;
 import org.springframework.cache.annotation.CachePut;
 import org.springframework.cache.annotation.Cacheable;
 import org.springframework.cache.annotation.Caching;
-import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
@@ -38,12 +36,14 @@ import org.springframework.transaction.annotation.Transactional;
 
 @Service
 @RequiredArgsConstructor
+@Slf4j
 public class ReviewService {
 
   private final ReviewRepository reviewRepository;
-  private final ApplicationEventPublisher eventPublisher;
   private final RedisRatingRepository redisRatingRepository;
   private final ReviewClient reviewClient;
+  private final EventService eventService;
+
 
   /**
    * 리뷰 생성
@@ -82,14 +82,9 @@ public class ReviewService {
     List<Long> userIds = new ArrayList<>();
 
     userIds.add(SecurityUtils.getUserId());
-    String nickname = reviewClient.getUserNicknameList(userIds).get(0).nickname();
-
+    String nickname = reviewClient.getUserNicknameList(userIds).get(SecurityUtils.getUserId());
     Review savedReview = reviewRepository.save(
         CreateReviewRequestDto.toEntity(requestDto, SecurityUtils.getUserId()));
-
-    eventPublisher.publishEvent(
-        AvgRatingEvent.toAvgRatingEvent(requestDto.performanceId(), (short) 0, requestDto.rating(),
-            RatingOperation.CREATE));
 
     return CreateReviewResponseDto.fromEntity(savedReview, nickname);
   }
@@ -120,13 +115,7 @@ public class ReviewService {
 
     List<Long> userIds = new ArrayList<>();
     userIds.add(findReview.getUserId());
-    String nickname = reviewClient.getUserNicknameList(userIds).get(0).nickname();
-
-    if (requestDto.rating() != null) {
-      eventPublisher.publishEvent(
-          AvgRatingEvent.toAvgRatingEvent(findReview.getPerformanceId(), findReview.getRating(),
-              requestDto.rating(), RatingOperation.UPDATE));
-    }
+    String nickname = reviewClient.getUserNicknameList(userIds).get(findReview.getUserId());
 
     findReview.updateReview(requestDto.rating(), requestDto.title(), requestDto.content());
     return UpdateReviewResponseDto.fromEntity(findReview, nickname);
@@ -158,11 +147,6 @@ public class ReviewService {
 
     findReview.deleteReview(SecurityUtils.getUserId());
 
-    eventPublisher.publishEvent(
-        AvgRatingEvent.toAvgRatingEvent(findReview.getPerformanceId(), findReview.getRating(),
-            (short) 0,
-            RatingOperation.DELETE));
-
     return DeleteReviewResponseDto.fromEntity(findReview);
   }
 
@@ -182,7 +166,7 @@ public class ReviewService {
 
     List<Long> userIds = new ArrayList<>();
     userIds.add(findReview.getUserId());
-    String nickname = reviewClient.getUserNicknameList(userIds).get(0).nickname();
+    String nickname = reviewClient.getUserNicknameList(userIds).get(findReview.getUserId());
 
     return ReviewResponseDto.fromEntity(findReview, nickname);
   }
@@ -210,18 +194,36 @@ public class ReviewService {
 
     List<Long> userIds = reviews.getContent().stream().map(Review::getUserId).toList();
 
-    List<UserNicknameInfoDto> nicknames = reviewClient.getUserNicknameList(userIds);
+    Map<Long, String> nicknames = reviewClient.getUserNicknameList(userIds);
 
     Page<ReviewResponseDto> reviewDtos = reviews.map(review -> {
-      String nickname = nicknames.stream()
-          .filter(nicknameInfo -> review.getUserId() == nicknameInfo.userId())
-          .findFirst()
-          .map(UserNicknameInfoDto::nickname)
-          .orElse(null);
+      String nickname = nicknames.get(review.getUserId());
       return ReviewResponseDto.fromEntity(review, nickname);
     });
 
     return ReviewListResponseDto.of(reviewDtos, redisRatingRepository.getAvgRating(performanceId));
+  }
+
+
+  /**
+   * 공연 취소 시 리뷰 삭제
+   *
+   * @param performanceId
+   * @param userId
+   */
+  @Transactional(readOnly = false)
+  @Caching(evict = {
+      @CacheEvict(cacheNames = "reviewCache", allEntries = true, cacheManager = "reviewCacheManager"),
+      @CacheEvict(cacheNames = {
+          "reviewSearchCache"}, allEntries = true, cacheManager = "reviewCacheManager")
+  })
+  public void deleteReviewByPerformance(UUID performanceId, Long userId) {
+    try {
+      reviewRepository.deleteByPerformanceId(performanceId, userId);
+
+    } catch (Exception e) {
+      eventService.publishReviewDeleteErrorEvent(performanceId, userId);
+    }
   }
 
 

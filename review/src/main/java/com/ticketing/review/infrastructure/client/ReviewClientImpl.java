@@ -3,16 +3,15 @@ package com.ticketing.review.infrastructure.client;
 import com.ticketing.review.application.client.ReviewClient;
 import com.ticketing.review.application.client.dto.OrderStatusDto;
 import com.ticketing.review.application.client.dto.PerformanceInfoDto;
-import com.ticketing.review.application.client.dto.UserNicknameInfoDto;
 import com.ticketing.review.common.exception.ReviewException;
 import com.ticketing.review.common.response.CommonResponse;
 import com.ticketing.review.common.response.ErrorCode;
-import com.ticketing.review.infrastructure.client.dto.GetNicknameResponseDto;
 import com.ticketing.review.infrastructure.client.dto.GetNicknamesRequestDto;
 import com.ticketing.review.infrastructure.client.dto.GetOrderStatusResponse;
 import com.ticketing.review.infrastructure.client.dto.PrfInfoResponseDto;
 import com.ticketing.review.infrastructure.utils.SecurityUtils;
 import java.util.List;
+import java.util.Map;
 import java.util.UUID;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
@@ -45,19 +44,19 @@ public class ReviewClientImpl implements ReviewClient {
   }
 
   @Override
-  public List<UserNicknameInfoDto> getUserNicknameList(List<Long> userIds) {
+  public Map<Long, String> getUserNicknameList(List<Long> userIds) {
     if (userIds == null) {
       return null;
     }
 
-    ResponseEntity<List<GetNicknameResponseDto>> nicknames = userClient.nickname(
+    ResponseEntity<Map<Long, String>> nicknames = userClient.nickname(
         GetNicknamesRequestDto.toGetNicknamesRequestDto(userIds));
 
     if (nicknames.getBody() == null) {
       throw new ReviewException(ErrorCode.USER_NOT_FUND);
     }
 
-    return nicknames.getBody().stream().map(GetNicknameResponseDto::toUserNicknameInfoDto).toList();
+    return nicknames.getBody();
   }
 
   @Override

@@ -55,7 +55,14 @@ public class SeatServiceImpl implements SeatService{
 
     @Transactional
     public void deleteSeatsByPerformanceId(UUID performanceId) {
-        seatRepository.softDeleteSeatsByPerformanceId(performanceId);
+        seatRepository.softDeleteSeatsByPerformanceId(performanceId, SecurityUtil.getId());
+    }
+
+    @Override
+    @Transactional
+    public void rollbackSeatsByPerformanceId(UUID performanceId) {
+        seatRepository.rollbackDeleteSeatsByPerformanceId(performanceId, SecurityUtil.getId());
+
     }
 
     @Transactional
@@ -121,7 +128,8 @@ public class SeatServiceImpl implements SeatService{
         seatRepository.updateSeatPriceBySeatType(
                 requestDto.getSeatType(),
                 requestDto.getPrice(),
-                requestDto.getPerformanceId()
+                requestDto.getPerformanceId(),
+                SecurityUtil.getId()
         );
     }
 

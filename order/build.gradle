@@ -29,6 +29,8 @@ ext {
 
 dependencies {
 
+    //thymeleaf
+    implementation 'org.springframework.boot:spring-boot-starter-thymeleaf'
     // prometheus
     implementation 'org.springframework.boot:spring-boot-starter-actuator'
     runtimeOnly 'io.micrometer:micrometer-registry-prometheus'
@@ -57,6 +59,7 @@ dependencies {
 
     // redis
     implementation 'org.springframework.boot:spring-boot-starter-data-redis'
+    implementation 'org.redisson:redisson-spring-boot-starter:3.16.4'
 
 
     testImplementation 'com.github.codemonstur:embedded-redis:1.0.0'

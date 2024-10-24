@@ -69,7 +69,18 @@ public class PaymentServiceImpl implements PaymentService {
             if (price != iamportPrice) {
                 throw new PaymentException(ErrorCode.PAYMENT_AMOUNT_TAMPERED);
             }
-        }catch (IamportResponseException | IOException e) {
+            Payment payment = Payment.create(iamportPrice, impUid);
+
+            paymentRepository.save(payment);
+
+            // order 상태값 변경
+            orderService.changeOrderBySuccess(SecurityUtil.getId().toString(),
+                    SecurityUtil.getRole(),
+                    SecurityUtil.getEmail(), orderUid);
+
+            return PaymentResponseDto.of(payment);
+
+        } catch (IamportResponseException | IOException e) {
             throw new IamportException(ErrorCode.IAMPORT_ERROR);
         } catch (FeignException | PaymentException e) {
             cancelAndDeleteOrder(orderUid, impUid, iamportPrice);
@@ -78,17 +89,6 @@ public class PaymentServiceImpl implements PaymentService {
             cancelAndDeleteOrder(null, impUid, iamportPrice);
             throw new PaymentException(ErrorCode.INVALID_UUID);
         }
-
-        Payment payment = Payment.create(iamportPrice, impUid);
-
-        paymentRepository.save(payment);
-
-        // order 상태값 변경
-        orderService.changeOrderBySuccess(SecurityUtil.getId().toString(),
-                SecurityUtil.getRole(),
-                SecurityUtil.getEmail(), orderUid);
-
-        return PaymentResponseDto.of(payment);
     }
 
     private void cancelAndDeleteOrder(UUID orderUid, String impUid, long iamportPrice) {

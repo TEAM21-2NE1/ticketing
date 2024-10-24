@@ -16,11 +16,4 @@ public class RedisScriptConfig {
     return RedisScript.of(scriptSource, Boolean.class);
   }
 
-  @Bean
-  public RedisScript<String> getAvgRatingScript() throws IOException {
-    Resource scriptSource = new ClassPathResource("scripts/getAvgRating.lua");
-    return RedisScript.of(scriptSource, String.class);
-  }
-
-
 }

@@ -6,6 +6,7 @@ import com.ticketing.performance.application.dto.performance.PrfInfoResponseDto;
 import com.ticketing.performance.application.dto.performance.PrfListResponseDto;
 import com.ticketing.performance.application.dto.performance.UpdatePrfResponseDto;
 import com.ticketing.performance.application.dto.seat.SeatInfoResponseDto;
+import com.ticketing.performance.application.event.PrfDeletedEvent;
 import com.ticketing.performance.common.exception.ForbiddenAccessException;
 import com.ticketing.performance.common.exception.PerformanceException;
 import com.ticketing.performance.common.response.ErrorCode;
@@ -34,6 +35,8 @@ public class PerformanceServiceImpl implements PerformanceService {
     private final SeatService seatService;
     private final HallService hallService;
     private final ImageUploadService imageUploadService;
+    private final PerformanceEventService performanceEventService;
+
 
     @Transactional
     public CreatePrfResponseDto createPerformance(CreatePrfRequestDto requestDto) {
@@ -111,7 +114,21 @@ public class PerformanceServiceImpl implements PerformanceService {
 
         seatService.deleteSeatsByPerformanceId(performanceId);
 
+        performanceEventService.publishPerformanceDeletedEvent(
+                PrfDeletedEvent.create(performanceId, SecurityUtil.getId())
+        );
         performance.delete();
+    }
+
+
+    @Override
+    @Transactional
+    public void rollbackDeletePerformance(UUID performanceId) {
+        Performance performance = performanceRepository.findById(performanceId)
+                .orElseThrow(() -> new PerformanceException(ErrorCode.PERFORMANCE_NOT_FOUND));
+
+        seatService.rollbackSeatsByPerformanceId(performanceId);
+        performance.rollbackDelete();
     }
 
 

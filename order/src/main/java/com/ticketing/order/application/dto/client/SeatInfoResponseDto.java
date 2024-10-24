@@ -4,12 +4,14 @@ import com.ticketing.order.config.SecurityUtil;
 import java.io.Serializable;
 import java.util.UUID;
 import lombok.AllArgsConstructor;
+import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
 @Getter
 @AllArgsConstructor
 @NoArgsConstructor
+@Builder
 public class SeatInfoResponseDto implements Serializable {
 
     private UUID seatId;
@@ -26,6 +28,11 @@ public class SeatInfoResponseDto implements Serializable {
         this.orderId = orderId;
         this.seatStatus = SeatStatus.BOOKED;
 
+    }
+
+    public void hold(Long userId) {
+        this.userId = userId;
+        this.seatStatus = SeatStatus.HOLD;
     }
 
     public void hold() {

@@ -7,7 +7,7 @@ import org.springframework.http.HttpStatus;
 @Getter
 @RequiredArgsConstructor
 public enum SuccessMessage {
-    CREATE_ORDER(HttpStatus.CREATED, "예매가 완료되었습니다."),
+    CREATE_ORDER(HttpStatus.CREATED, "예매가 생성 되었습니다."),
     GET_ORDER(HttpStatus.OK, "예매 조회가 완료되었습니다."),
     GET_ORDER_PERFORMANCE(HttpStatus.OK, "예매한 공연 목록 조회가 완료되었습니다."),
     DELETE_ORDER(HttpStatus.OK, "예매 취소가 완료되었습니다.");

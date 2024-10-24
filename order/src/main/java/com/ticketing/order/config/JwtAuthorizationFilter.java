@@ -22,7 +22,10 @@ public class JwtAuthorizationFilter extends OncePerRequestFilter {
     @Override
     protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain) throws ServletException, IOException {
 
-        if (request.getRequestURI().startsWith("/api/v1/orders/actuator") || request.getRequestURI().startsWith("/api/v1/orders/seats")) {;
+        if (request.getRequestURI().startsWith("/api/v1/orders/actuator") ||
+                request.getRequestURI().startsWith("/api/v1/orders/seats")||
+                request.getRequestURI().startsWith("/api/v1/orders/view")
+        ) {
             filterChain.doFilter(request, response);
             return;
         }
