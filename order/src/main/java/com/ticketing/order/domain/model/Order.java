@@ -75,8 +75,9 @@ public class Order extends BaseEntity {
                 .build();
     }
 
-    public void setStatus(OrderStatus status) {
+    public void successUpdate(OrderStatus status,UUID paymentId) {
         this.orderStatus = status;
+        this.paymentId = paymentId;
     }
 
     public void delete(Long id) {
