@@ -63,4 +63,12 @@ public class OrderRUDController {
         return ResponseEntity.ok(
                 SuccessResponse.success(200, SuccessMessage.GET_ORDER.getMessage(), responseDto));
     }
+
+    @GetMapping("/cancel/{orderId}")
+    public ResponseEntity<?> cancelOrder(@PathVariable UUID orderId) {
+        orderRUDService.cancelOrder(orderId);
+
+        return ResponseEntity.ok(
+                SuccessResponse.success(SuccessMessage.GET_ORDER.getMessage()));
+    }
 }

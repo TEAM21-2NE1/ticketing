@@ -34,7 +34,7 @@ public class PaymentController {
         return ResponseEntity.ok(CommonResponse.success("결제 상세 조회 성공", payment));
     }
 
-    @PatchMapping("/{paymentId}")
+    @PutMapping("/{paymentId}")
     public ResponseEntity<CommonResponse<Void>> cancelPayment(@PathVariable UUID paymentId) {
         paymentService.cancelPayment(paymentId);
         return ResponseEntity.ok(CommonResponse.success("결제 취소 성공"));

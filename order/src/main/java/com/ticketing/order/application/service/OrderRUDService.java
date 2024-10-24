@@ -11,6 +11,7 @@ import com.ticketing.order.common.response.ExceptionMessage;
 import com.ticketing.order.config.SecurityUtil;
 import com.ticketing.order.domain.model.Order;
 import com.ticketing.order.domain.repository.OrderRepository;
+import com.ticketing.order.infrastructure.PaymentClient;
 import com.ticketing.order.infrastructure.PerformanceClient;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -28,13 +29,26 @@ public class OrderRUDService {
     private final OrderRepository orderRepository;
     private final SeatOrderService seatOrderService;
     private final PerformanceClient performanceClient;
+    private final PaymentClient paymentClient;
 
     @Transactional
     public void deleteOrder(UUID orderId) {
         Order order = orderRepository.findById(orderId)
                 .orElseThrow(() -> new OrderException(ExceptionMessage.ORDER_NOT_FOUND));
-        seatOrderService.cancel(order.getSelectedSeatIds(), order.getPerformanceId());
         order.delete(SecurityUtil.getId());
+    }
+
+    @Transactional
+    public void cancelOrder(UUID orderId) {
+        Order order = orderRepository.findById(orderId)
+                .orElseThrow(() -> new OrderException(ExceptionMessage.ORDER_NOT_FOUND));
+
+        seatOrderService.cancel(order.getSelectedSeatIds(), order.getPerformanceId());
+        paymentClient.cancelPayment(SecurityUtil.getId().toString(),
+                SecurityUtil.getRole(),
+                SecurityUtil.getEmail(),
+                order.getPaymentId());
+        order.cancel();
     }
 
 
