@@ -69,6 +69,8 @@ public class OrderServiceImpl implements OrderService {
         if (!existingOrder.getUserId().equals(userId)) {
             throw new SeatException(ExceptionMessage.SEAT_NOT_SELECTED_BY_USER);
         }
+
+        validateSeats(requestDto.performanceId(), requestDto.selectedSeatIds(), userId);
         return returnExistingOrderDetails(requestDto, existingOrder);
     }
 
