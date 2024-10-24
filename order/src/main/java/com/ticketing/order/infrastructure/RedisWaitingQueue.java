@@ -55,7 +55,7 @@ public class RedisWaitingQueue implements WaitingQueue {
 
     private WaitingTicket createWaitingTicket(User user) {
         var rank = redisTemplate.opsForZSet().rank(WAITING_QUEUE, user);
-        return WaitingTicket.of(((rank != null) ? rank : -1L) + 1);
+        return WaitingTicket.of(((rank != null) ? rank : -1L) + 1, size()-((rank !=null)?rank + 1 : 0L));
     }
 
 }
