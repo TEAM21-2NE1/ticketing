@@ -26,11 +26,11 @@ public class OrderStatusService {
     private final RunningQueue runningQueue;
 
     @Transactional
-    public void changeOrderBySuccess(UUID orderId) {
+    public void changeOrderBySuccess(UUID orderId, UUID paymentId) {
         Order order = orderRepository.findById(orderId)
                 .orElseThrow(()-> new OrderException(ExceptionMessage.ORDER_NOT_FOUND));
 
-        order.setStatus(OrderStatus.COMPLETED);
+        order.successUpdate(OrderStatus.COMPLETED, paymentId);
         List<UUID> seatIds = order.getSelectedSeatIds();
         UUID performanceId = order.getPerformanceId();
 

@@ -76,7 +76,9 @@ public class PaymentServiceImpl implements PaymentService {
             // order 상태값 변경
             orderService.changeOrderBySuccess(SecurityUtil.getId().toString(),
                     SecurityUtil.getRole(),
-                    SecurityUtil.getEmail(), orderUid);
+                    SecurityUtil.getEmail(),
+                    orderUid,
+                    payment.getId());
 
             return PaymentResponseDto.of(payment);
 

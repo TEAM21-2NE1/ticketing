@@ -33,8 +33,6 @@ dependencies {
 
 	// 포트원
 	implementation 'com.github.iamport:iamport-rest-client-java:0.2.23'
-	//thymeleaf
-	implementation 'org.springframework.boot:spring-boot-starter-thymeleaf'
 
 	//security
 	implementation 'org.springframework.boot:spring-boot-starter-security'
