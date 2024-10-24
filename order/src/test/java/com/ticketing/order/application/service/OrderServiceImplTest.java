@@ -54,7 +54,7 @@ class OrderServiceImplTest {
         waitingQueue = new RedisWaitingQueue(redisTemplate);
 
         orderService = new OrderServiceImpl(orderRepository, performanceClient,
-                seatOrderService);
+                seatOrderService, waitingQueue);
 
         waitingQueue.clear();
         runningQueue.clear();

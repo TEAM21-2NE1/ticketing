@@ -163,7 +163,8 @@ public class SeatOrderHashServiceImpl implements SeatOrderService {
                 // 실행 큐가 가득 찬 경우 대기열에 등록
                 waitingQueue.register(user);
                 var waitingTicket = waitingQueue.getTicket(user);
-                return GetSeatsResponseDto.waiting(waitingTicket);
+                var totalWaiting = waitingQueue.size();
+                return GetSeatsResponseDto.waiting(waitingTicket, totalWaiting);
             }
         }
 
