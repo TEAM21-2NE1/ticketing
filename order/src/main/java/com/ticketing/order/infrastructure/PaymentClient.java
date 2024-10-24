@@ -16,6 +16,6 @@ public interface PaymentClient {
             @RequestHeader("X-User-Id") String userId,
             @RequestHeader("X-User-Role") String userRole,
             @RequestHeader("X-User-Email") String email,
-            @PathVariable UUID paymentId);
+            @PathVariable("paymentId") UUID paymentId);
 
 }
