@@ -3,17 +3,13 @@ package com.ticketing.order.infrastructure;
 
 import com.ticketing.order.application.dto.PrfRedisInfoDto;
 import com.ticketing.order.application.dto.client.SeatInfoResponseDto;
+import com.ticketing.order.application.dto.response.GetSeatsResponseDto;
 import com.ticketing.order.application.service.SeatOrderService;
+import com.ticketing.order.common.exception.OrderException;
 import com.ticketing.order.common.exception.SeatException;
 import com.ticketing.order.common.response.ExceptionMessage;
 import com.ticketing.order.config.SecurityUtil;
-import lombok.RequiredArgsConstructor;
-import lombok.extern.slf4j.Slf4j;
-import org.redisson.api.RLock;
-import org.redisson.api.RedissonClient;
-import org.springframework.data.redis.core.RedisTemplate;
-import org.springframework.stereotype.Service;
-
+import com.ticketing.order.domain.model.User;
 import java.time.Duration;
 import java.time.LocalDateTime;
 import java.util.List;
@@ -22,6 +18,13 @@ import java.util.Objects;
 import java.util.UUID;
 import java.util.concurrent.TimeUnit;
 import java.util.stream.Collectors;
+import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
+import org.redisson.api.RLock;
+import org.redisson.api.RedissonClient;
+import org.springframework.data.redis.core.RedisTemplate;
+import org.springframework.scheduling.annotation.Scheduled;
+import org.springframework.stereotype.Service;
 
 @Service
 @RequiredArgsConstructor
@@ -40,9 +43,11 @@ public class SeatOrderHashServiceImpl implements SeatOrderService {
 
     private final RedisTemplate<String, Object> redisTemplateSeat;
     private final RedissonClient redissonClient;
+    private final RedisRunningQueue runningQueue;
+    private final RedisWaitingQueue waitingQueue;
 
     public void saveSeatsToRedis(PrfRedisInfoDto prfRedisInfoDto,
-                                 List<SeatInfoResponseDto> seatList) {
+            List<SeatInfoResponseDto> seatList) {
         String key = String.format(SEATS_KEY, prfRedisInfoDto.getPerformanceId());
         Map<String, SeatInfoResponseDto> seatMap = seatList.stream()
                 .collect(Collectors.toMap(
@@ -128,7 +133,8 @@ public class SeatOrderHashServiceImpl implements SeatOrderService {
     }
 
     private void addSeatToHoldSet(UUID performanceId, UUID seatId) {
-        String key = String.format(HOLD_SEAT_SET_KEY, performanceId.toString(), SecurityUtil.getId());
+        String key = String.format(HOLD_SEAT_SET_KEY, performanceId.toString(),
+                SecurityUtil.getId());
         redisTemplateSeat.opsForSet().add(key, seatId.toString());
     }
 
@@ -145,8 +151,42 @@ public class SeatOrderHashServiceImpl implements SeatOrderService {
         return seat != null ? (SeatInfoResponseDto) seat : null;
     }
 
-    @Override
+    public GetSeatsResponseDto getSeats(UUID performanceId) {
+        Long userId = SecurityUtil.getId();
+        User user = User.of(String.valueOf(userId));
+
+        if (!runningQueue.check(user)) {
+            try {
+                // 실행 큐에 넣기 시도
+                runningQueue.push(user);
+            } catch (OrderException e) {
+                // 실행 큐가 가득 찬 경우 대기열에 등록
+                waitingQueue.register(user);
+                var waitingTicket = waitingQueue.getTicket(user);
+                return GetSeatsResponseDto.waiting(waitingTicket);
+            }
+        }
+
+        String key = String.format(SEATS_KEY, performanceId);
+        String openTimeStr = (String) redisTemplateSeat.opsForHash().get(key, TICKET_OPEN_TIME);
+
+        if (openTimeStr == null || LocalDateTime.now().isBefore(LocalDateTime.parse(openTimeStr))) {
+            throw new SeatException(ExceptionMessage.TICKET_NOT_OPEN);
+        }
+
+        Map<Object, Object> seatMap = redisTemplateSeat.opsForHash().entries(key);
+        seatMap.remove(TICKET_LIMIT);
+        seatMap.remove(TICKET_OPEN_TIME);
+
+        List<SeatInfoResponseDto> seats = seatMap.values().parallelStream()
+                .map(value -> (SeatInfoResponseDto) value)
+                .toList();
+
+        return GetSeatsResponseDto.success(seats);
+    }
+
     public List<SeatInfoResponseDto> getSeatsFromRedis(UUID performanceId) {
+
         String key = String.format(SEATS_KEY, performanceId);
         String openTimeStr = (String) redisTemplateSeat.opsForHash().get(key, TICKET_OPEN_TIME);
 
@@ -162,6 +202,7 @@ public class SeatOrderHashServiceImpl implements SeatOrderService {
                 .map(value -> (SeatInfoResponseDto) value)
                 .toList();
     }
+
 
     @Override
     public void confirm(List<UUID> seatIds, UUID performanceId) {
@@ -205,18 +246,21 @@ public class SeatOrderHashServiceImpl implements SeatOrderService {
         }
     }
 
-    public void releaseExpiredSeats(UUID performanceId, UUID seatId, SeatInfoResponseDto seat, Long userId) {
+    public void releaseExpiredSeats(UUID performanceId, UUID seatId, SeatInfoResponseDto seat,
+            Long userId) {
         updateSeatStatus(performanceId, seatId, seat);
         removeSeatFromHoldSet(performanceId, seatId, userId);
     }
 
     private void updateSeatStatus(UUID performanceId, UUID seatId, SeatInfoResponseDto seat) {
-        redisTemplateSeat.opsForHash().put(String.format(SEATS_KEY, performanceId), seatId.toString(), seat);
+        redisTemplateSeat.opsForHash()
+                .put(String.format(SEATS_KEY, performanceId), seatId.toString(), seat);
     }
 
     private void checkSeatOwner(UUID performanceId, SeatInfoResponseDto seat) {
         if (!seat.getUserId().equals(SecurityUtil.getId())) {
-            throw new SeatException(ExceptionMessage.SEAT_ALREADY_HOLD, getSeatsFromRedis(performanceId));
+            throw new SeatException(ExceptionMessage.SEAT_ALREADY_HOLD,
+                    getSeatsFromRedis(performanceId));
         }
     }
 
@@ -228,7 +272,8 @@ public class SeatOrderHashServiceImpl implements SeatOrderService {
 
 
     private Long getSelectedSeatsCount(UUID performanceId) {
-        String key = String.format(HOLD_SEAT_SET_KEY, performanceId.toString(), SecurityUtil.getId());
+        String key = String.format(HOLD_SEAT_SET_KEY, performanceId.toString(),
+                SecurityUtil.getId());
         return redisTemplateSeat.opsForSet().size(key);
     }
 
@@ -240,5 +285,24 @@ public class SeatOrderHashServiceImpl implements SeatOrderService {
                 ));
     }
 
+    @Scheduled(fixedRate = 100)
+    public void transferWaitingToRunning() {
+        try {
+            while (runningQueue.available()) {
+                User user = waitingQueue.pop();
+                if (user == null) {
+                    break;
+                }
+                try {
+                    runningQueue.push(user);
+                } catch (OrderException e) {
+                    waitingQueue.register(user);
+                    break;
+                }
+            }
+        } catch (Exception e) {
+            log.error("Error in transferWaitingToRunning: ", e);
+        }
+    }
 
 }

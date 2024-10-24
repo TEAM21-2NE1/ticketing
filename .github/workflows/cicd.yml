@@ -30,7 +30,6 @@ jobs:
       PERFORMANCE_PROD_DB_NAME: ${{ secrets.PERFORMANCE_PROD_DB_NAME }}
       PERFORMANCE_REDIS_HOST: ${{ secrets.PERFORMANCE_REDIS_HOST }}
       PERFORMANCE_REDIS_PORT: ${{ secrets.PERFORMANCE_REDIS_PORT }}
-      PERFORMANCE_REDIS_USERNAME: ${{ secrets.PERFORMANCE_REDIS_USERNAME }}
       PERFORMANCE_REDIS_PASSWORD: ${{ secrets.PERFORMANCE_REDIS_PASSWORD }}
       S3_ACCESS_KEY: ${{ secrets.S3_ACCESS_KEY }}
       S3_SECRET_KEY: ${{ secrets.S3_SECRET_KEY }}
@@ -39,12 +38,15 @@ jobs:
       ORDER_PROD_DB_NAME: ${{ secrets.ORDER_PROD_DB_NAME }}
       ORDER_REDIS_HOST: ${{ secrets.ORDER_REDIS_HOST }}
       ORDER_REDIS_PORT: ${{ secrets.ORDER_REDIS_PORT }}
-      ORDER_REDIS_USERNAME: ${{ secrets.ORDER_REDIS_USERNAME }}
       ORDER_REDIS_PASSWORD: ${{ secrets.ORDER_REDIS_PASSWORD }}
       # payment
       PAYMENT_PROD_DB_NAME: ${{ secrets.PAYMENT_PROD_DB_NAME }}
       PORTONE_REST_API_KEY=: ${{ secrets.PORTONE_REST_API_KEY }}
       PORTONE_REST_API_SECRET: ${{ secrets.PORTONE_REST_API_SECRET }}
+      # kafka
+      ZOOKEEPER_PORT: ${{ secrets.ZOOKEEPER_PORT }}
+      KAFKA_PORT: ${{ secrets.KAFKA_PORT }}
+      KAFKA_UI_PORT: ${{ secrets.KAFKA_UI_PORT }}
 
     strategy:
       matrix:
