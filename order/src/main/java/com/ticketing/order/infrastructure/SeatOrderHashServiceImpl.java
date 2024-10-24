@@ -285,6 +285,10 @@ public class SeatOrderHashServiceImpl implements SeatOrderService {
                 ));
     }
 
+    public void deleteOrderSeats(UUID performanceId) {
+        redisTemplateSeat.unlink(String.format(SEATS_KEY, performanceId.toString()));
+    }
+
     @Scheduled(fixedRate = 100)
     public void transferWaitingToRunning() {
         try {
