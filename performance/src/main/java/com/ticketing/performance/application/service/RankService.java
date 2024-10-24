@@ -18,7 +18,7 @@ public class RankService {
     private final RankRepository rankRepository;
 
 
-    @Cacheable(cacheNames = "getRank", key = "'allRankings'")
+    @Cacheable(cacheNames = "getRank", key = "'allRankings'", cacheManager = "rankCacheManager")
     public List<RankingResponseDto> getRank() {
         List<RankingResponseDto> ranks = rankRepository.getRank();
 

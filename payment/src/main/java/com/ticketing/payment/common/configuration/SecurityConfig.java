@@ -36,7 +36,6 @@ public class SecurityConfig {
             SessionCreationPolicy.STATELESS))  // 세션 사용하지 않음
         .authorizeHttpRequests(authorize -> authorize
             .requestMatchers("/api/v1/payments/actuator/**").permitAll()
-            .requestMatchers("/api/v1/payments/view").permitAll()
             .anyRequest().authenticated()  // 그 외 모든 요청은 인증 필요
         )
         .addFilterBefore(jwtAuthenticationFilter,

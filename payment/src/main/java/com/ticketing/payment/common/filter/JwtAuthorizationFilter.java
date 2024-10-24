@@ -24,8 +24,7 @@ public class JwtAuthorizationFilter extends OncePerRequestFilter {
   protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response,
       FilterChain filterChain) throws ServletException, IOException {
 
-    if (request.getRequestURI().startsWith("/api/v1/payments/view") ||
-            request.getRequestURI().startsWith("/api/v1/payments/actuator")) {
+    if (request.getRequestURI().startsWith("/api/v1/payments/actuator")) {
       filterChain.doFilter(request, response);
       return;
     }
