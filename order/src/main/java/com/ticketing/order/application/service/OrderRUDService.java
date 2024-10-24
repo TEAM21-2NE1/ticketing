@@ -32,6 +32,7 @@ public class OrderRUDService {
     public void deleteOrder(UUID orderId) {
         Order order = orderRepository.findById(orderId)
                 .orElseThrow(() -> new OrderException(ExceptionMessage.ORDER_NOT_FOUND));
+
         order.delete(SecurityUtil.getId());
     }
 
@@ -52,14 +53,15 @@ public class OrderRUDService {
     public GetOrderResponseDto getOrder(UUID orderId) {
         Order order = orderRepository.findById(orderId)
                 .orElseThrow(() -> new OrderException(ExceptionMessage.ORDER_NOT_FOUND));
+
         List<UUID> orderSelectedSeats = order.getSelectedSeatIds();
 
         List<SeatDetail> seats = performanceClient.orderSeats(
-                SecurityUtil.getId().toString(),
-                SecurityUtil.getRole(),
-                SecurityUtil.getEmail(),
-                new OrderSeatRequestDto(orderSelectedSeats)
-        ).data().stream()
+                        SecurityUtil.getId().toString(),
+                        SecurityUtil.getRole(),
+                        SecurityUtil.getEmail(),
+                        new OrderSeatRequestDto(orderSelectedSeats)
+                ).data().stream()
                 .map(seat -> new SeatDetail(
                         seat.getSeatId(),
                         seat.getSeatNum(),
@@ -112,5 +114,11 @@ public class OrderRUDService {
                 .stream()
                 .map(GetOrderListResponseDto::from)
                 .toList();
+    }
+
+    private void validateOrderOwner(Order order) {
+        if (!order.getUserId().equals(SecurityUtil.getId().toString())) {
+            throw new OrderException(ExceptionMessage.ORDER_NOT_AUTHORIZED);
+        }
     }
 }

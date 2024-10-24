@@ -7,13 +7,12 @@ import com.ticketing.order.application.dto.client.SeatInfoResponseDto;
 import com.ticketing.order.application.dto.request.OrderSeatInfoDto;
 import com.ticketing.order.application.service.SeatOrderService;
 import java.util.List;
+import java.util.UUID;
+
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 @RestController
 @RequiredArgsConstructor
@@ -31,6 +30,12 @@ public class OrderSeatController {
         List<SeatInfoResponseDto> seatList = requestDto.getSeatList();
         seatOrderService.saveSeatsToRedis(prfRedisInfoDto, seatList);
         return ResponseEntity.ok(success("성공"));
-
     }
+
+    @DeleteMapping("/seats/{performanceId}")
+    public ResponseEntity<?> deleteOrderSeats(@PathVariable UUID performanceId) {
+        seatOrderService.deleteOrderSeats(performanceId);
+        return ResponseEntity.ok(success("좌석 삭제 성공"));
+    }
+
 }

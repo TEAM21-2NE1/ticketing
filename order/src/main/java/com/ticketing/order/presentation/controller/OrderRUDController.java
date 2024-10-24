@@ -75,6 +75,6 @@ public class OrderRUDController {
         orderRUDService.cancelOrder(orderId);
 
         return ResponseEntity.ok(
-                SuccessResponse.success(SuccessMessage.GET_ORDER.getMessage()));
+                SuccessResponse.success(SuccessMessage.CANCEL_ORDER.getMessage()));
     }
 }

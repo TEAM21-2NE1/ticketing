@@ -163,7 +163,8 @@ public class SeatOrderHashServiceImpl implements SeatOrderService {
                 // 실행 큐가 가득 찬 경우 대기열에 등록
                 waitingQueue.register(user);
                 var waitingTicket = waitingQueue.getTicket(user);
-                return GetSeatsResponseDto.waiting(waitingTicket);
+                var totalWaiting = waitingQueue.size();
+                return GetSeatsResponseDto.waiting(waitingTicket, totalWaiting);
             }
         }
 
@@ -283,6 +284,10 @@ public class SeatOrderHashServiceImpl implements SeatOrderService {
                         redisTemplateSeat.opsForHash()
                                 .get(String.format(SEATS_KEY, performanceId), TICKET_LIMIT)
                 ));
+    }
+
+    public void deleteOrderSeats(UUID performanceId) {
+        redisTemplateSeat.unlink(String.format(SEATS_KEY, performanceId.toString()));
     }
 
     @Scheduled(fixedRate = 100)
