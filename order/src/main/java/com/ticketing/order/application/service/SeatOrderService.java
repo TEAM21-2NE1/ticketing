@@ -26,4 +26,6 @@ public interface SeatOrderService {
     void releaseExpiredSeats(UUID performanceId, UUID seatId, SeatInfoResponseDto seat,
             Long userId);
 
+    void deleteOrderSeats(UUID performanceId);
+
 }
