@@ -8,6 +8,6 @@ public interface OrderService  {
 
     void insertSeats(OrderSeatInfoDto orderSeatInfoDto);
 
-    void deleteOrderSeats(UUID performanceId);
+    void deleteOrderSeats(UUID performanceId, String userId, String userRole, String email);
 
 }

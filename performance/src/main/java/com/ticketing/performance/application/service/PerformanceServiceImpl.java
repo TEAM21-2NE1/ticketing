@@ -121,7 +121,10 @@ public class PerformanceServiceImpl implements PerformanceService {
                 PrfDeletedEvent.create(performanceId, SecurityUtil.getId())
         );
 
-        orderService.deleteOrderSeats(performanceId);
+        orderService.deleteOrderSeats(performanceId,
+                SecurityUtil.getId().toString(),
+                SecurityUtil.getRole(),
+                SecurityUtil.getEmail());
 
         performance.delete();
     }
