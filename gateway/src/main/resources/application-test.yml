@@ -1,0 +1,27 @@
+spring:
+  main:
+    web-application-type: reactive
+  application:
+    name: gateway-service
+  cloud:
+    gateway:
+      routes:
+        - id: order-service
+          uri: http://localhost:19095
+          predicates:
+            - Path=/api/v1/orders/**
+      discovery:
+        locator:
+          enabled: true
+
+server:
+  port: 19091
+
+eureka:
+  client:
+    register-with-eureka: false
+    fetch-registry: false
+
+service:
+  jwt:
+    secret-key: dGVzdF9zZWNyZXRfa2V5X2Zvcl9qd3RfdG9rZW5fZ2VuZXJhdGlvbl9pbl90aWNrZXRpbmdfYXBwbGljYXRpb24=
