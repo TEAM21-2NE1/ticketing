@@ -11,7 +11,10 @@ import lombok.Builder;
 public record GetSeatsResponseDto(
         String status,  // "SUCCESS" 또는 "WAITING"
         Long waitingNumber,
-        List<SeatInfoResponseDto> responseDtos
+        List<SeatInfoResponseDto> responseDtos,
+        Long totalWaiting,
+        Long aheadCount,
+        Long behindCount
 ) {
 
     // 좌석 선택 성공
@@ -23,10 +26,13 @@ public record GetSeatsResponseDto(
     }
 
     // 대기 상태 응답
-    public static GetSeatsResponseDto waiting(WaitingTicket waitingTicket) {
+    public static GetSeatsResponseDto waiting(WaitingTicket waitingTicket, Long totalWaiting) {
         return GetSeatsResponseDto.builder()
                 .status("WAITING")
                 .waitingNumber(waitingTicket.getOrder())
+                .totalWaiting(totalWaiting)
+                .aheadCount(waitingTicket.getOrder() - 1)
+                .behindCount(totalWaiting - waitingTicket.getOrder())
                 .build();
     }
 }
