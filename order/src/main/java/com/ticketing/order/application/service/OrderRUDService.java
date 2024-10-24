@@ -1,11 +1,8 @@
 package com.ticketing.order.application.service;
 
 import com.ticketing.order.application.dto.request.OrderSeatRequestDto;
-import com.ticketing.order.application.dto.response.GetOrderPerformancesResponseDto;
-import com.ticketing.order.application.dto.response.GetOrderResponseDto;
+import com.ticketing.order.application.dto.response.*;
 import com.ticketing.order.application.dto.response.GetOrderResponseDto.SeatDetail;
-import com.ticketing.order.application.dto.response.GetOrderStatusResponse;
-import com.ticketing.order.application.dto.response.ViewOrderDto;
 import com.ticketing.order.common.exception.OrderException;
 import com.ticketing.order.common.response.ExceptionMessage;
 import com.ticketing.order.config.SecurityUtil;
@@ -108,5 +105,12 @@ public class OrderRUDService {
         return GetOrderPerformancesResponseDto.builder()
                 .performanceIds(orderPerformanceIds)
                 .build();
+    }
+
+    public List<GetOrderListResponseDto> getOrders() {
+        return orderRepository.findAllByUserId(SecurityUtil.getId().toString())
+                .stream()
+                .map(GetOrderListResponseDto::from)
+                .toList();
     }
 }

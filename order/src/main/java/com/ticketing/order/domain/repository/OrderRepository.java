@@ -19,4 +19,7 @@ public interface OrderRepository extends JpaRepository<Order, UUID> {
     @Query("SELECT o FROM Order o JOIN o.selectedSeatIds s WHERE s IN :selectedSeatIds and o.userId = :userId")
     Order findBySelectedSeatIds(@Param("selectedSeatIds") List<UUID> selectedSeatIds,
             @Param("userId") String userId);
+
+    List<Order> findAllByUserId(String userId);
+
 }
