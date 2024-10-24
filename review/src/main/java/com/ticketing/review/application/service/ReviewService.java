@@ -24,7 +24,6 @@ import java.util.UUID;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.cache.annotation.CacheEvict;
-import org.springframework.cache.annotation.CachePut;
 import org.springframework.cache.annotation.Cacheable;
 import org.springframework.cache.annotation.Caching;
 import org.springframework.data.domain.Page;
@@ -98,9 +97,11 @@ public class ReviewService {
    * @return
    */
   @Transactional(readOnly = false)
-  @CachePut(cacheNames = "reviewCache", key = "#result.reviewId", cacheManager = "reviewCacheManager")
-  @CacheEvict(cacheNames = {
-      "reviewSearchCache"}, allEntries = true, cacheManager = "reviewCacheManager")
+  @Caching(evict = {
+      @CacheEvict(cacheNames = "reviewCache", key = "#reviewId", cacheManager = "reviewCacheManager"),
+      @CacheEvict(cacheNames = {
+          "reviewSearchCache"}, allEntries = true, cacheManager = "reviewCacheManager")
+  })
   public UpdateReviewResponseDto updateReview(UUID reviewId, UpdateReviewRequestDto requestDto) {
     //DB에 reviewId에 대한 정보가 존재하는지 확인
     Review findReview = reviewRepository.findById(reviewId).orElseThrow(
@@ -130,7 +131,7 @@ public class ReviewService {
    */
   @Transactional(readOnly = false)
   @Caching(evict = {
-      @CacheEvict(cacheNames = "reviewCache", key = "args[0]", cacheManager = "reviewCacheManager"),
+      @CacheEvict(cacheNames = "reviewCache", key = "#reviewId", cacheManager = "reviewCacheManager"),
       @CacheEvict(cacheNames = {
           "reviewSearchCache"}, allEntries = true, cacheManager = "reviewCacheManager")
   })
@@ -158,7 +159,7 @@ public class ReviewService {
    * @return
    */
   @Transactional(readOnly = true)
-  @Cacheable(cacheNames = "reviewCache", key = "args[0]", cacheManager = "reviewCacheManager")
+  @Cacheable(cacheNames = "reviewCache", key = "#reviewId", cacheManager = "reviewCacheManager")
   public ReviewResponseDto getReview(UUID reviewId) {
     Review findReview = reviewRepository.findById(reviewId).orElseThrow(
         () -> new ReviewException(ErrorCode.REVIEW_NOT_FOUND)
