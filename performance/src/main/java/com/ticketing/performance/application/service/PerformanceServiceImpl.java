@@ -97,6 +97,8 @@ public class PerformanceServiceImpl implements PerformanceService {
         Performance performance = performanceRepository.findById(performanceId)
                 .orElseThrow(() -> new PerformanceException(ErrorCode.PERFORMANCE_NOT_FOUND));
 
+        hallService.getHall(requestDto.getHallId());
+
         checkRole(performance.getManagerId());
 
         performance.update(requestDto);

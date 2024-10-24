@@ -1,5 +1,6 @@
 package com.ticketing.order.presentation.controller;
 
+import com.ticketing.order.application.dto.response.GetOrderListResponseDto;
 import com.ticketing.order.application.dto.response.GetOrderPerformancesResponseDto;
 import com.ticketing.order.application.dto.response.GetOrderResponseDto;
 import com.ticketing.order.application.dto.response.GetOrderStatusResponse;
@@ -7,6 +8,8 @@ import com.ticketing.order.application.service.OrderRUDService;
 import com.ticketing.order.application.service.OrderStatusService;
 import com.ticketing.order.common.response.SuccessMessage;
 import com.ticketing.order.common.response.SuccessResponse;
+
+import java.util.List;
 import java.util.UUID;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
@@ -26,6 +29,15 @@ public class OrderRUDController {
 
     private final OrderStatusService orderStatusService;
     private final OrderRUDService orderRUDService;
+
+
+    @GetMapping
+    public ResponseEntity<?> getOrders() {
+        List<GetOrderListResponseDto> responseDto = orderRUDService.getOrders();
+        return ResponseEntity.ok(
+                SuccessResponse.success(200, SuccessMessage.GET_ORDER.getMessage(), responseDto));
+    }
+
 
     @GetMapping("/{orderId}")
     public ResponseEntity<?> getOrder(@PathVariable("orderId") UUID orderId) {
@@ -62,5 +74,13 @@ public class OrderRUDController {
 
         return ResponseEntity.ok(
                 SuccessResponse.success(200, SuccessMessage.GET_ORDER.getMessage(), responseDto));
+    }
+
+    @GetMapping("/cancel/{orderId}")
+    public ResponseEntity<?> cancelOrder(@PathVariable UUID orderId) {
+        orderRUDService.cancelOrder(orderId);
+
+        return ResponseEntity.ok(
+                SuccessResponse.success(SuccessMessage.GET_ORDER.getMessage()));
     }
 }
