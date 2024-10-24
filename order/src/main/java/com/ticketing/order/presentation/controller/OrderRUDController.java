@@ -13,13 +13,7 @@ import java.util.List;
 import java.util.UUID;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.DeleteMapping;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.PutMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 
 @RestController
@@ -53,8 +47,8 @@ public class OrderRUDController {
     }
 
     @PutMapping("/{orderId}")
-    public ResponseEntity<?> changeOrderBySuccess(@PathVariable("orderId") UUID orderId) {
-        orderStatusService.changeOrderBySuccess(orderId);
+    public ResponseEntity<?> changeOrderBySuccess(@PathVariable("orderId") UUID orderId, @RequestBody UUID paymentId) {
+        orderStatusService.changeOrderBySuccess(orderId, paymentId);
         return ResponseEntity.ok("성공");
     }
 

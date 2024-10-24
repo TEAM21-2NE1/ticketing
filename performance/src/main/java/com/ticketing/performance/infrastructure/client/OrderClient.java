@@ -8,7 +8,6 @@ import org.springframework.web.bind.annotation.RequestBody;
 @FeignClient(name = "order-service")
 public interface OrderClient extends OrderService {
 
-    // 임시로 만든 path
     @PostMapping(value = "/api/v1/orders/seats", consumes = "application/json")
     void insertSeats(@RequestBody OrderSeatInfoDto orderSeatInfoDto);
 }

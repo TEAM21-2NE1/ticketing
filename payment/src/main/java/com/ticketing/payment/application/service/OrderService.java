@@ -11,5 +11,5 @@ public interface OrderService {
 
     void deleteOrder(String userId, String role, String email, UUID orderId);
 
-    void changeOrderBySuccess(String userId, String role, String email, UUID orderId);
+    void changeOrderBySuccess(String userId, String role, String email, UUID orderId, UUID paymentId);
 }

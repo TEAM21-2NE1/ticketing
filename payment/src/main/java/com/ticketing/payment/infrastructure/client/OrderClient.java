@@ -32,5 +32,6 @@ public interface OrderClient extends OrderService {
             @RequestHeader("X-User-Id") String userId,
             @RequestHeader("X-User-Role") String userRole,
             @RequestHeader("X-User-Email") String email,
-            @PathVariable("orderId") UUID orderId);
+            @PathVariable("orderId") UUID orderId,
+            @RequestBody UUID paymentId);
 }
