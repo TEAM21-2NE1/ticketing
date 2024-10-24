@@ -54,7 +54,9 @@
                             })
                         }).done(function (response) {
                             console.log(response);
-                            alert('결제가 완료되었습니다!');
+                            alert('결제가 완료되었습니다! 메시지: ' + response.message +
+                                '\n결제 ID: ' + response.data.paymentId +
+                                '\n결제 UID: ' + response.data.paymentUid);
                         }).fail(function (error) {
                             alert('결제 처리 중 문제가 발생했습니다.');
                             console.error(error);
