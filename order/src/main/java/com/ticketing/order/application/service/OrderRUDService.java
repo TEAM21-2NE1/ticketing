@@ -40,12 +40,12 @@ public class OrderRUDService {
         Order order = orderRepository.findById(orderId)
                 .orElseThrow(() -> new OrderException(ExceptionMessage.ORDER_NOT_FOUND));
 
-        seatOrderService.cancel(order.getSelectedSeatIds(), order.getPerformanceId());
         paymentClient.cancelPayment(SecurityUtil.getId().toString(),
                 SecurityUtil.getRole(),
                 SecurityUtil.getEmail(),
                 order.getPaymentId());
         order.cancel();
+        seatOrderService.cancel(order.getSelectedSeatIds(), order.getPerformanceId());
     }
 
 

@@ -1,12 +1,14 @@
 package com.ticketing.order.application.dto.client;
 
+import com.fasterxml.jackson.annotation.JsonInclude;
 import com.ticketing.order.config.SecurityUtil;
-import java.io.Serializable;
-import java.util.UUID;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
+
+import java.io.Serializable;
+import java.util.UUID;
 
 @Getter
 @AllArgsConstructor
@@ -22,6 +24,7 @@ public class SeatInfoResponseDto implements Serializable {
     private Integer seatNum;
     private Integer price;
     private SeatStatus seatStatus;
+    @JsonInclude(JsonInclude.Include.NON_NULL)
     private Long userId;
 
     public void confirm(UUID orderId) {
